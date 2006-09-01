@@ -1,0 +1,19 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+examples/getUsageQuotaThisMonth.pl
+lib/Google/Adwords.pm
+lib/Google/Adwords/Campaign.pm
+lib/Google/Adwords/InfoService.pm
+lib/Google/Adwords/CampaignService.pm
+lib/Google/Adwords/Service.pm
+lib/Google/Adwords/Data.pm
+t/run.t
+t/sandbox.t
+t/lib/Campaign.pm
+t/lib/Data.pm
+t/lib/Service.pm
+t/lib/CampaignService.pm
+t/lib/InfoService.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,6 @@
+Revision history for Perl module Google::Adwords
+
+0.0.1   Fri Sep  1 23:00:15 IST 2006
+    - supports all calls of InfoService
+    - supports addCampaign call of CampaignService
+
