@@ -1,7 +1,7 @@
 package Google::Adwords;
 use strict; use warnings;
 
-use version; our $VERSION = qv('0.0.1');
+use version; our $VERSION = qv('0.1');
 
 1;
 
@@ -14,7 +14,7 @@ Google::Adwords - an interface which abstracts the Google Adwords SOAP API
  
 =head1 VERSION
  
-This documentation refers to Google::Adwords version 0.0.1
+This documentation refers to Google::Adwords version 0.1
  
  
 =head1 SYNOPSIS
@@ -22,23 +22,28 @@ This documentation refers to Google::Adwords version 0.0.1
     use Google::Adwords::CampaignService;
     use Google::Adwords::Campaign;
 
-    my $ginfo = Google::Adwords::CampaignService->new();
+    my $service = Google::Adwords::CampaignService->new();
 
-    $ginfo->email('email@domain.com')
-          ->password('password')
-          ->token('developer_token');
+    $service->email('email@domain.com')
+            ->password('password')
+            ->token('developer_token');
+
+    # if you use a MCC
+    #$service->clientEmail('clientemail@domain.com');
+
+    # if you want SOAP trace output
+    #$service->debug(1);
 
     # create a campaign object
     my $campaign = Google::Adwords::Campaign->new();
 
+    # fill in your campaign details
     $campaign->name('my campaign #1')
              ->dailyBudget(100000)
              ->status('Paused');
 
     # add the campaign
-    my $campaign_response = $ginfo->addCampaign({
-        campaign => $campaign,
-    });
+    my $campaign_response = $service->addCampaign($campaign);
 
     # ID of new campaign
     my $campaign_id = $campaign_response->id;
@@ -50,18 +55,24 @@ This collection of modules under Google::Adwords provides an easy
 to use object oriented interface to the Google Adwords SOAP API. 
 You don't need to understand SOAP or web services to use this module.
 
+* Base Service Class - L<Google::Adwords::Service>
+
+Read the manual page for this module in order to see how to setup your
+authentication details and other options available
+
 Each API Service belongs to a particular module.
 
-* CampaignService   - Google::Adwords::CampaignService
+* CampaignService   - L<Google::Adwords::CampaignService>
 
-* InfoService       - Google::Adwords::InfoService
+* InfoService       - L<Google::Adwords::InfoService>
  
 
 Some services like the CampaignService need to deal with complex data 
 types which are available as objects.
 
-* Campaign          - Google::Adwords::Campaign
+* Campaign          - L<Google::Adwords::Campaign>
 
+* StatsRecord       - L<Google::Adwords::StatsRecord>   
 
 Please read the documentation for the above modules.
  
@@ -76,10 +87,11 @@ Please read the documentation for the above modules.
 * betonmarkets.com - For the initial requirement and funding
 
 
-=head1 AUTHOR
+=head1 AUTHORS
  
 Rohan Almeida <rohan@almeida.in>
 
+Mathieu Jondet <mathieu@eulerian.com>
  
  
 =head1 LICENCE AND COPYRIGHT

@@ -101,7 +101,7 @@ sub get_method_cost : Test(1)
         my $got = $self->{'obj'}->getMethodCost({
             service => 'InfoService',
             method => 'getFreeUsageQuotaThisMonth',
-            date => '2006-08-02T00:00:00',
+            date => '2006-08-02',
         });
         is ($got, $expected, 'getMethodCost');
     }
@@ -148,8 +148,8 @@ sub get_operation_count : Test(1)
     if ($self->{'sandbox'}) {
         my $expected = '0';
         my $got = $self->{'obj'}->getOperationCount({
-            startDate => '2006-08-02T00:00:00',
-            endDate => '2006-08-12T00:00:00',
+            startDate => '2006-08-02',
+            endDate => '2006-08-12',
         });
         is ($got, $expected, 'getOperationCount');
     }
@@ -195,8 +195,8 @@ sub get_unit_count : Test(1)
     if ($self->{'sandbox'}) {
         my $expected = '0';
         my $got = $self->{'obj'}->getUnitCount({
-            startDate => '2006-08-02T00:00:00',
-            endDate => '2006-08-12T00:00:00',
+            startDate => '2006-08-02',
+            endDate => '2006-08-12',
         });
         is ($got, $expected, 'getUnitCount');
     }

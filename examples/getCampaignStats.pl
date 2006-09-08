@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use strict; use warnings;
 
-use Google::Adwords::InfoService;
+use Google::Adwords::CampaignService;
 
 # your adwords login email
 my $email = '';
@@ -15,7 +15,7 @@ my $token = '';
 # your client email if you use a MCC
 my $client_email = '';
 
-my $service = Google::Adwords::InfoService->new();
+my $service = Google::Adwords::CampaignService->new();
 
 $service->email($email)
         ->password($password)
@@ -23,7 +23,7 @@ $service->email($email)
 ;
 
 # debug
-$service->debug(1);
+#$service->debug(1);
 
 # client email
 if ((defined $client_email) && ($client_email ne '')) {
@@ -31,6 +31,16 @@ if ((defined $client_email) && ($client_email ne '')) {
 }
 
 
-my $quota = $service->getUsageQuotaThisMonth;
-print "usage quota this month is $quota\n";
+my @stats = $service->getCampaignStats({
+    campaignids => [ $campaign_id_1, $campaign_id_2 ],
+    startDay => '2006-08-01',
+    endDay => '2006-08-31',
+    inPST => 1,
+});
+
+for (@stats) {
+    print "ID: " . $_->id . "\n";
+    print "Clicks: " . $_->clicks . "\n";
+    print "Conversions: " . $_->conversions . "\n";
+}
 

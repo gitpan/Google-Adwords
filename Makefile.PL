@@ -6,16 +6,15 @@ WriteMakefile(
     NAME              => 'Google::Adwords',
     VERSION_FROM      => 'lib/Google/Adwords.pm', # finds $VERSION
     PREREQ_PM         => {
-        'SOAP::Lite'    => 0,
-        'version'       => 0,
-        'Readonly'      => 0,
-        'Class::Accessor::Chained'  => 0,
-        'Date::Manip'   => 0,
-        'Test::Class'   => 0,
-        'Test::More'    => 0,
-        'IO::Prompt'    => 0,
-    }, # e.g., Module::Name => 1.1
-    ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
-      (ABSTRACT_FROM  => 'lib/Google/Adwords.pm', # retrieve abstract from module
-       AUTHOR         => 'Rohan Almeida <rohan.almeida@gmail.com>') : ()),
+        'SOAP::Lite'    => '0.65',
+        'version'       => '0.50',
+        'Readonly'      => '1.03',
+        'Class::Accessor::Chained'  => '0.01',
+        'Date::Manip'   => '5.42',
+        'Test::Class'   => '0.11',
+        'Test::More'    => '0.62',
+        'IO::Prompt'    => '0.099004',
+    }, 
+    ABSTRACT_FROM  => 'lib/Google/Adwords.pm', 
+    AUTHOR         => 'Rohan Almeida <rohan@almeida.in>'
 );

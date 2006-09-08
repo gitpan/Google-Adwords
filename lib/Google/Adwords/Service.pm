@@ -1,23 +1,30 @@
 package Google::Adwords::Service;
 use strict; use warnings;
 
-use version; our $VERSION = qv('0.0.1');
+use version; our $VERSION = qv('0.1');
 
 use base qw/ Class::Accessor::Chained Google::Adwords /;
-use SOAP::Lite; # +trace => 'debug';
-use Data::Dumper;
+use SOAP::Lite;
 use Readonly;
 
-Readonly my $user_agent => 'SOAP::Lite';
-Readonly my $endpoint => 'https://adwords.google.com/api/adwords/v4';
-Readonly my $endpoint_sandbox => 'https://sandbox.google.com/api/adwords/v4';
-Readonly my $soap_timeout => 10;
+# data types
+use Google::Adwords::Campaign;
+use Google::Adwords::StatsRecord;
+
+Readonly my $user_agent => "Google::Adwords v0.1";
+Readonly my $endpoint => 'https://adwords.google.com/api/adwords/v5';
+Readonly my $endpoint_sandbox => 'https://sandbox.google.com/api/adwords/v5';
+Readonly my $soap_timeout => 20;
 
 __PACKAGE__->mk_accessors(qw/
     email
     password
     token
+    useragent
     use_sandbox
+    clientEmail
+    timeout
+    debug
 /);
 
 ### CLASS METHOD ##################################################
@@ -37,6 +44,15 @@ sub new
 
     # don't use sandbox by default
     $self->{'use_sandbox'} = 0;
+
+    # no debug by default
+    $self->{'debug'} = 0;
+
+    # set default timeout
+    $self->{'timeout'} = $soap_timeout;
+
+    # default useragent
+    $self->{'useragent'} = $user_agent;
 
     bless $self, $class;
     return $self;
@@ -59,10 +75,15 @@ sub _get_soap_headers
     my @headers = (
         SOAP::Header->name("email")->value($self->email),
         SOAP::Header->name("password")->value($self->password),
-        SOAP::Header->name("useragent")->value($user_agent),
+        SOAP::Header->name("useragent")->value($self->useragent),
         SOAP::Header->name("token")->value($self->token),
-        SOAP::Header->name("clientEmail")->value('client_2+' . $self->email),
     );
+
+    # check for clientEmail header
+    if (defined $self->clientEmail) {
+        push @headers, 
+            SOAP::Header->name("clientEmail")->value($self->clientEmail);
+    }
 
     return @headers;
 }
@@ -107,7 +128,11 @@ sub _create_soap_service
     my ($self, $args_ref) = @_;
 
     my $endpoint = $self->_endpoint . '/' . $args_ref->{'service'};
-    my $service = SOAP::Lite->proxy($endpoint, timeout => $soap_timeout);
+    my $service = SOAP::Lite->proxy($endpoint, timeout => $self->timeout);
+
+    if ($self->debug) {
+        SOAP::Lite->import(+trace => 'debug');
+    }
 
     return $service; 
 }
@@ -146,12 +171,13 @@ sub _call
     };
     if ($@) {
         # TODO: return an error object
-        die "SOAP timeout";
+        die "Error: $@\n";
     }
     
     # check for SOAP faults
     if ($result->fault) {
-        die "Fault Code: " . $result->faultcode;
+        die "Fault Code: " . $result->faultcode . "\n" 
+            . "Fault Description: " . $result->faultstring . "\n";
     }
     
     return $result; 
@@ -220,7 +246,7 @@ Google::Adwords::Service - Base class for the Service modules
  
 =head1 VERSION
  
-This documentation refers to Google::Adwords::Service version 0.0.1
+This documentation refers to Google::Adwords::Service version 0.1
  
  
 =head1 DESCRIPTION
@@ -246,7 +272,7 @@ Creates a new Google::Adwords::Service object
 
 =over 4
 
-my $ginfo = Google::Adwords::Service->new();
+    my $service = Google::Adwords::CampaignService->new();
 
 =back
 
@@ -293,6 +319,24 @@ value should be set before calling any other API methods
 
 =back
 
+=head2 B<clientEmail()>
+
+=over 4
+
+Use this if you have a MCC (My Client Center) account. Set/Get the actual
+client email which will be used for the API calls.
+
+=back
+
+=head2 B<useragent()>
+
+=over 4
+
+Set this to an arbitrary string that identifies the customer sending the
+request. Default value is "Google::Adwords $VERSION"
+
+=back
+
 =head2 B<use_sandbox()>
 
 =over 4
@@ -302,16 +346,37 @@ sandbox for all API calls.
 
 =back
 
+=head2 B<timeout()>
+
+=over 4
+
+Set the SOAP timeout value in seconds. Default value is 20.
+
+=back
+
+=head2 B<debug()>
+
+=over 4
+
+Use $obj->debug(1) if you want to see the request/response XML
+
+=back
+
  
 =head1 DEPENDENCIES
  
-* SOAP::Lite
+=over 4
+
+=item * SOAP::Lite
+
+=item * Class::Accessor::Chained
+
+=back
 
  
 =head1 AUTHOR
  
 Rohan Almeida <rohan@almeida.in>
-
  
  
 =head1 LICENCE AND COPYRIGHT

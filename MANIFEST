@@ -3,12 +3,15 @@ Makefile.PL
 MANIFEST
 README
 examples/getUsageQuotaThisMonth.pl
+examples/getAllAdWordsCampaigns.pl
+examples/getCampaignStats.pl
 lib/Google/Adwords.pm
 lib/Google/Adwords/Campaign.pm
 lib/Google/Adwords/InfoService.pm
 lib/Google/Adwords/CampaignService.pm
 lib/Google/Adwords/Service.pm
 lib/Google/Adwords/Data.pm
+lib/Google/Adwords/StatsRecord.pm
 t/run.t
 t/sandbox.t
 t/lib/Campaign.pm

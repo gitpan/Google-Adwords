@@ -60,10 +60,11 @@ This documentation refers to Google::Adwords::Campaign version 0.0.1
                      ->password($password)
                      ->token($developer_token);
 
+    # if you use a MCC
+    $campaign_service->clientEmail($client_email);
+
     # now create the campaign
-    my $campaign_response = $campaign_service->addCampaign({
-        campaign => $campaign,
-    });
+    my $campaign_response = $campaign_service->addCampaign($campaign);
 
     print "New campaign ID is :" . $campaign_response->id;
  
@@ -245,6 +246,14 @@ More info is here:
 
 http://www.google.com/apis/adwords/developer/NetworkTarget.html
 
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Google::Adwords::CampaignService>
 
 =back
 

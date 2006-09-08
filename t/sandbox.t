@@ -18,10 +18,24 @@ if ($answer ne 'y') {
     exit;
 }
 
+my $email = prompt "Your gmail address: ";
+my $password = prompt "Your password: ";
+my $currency = prompt "Your currence code (3 digit): ";
+$email = $email->{value};
+$password = $password->{value};
+$currency = $currency->{value};
 
-$i = InfoService->new({sandbox => 1});
+my $params_ref = {
+    sandbox => 1,
+    email => $email,
+    password => $password,
+    token => $email. '++' . $currency,
+};
+
+
+$i = InfoService->new($params_ref);
 $i->runtests();
 
-$i = CampaignService->new({sandbox => 1});
+$i = CampaignService->new($params_ref);
 $i->runtests();
 

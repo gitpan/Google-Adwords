@@ -13,8 +13,10 @@ sub new
     my ($args_ref) = @_;
 
     my $self;
+
     if (exists $args_ref->{'sandbox'}) {
-        return $class->SUPER::new(sandbox => 1);
+        my @params = %{$args_ref};
+        return $class->SUPER::new(@params);
     }
     else {
         return $class->SUPER::new(sandbox => 0);
@@ -31,7 +33,7 @@ sub startup : Test(startup => 2)
         or $self->FAIL_ALL('cannot create object');
 }
 
-sub accessors : Test(4)
+sub accessors : Test(6)
 {
     my $self = shift;
 
@@ -40,16 +42,25 @@ sub accessors : Test(4)
     my $password = 'password';
     my $token = $email . '++INR';
 
+    if ($self->{'sandbox'}) {
+        $email = $self->{'email'};
+        $password = $self->{'password'};
+        $token = $self->{'token'};
+    }   
+
     $self->{'obj'}->email($email)
         ->password($password)
         ->token($token)
         ->use_sandbox(1)
+        ->clientEmail('client_1' . '+' . $email)
     ;
 
     ok ($self->{'obj'}->email eq $email, 'email');
     ok ($self->{'obj'}->password eq $password, 'password');
     ok ($self->{'obj'}->token eq $token, 'token');
     ok ($self->{'obj'}->use_sandbox == 1, 'use_sandbox');
+    ok ($self->{'obj'}->clientEmail eq 'client_1' . '+' . $email, 'clientEmail');
+    ok ($self->{'obj'}->debug == 0, 'debug');
 }
 
 1;

@@ -1,7 +1,7 @@
 package Google::Adwords::InfoService;
 use strict; use warnings;
 
-use version; our $VERSION = qv('0.0.1');
+use version; our $VERSION = qv('0.0.2');
 
 use base 'Google::Adwords::Service';
 use Data::Dumper;
@@ -198,7 +198,7 @@ API calls
  
 =head1 VERSION
  
-This documentation refers to Google::Adwords::InfoService version 0.0.1
+This documentation refers to Google::Adwords::InfoService version 0.0.2
  
  
 =head1 SYNOPSIS
@@ -210,6 +210,9 @@ This documentation refers to Google::Adwords::InfoService version 0.0.1
     $ginfo->email('email@domain.com')
           ->password('password')
           ->token('developer_token');
+
+    # If you use a MCC
+    $ginfo->clientEmail('clientemail@domain.com');
 
     my $quota = $ginfo->getFreeUsageQuotaThisMonth;
     print "Free quota this month is $quota\n"; 
@@ -233,7 +236,7 @@ developer token being used to make this call.
 
 =over 4
 
-my $quota = $ginfo->getUsageQuotaThisMonth();
+    my $quota = $ginfo->getUsageQuotaThisMonth();
 
 =back
 
@@ -271,7 +274,7 @@ getUsageQuotaThisMonth.
 
 =over 4
 
-my $quota = $ginfo->getFreeUsageQuotaThisMonth();
+    my $quota = $ginfo->getFreeUsageQuotaThisMonth();
 
 =back
 
@@ -327,7 +330,7 @@ A hashref with keys:
 "scheduleReportJob".
 
 * date   - The date for which to retrieve the cost of the method. An error 
-occurs if this date is in the future.
+occurs if this date is in the future. Format is YYYY-MM-DD
 
 
 =back
@@ -372,9 +375,9 @@ date.
 
 A hashref with keys:
 
-* startDate  - the beginning of the date range, inclusive
+* startDate  - the beginning of the date range, inclusive. YYYY-MM-DD format.
 
-* ebdDate    - the end of the date range, inclusive
+* ebdDate    - the end of the date range, inclusive. YYYY-MM-DD format.
 
 
 =back
@@ -418,9 +421,9 @@ the unit count for a single day, supply it as both the start and end date.
 
 A hashref, with keys:
 
-* startDate  - the beginning of the date range, inclusive
+* startDate  - the beginning of the date range, inclusive. YYYY-MM-DD format.
 
-* endDate    - the end of the date range, inclusive
+* endDate    - the end of the date range, inclusive. YYYY-MM-DD format.
 
 =back
 
@@ -450,12 +453,12 @@ the start and end date.
 
 =over 4
 
-my $count = $ginfo->getUnitCountForMethod({
-    service => $service_name,
-    method => $method_name,
-    startDate => $date,
-    endDate => $date,
-});
+    my $count = $ginfo->getUnitCountForMethod({
+        service => $service_name,
+        method => $method_name,
+        startDate => $date,
+        endDate => $date,
+    });
 
 =back
 
@@ -471,9 +474,9 @@ A hashref, with keys:
 * method - The method whose quota cost is being queried, for example
 "scheduleReportJob".
 
-* startDate  - the beginning of the date range, inclusive
+* startDate  - the beginning of the date range, inclusive. YYYY-MM-DD format.
 
-* endDate    - the end of the date range, inclusive
+* endDate    - the end of the date range, inclusive. YYYY-MM-DD format.
 
 
 =back
