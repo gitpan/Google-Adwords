@@ -6,6 +6,7 @@ use Service;
 use InfoService;
 use Campaign;
 use CampaignService;
+use AdGroupService;
 
 Test::Class->runtests();
 

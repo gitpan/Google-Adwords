@@ -4,7 +4,6 @@ use strict; use warnings;
 use version; our $VERSION = qv('0.0.1');
 
 use base 'Google::Adwords::Data';
-use Data::Dumper;
 
 my @fields = qw/
     dailyBudget

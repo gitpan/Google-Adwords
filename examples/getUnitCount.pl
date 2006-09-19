@@ -1,7 +1,8 @@
 #!/usr/bin/perl
 use strict; use warnings;
 
-use Google::Adwords::CampaignService;
+use Google::Adwords::InfoService;
+
 
 # your adwords login email
 my $email = '';
@@ -15,7 +16,7 @@ my $token = '';
 # your client email if you use a MCC
 my $client_email = '';
 
-my $service = Google::Adwords::CampaignService->new();
+my $service = Google::Adwords::InfoService->new();
 
 $service->email($email)
         ->password($password)
@@ -30,10 +31,11 @@ if ((defined $client_email) && ($client_email ne '')) {
     $service->clientEmail($client_email);
 }
 
-my @campaigns = $service->getAllAdWordsCampaigns;
-print "number of campaigns: " . scalar @campaigns . "\n";
 
-for (@campaigns) {
-    print "ID: " . $_->id . "\n";
-}
+my $count = $service->getUnitCount({
+    startDate => '2006-09-01',
+    endDate => '2006-09-15',
+});
+;
+print "unit count is $count\n";
 

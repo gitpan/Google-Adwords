@@ -23,13 +23,15 @@ $service->email($email)
 ;
 
 # debug
-#$service->debug(1);
+$service->debug(1);
 
 # client email
 if ((defined $client_email) && ($client_email ne '')) {
     $service->clientEmail($client_email);
 }
 
+my $campaign_id_1;
+my $campaign_id_2;
 
 my @stats = $service->getCampaignStats({
     campaignids => [ $campaign_id_1, $campaign_id_2 ],
@@ -39,8 +41,8 @@ my @stats = $service->getCampaignStats({
 });
 
 for (@stats) {
-    print "ID: " . $_->id . "\n";
-    print "Clicks: " . $_->clicks . "\n";
-    print "Conversions: " . $_->conversions . "\n";
+    print "Campaign ID: " . $_->id . "\n";
+    print "\tClicks: " . $_->clicks . "\n";
+    print "\tConversions: " . $_->conversions . "\n";
 }
 

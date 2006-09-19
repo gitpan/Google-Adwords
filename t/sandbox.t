@@ -7,6 +7,7 @@ use IO::Prompt;
 use lib 't/lib';
 use InfoService;
 use CampaignService;
+use AdGroupService;
 
 my $i;
 
@@ -37,5 +38,8 @@ $i = InfoService->new($params_ref);
 $i->runtests();
 
 $i = CampaignService->new($params_ref);
+$i->runtests();
+
+$i = AdGroupService->new($params_ref);
 $i->runtests();
 

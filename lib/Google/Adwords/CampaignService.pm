@@ -1,7 +1,7 @@
 package Google::Adwords::CampaignService;
 use strict; use warnings;
 
-use version; our $VERSION = qv('0.1');
+use version; our $VERSION = qv('0.1.1');
 
 use base 'Google::Adwords::Service';
 use Date::Manip;
@@ -317,22 +317,22 @@ sub getCampaign
 
 ### INSTANCE METHOD ################################################
 # Usage      : 
-#   my @campaigns = $obj->getCampaignList([234, 778, 189]);
+#   my @campaigns = $obj->getCampaignList(@campaign_ids);
 # Purpose    : Get details on a specific list of campaigns
 # Returns    : A list of campaign objects
-# Parameters : An array ref of campaign ids to be fetched 
+# Parameters : An list of campaign ids to be fetched 
 # Throws     : no exceptions
 # Comments   : none
 # See Also   : n/a
 #######################################################################
 sub getCampaignList
 {
-    my ($self, $ra_id) = @_;
+    my ($self, @campaign_ids) = @_;
     
     my @params;
     push @params,
      SOAP::Data->name(
-      'ids' => @{ $ra_id } )->type('');
+      'ids' => @campaign_ids )->type('');
 
     my $result	= $self->_create_service_and_call({
      service	=> 'CampaignService',
@@ -715,7 +715,7 @@ CampaignService API calls
  
 =head1 VERSION
  
-This documentation refers to Google::Adwords::CampaignService version 0.1
+This documentation refers to Google::Adwords::CampaignService version 0.1.1
  
  
 =head1 SYNOPSIS
@@ -907,13 +907,13 @@ Return all information about a list of Campaigns.
 
 =over 4
 
-    my @campaigns = $obj->getCampaignList([ $id1, $id2 ]);
+    my @campaigns = $obj->getCampaignList(@campaign_ids);
 
 =back
 
 =head3 Parameters
 
-An array ref of campaign ids you require information about
+A list of campaign ids you require information about
 
 =head3 Returns
  

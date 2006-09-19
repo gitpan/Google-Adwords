@@ -1,7 +1,7 @@
 package Google::Adwords;
 use strict; use warnings;
 
-use version; our $VERSION = qv('0.1');
+use version; our $VERSION = qv('0.2');
 
 1;
 
@@ -14,7 +14,7 @@ Google::Adwords - an interface which abstracts the Google Adwords SOAP API
  
 =head1 VERSION
  
-This documentation refers to Google::Adwords version 0.1
+This documentation refers to Google::Adwords version 0.2
  
  
 =head1 SYNOPSIS
@@ -22,8 +22,10 @@ This documentation refers to Google::Adwords version 0.1
     use Google::Adwords::CampaignService;
     use Google::Adwords::Campaign;
 
+    # create the service
     my $service = Google::Adwords::CampaignService->new();
 
+    # login details
     $service->email('email@domain.com')
             ->password('password')
             ->token('developer_token');
@@ -48,6 +50,12 @@ This documentation refers to Google::Adwords version 0.1
     # ID of new campaign
     my $campaign_id = $campaign_response->id;
     
+    # time taken for the API call 
+    my $response_time = $service->responseTime;
+
+    # quota units consumed
+    my $units_consumed = $service->units;
+
   
 =head1 DESCRIPTION
  
@@ -66,6 +74,7 @@ Each API Service belongs to a particular module.
 
 * InfoService       - L<Google::Adwords::InfoService>
  
+* AdGroupService    - L<Google::Adwords::AdGroupService>
 
 Some services like the CampaignService need to deal with complex data 
 types which are available as objects.
@@ -73,6 +82,8 @@ types which are available as objects.
 * Campaign          - L<Google::Adwords::Campaign>
 
 * StatsRecord       - L<Google::Adwords::StatsRecord>   
+
+* AdGroup           - L<Google::Adwords::AdGroup>   
 
 Please read the documentation for the above modules.
  

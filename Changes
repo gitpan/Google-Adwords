@@ -1,6 +1,14 @@
 Revision history for Perl module Google::Adwords
 
-0.1     Fri Sep  8 17:29:56 IST 2006
+v0.2     Tue Sep 19 16:08:43 IST 2006
+    - supports all calls of AdGroupService
+    - added module Google::Adwords::AdGroup
+    - added accessors - responseTime, requestId, operations and units to the
+      base Service module. These give access to the information contained in
+      the SOAP response header.
+    - some more example scripts
+
+v0.1     Fri Sep  8 17:29:56 IST 2006
     - supports all calls of CampaignService
     - uses v5 of the Adwords API
     - added clientEmail, timeout, debug and useragent methods to the Service
@@ -8,7 +16,7 @@ Revision history for Perl module Google::Adwords
     - added module Google::Adwords::StatsRecord
     - version dependencies are in Makefile.PL
 
-0.0.1   Fri Sep  1 23:00:15 IST 2006
+v0.0.1   Fri Sep  1 23:00:15 IST 2006
     - supports all calls of InfoService
     - supports addCampaign call of CampaignService
 

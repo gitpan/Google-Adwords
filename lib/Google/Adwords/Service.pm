@@ -1,7 +1,7 @@
 package Google::Adwords::Service;
 use strict; use warnings;
 
-use version; our $VERSION = qv('0.1');
+use version; our $VERSION = qv('0.2');
 
 use base qw/ Class::Accessor::Chained Google::Adwords /;
 use SOAP::Lite;
@@ -10,8 +10,9 @@ use Readonly;
 # data types
 use Google::Adwords::Campaign;
 use Google::Adwords::StatsRecord;
+use Google::Adwords::AdGroup;
 
-Readonly my $user_agent => "Google::Adwords v0.1";
+Readonly my $user_agent => "Google::Adwords v0.2";
 Readonly my $endpoint => 'https://adwords.google.com/api/adwords/v5';
 Readonly my $endpoint_sandbox => 'https://sandbox.google.com/api/adwords/v5';
 Readonly my $soap_timeout => 20;
@@ -25,6 +26,10 @@ __PACKAGE__->mk_accessors(qw/
     clientEmail
     timeout
     debug
+    requestId
+    operations
+    units
+    responseTime
 /);
 
 ### CLASS METHOD ##################################################
@@ -162,6 +167,12 @@ sub _call
     # create the method
     my $method = SOAP::Data->name($args_ref->{'method'});
         
+    # Blank out the earlier response header values
+    $self->requestId('');
+    $self->responseTime('');
+    $self->operations('');
+    $self->units('');
+
     # call the SOAP service
     my $result;
     eval {
@@ -179,6 +190,12 @@ sub _call
         die "Fault Code: " . $result->faultcode . "\n" 
             . "Fault Description: " . $result->faultstring . "\n";
     }
+
+    # get the SOAP response headers
+    for (qw/requestId responseTime operations units/) {
+        $self->$_($result->headerof("//$_")->value);
+    }
+
     
     return $result; 
 }
@@ -246,7 +263,7 @@ Google::Adwords::Service - Base class for the Service modules
  
 =head1 VERSION
  
-This documentation refers to Google::Adwords::Service version 0.1
+This documentation refers to Google::Adwords::Service version 0.2
  
  
 =head1 DESCRIPTION
@@ -359,6 +376,43 @@ Set the SOAP timeout value in seconds. Default value is 20.
 =over 4
 
 Use $obj->debug(1) if you want to see the request/response XML
+
+=back
+
+
+The following accessors are available after an API call is done. These give
+information about the response.
+
+=head2 B<requestId()>
+
+=over 4
+
+Get the unique ID that identifies this request.
+
+=back
+
+=head2 B<operations()>
+
+=over 4
+
+number of operations in the request
+
+=back
+
+=head2 B<units()>
+
+=over 4
+
+number of quota units the request used
+
+=back
+
+=head2 B<responseTime()>
+
+=over 4
+
+elapsed time between the web service receiving the request and sending the
+response
 
 =back
 
