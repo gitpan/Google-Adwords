@@ -10,7 +10,10 @@ my $email = '';
 my $password = '';
 
 # your developer token
-my $token = '';
+my $dev_token = '';
+
+# your application token
+my $app_token = '';
 
 # your client email if you use a MCC
 my $client_email = '';
@@ -19,7 +22,8 @@ my $service = Google::Adwords::CampaignService->new();
 
 $service->email($email)
         ->password($password)
-        ->token($token)
+        ->developerToken($dev_token)
+        ->applicationToken($app_token)
 ;
 
 # debug

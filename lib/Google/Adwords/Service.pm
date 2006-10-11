@@ -7,20 +7,16 @@ use base qw/ Class::Accessor::Chained Google::Adwords /;
 use SOAP::Lite;
 use Readonly;
 
-# data types
-use Google::Adwords::Campaign;
-use Google::Adwords::StatsRecord;
-use Google::Adwords::AdGroup;
-
-Readonly my $user_agent => "Google::Adwords v0.2";
-Readonly my $endpoint => 'https://adwords.google.com/api/adwords/v5';
-Readonly my $endpoint_sandbox => 'https://sandbox.google.com/api/adwords/v5';
+Readonly my $user_agent => "Google::Adwords v0.4";
+Readonly my $endpoint => 'https://adwords.google.com/api/adwords/v6';
+Readonly my $endpoint_sandbox => 'https://sandbox.google.com/api/adwords/v6';
 Readonly my $soap_timeout => 20;
 
 __PACKAGE__->mk_accessors(qw/
     email
     password
-    token
+    developerToken
+    applicationToken
     useragent
     use_sandbox
     clientEmail
@@ -78,16 +74,17 @@ sub _get_soap_headers
     my ($self) = @_;
 
     my @headers = (
-        SOAP::Header->name("email")->value($self->email),
-        SOAP::Header->name("password")->value($self->password),
-        SOAP::Header->name("useragent")->value($self->useragent),
-        SOAP::Header->name("token")->value($self->token),
+        SOAP::Header->name("email")->value($self->email)->type(''),
+        SOAP::Header->name("password")->value($self->password)->type(''),
+        SOAP::Header->name("useragent")->value($self->useragent)->type(''),
+        SOAP::Header->name("developerToken")->value($self->developerToken)->type(''),
+        SOAP::Header->name("applicationToken")->value($self->applicationToken)->type(''),
     );
 
     # check for clientEmail header
     if (defined $self->clientEmail) {
         push @headers, 
-            SOAP::Header->name("clientEmail")->value($self->clientEmail);
+            SOAP::Header->name("clientEmail")->value($self->clientEmail)->type('');
     }
 
     return @headers;

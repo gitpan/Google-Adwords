@@ -1,6 +1,25 @@
 Revision history for Perl module Google::Adwords
 
-v0.2     Tue Sep 19 16:08:43 IST 2006
+v0.4    Wed Oct 11 20:16:53 IST 2006
+    - implements the AccountService and CreativeService API calls
+    - uses v6 of the Adwords API
+    - token method deprecated in favour of developerToken
+    - added method applicationToken
+    - getUnitCountForClients method added to the InfoService module
+    - Following modules were added to the distribution
+        * Google::Adwords::AccountInfo
+        * Google::Adwords::AccountService
+        * Google::Adwords::Address
+        * Google::Adwords::ClientUsageRecord
+        * Google::Adwords::CoverageType
+        * Google::Adwords::Creative
+        * Google::Adwords::CreativeService
+        * Google::Adwords::CreditCard
+        * Google::Adwords::EmailPromotionsPreferences
+        * Google::Adwords::Image
+    
+
+v0.2    Tue Sep 19 16:08:43 IST 2006
     - supports all calls of AdGroupService
     - added module Google::Adwords::AdGroup
     - added accessors - responseTime, requestId, operations and units to the
@@ -8,7 +27,7 @@ v0.2     Tue Sep 19 16:08:43 IST 2006
       the SOAP response header.
     - some more example scripts
 
-v0.1     Fri Sep  8 17:29:56 IST 2006
+v0.1    Fri Sep  8 17:29:56 IST 2006
     - supports all calls of CampaignService
     - uses v5 of the Adwords API
     - added clientEmail, timeout, debug and useragent methods to the Service
@@ -16,7 +35,7 @@ v0.1     Fri Sep  8 17:29:56 IST 2006
     - added module Google::Adwords::StatsRecord
     - version dependencies are in Makefile.PL
 
-v0.0.1   Fri Sep  1 23:00:15 IST 2006
+v0.0.1  Fri Sep  1 23:00:15 IST 2006
     - supports all calls of InfoService
     - supports addCampaign call of CampaignService
 

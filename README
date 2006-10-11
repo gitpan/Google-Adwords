@@ -1,4 +1,4 @@
-Google-Adwords version 0.2
+Google-Adwords version 0.4
 ==========================
 
 This module provides an interface to the Google Adwords SOAP API.
@@ -22,6 +22,11 @@ This module requires these other modules and libraries:
   - Readonly
   - Class::Accessor::Chained
   - Date::Manip
+
+AUTHORS
+
+    Rohan Almeida <rohan@almeida.in>
+    Mathieu Jondet <mathieu@eulerian.com>
 
 COPYRIGHT AND LICENCE
 

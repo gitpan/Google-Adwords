@@ -1,10 +1,14 @@
 package Google::Adwords::CampaignService;
 use strict; use warnings;
 
-use version; our $VERSION = qv('0.1.1');
+use version; our $VERSION = qv('0.1.2');
 
 use base 'Google::Adwords::Service';
 use Date::Manip;
+
+# data types
+use Google::Adwords::Campaign;
+use Google::Adwords::StatsRecord;
 
 
 ### INSTANCE METHOD ################################################
@@ -40,6 +44,12 @@ sub addCampaign
     if (defined $campaign->status) {
         push @campaign_params, SOAP::Data->name(
             'status' => $campaign->status )->type('');
+    }
+
+    # start_day
+    if (defined $campaign->startDay) {
+        push @campaign_params, SOAP::Data->name(
+            'startDay' => $campaign->startDay )->type('');
     }
 
     # end_day
@@ -159,6 +169,12 @@ sub addCampaignList
         if (defined $_->status) {
             push @campaign_params, SOAP::Data->name(
                 'status' => $_->status )->type('');
+        }
+    
+        # start_day
+        if (defined $_->startDay) {
+            push @campaign_params, SOAP::Data->name(
+                'startDay' => $_->startDay )->type('');
         }
     
         # end_day
@@ -715,7 +731,7 @@ CampaignService API calls
  
 =head1 VERSION
  
-This documentation refers to Google::Adwords::CampaignService version 0.1.1
+This documentation refers to Google::Adwords::CampaignService version 0.1.2
  
  
 =head1 SYNOPSIS
@@ -741,7 +757,8 @@ This documentation refers to Google::Adwords::CampaignService version 0.1.1
     # need to login to the Adwords service
     $campaign_service->email($email_address)
                      ->password($password)
-                     ->token($developer_token);
+                     ->developerToken($developer_token)
+                     ->applicationToken($application_token);
 
     # if you have a MCC
     $campaign_service->clientEmail($client_email);

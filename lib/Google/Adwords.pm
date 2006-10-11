@@ -1,7 +1,7 @@
 package Google::Adwords;
 use strict; use warnings;
 
-use version; our $VERSION = qv('0.2');
+use version; our $VERSION = qv('0.4');
 
 1;
 
@@ -14,7 +14,7 @@ Google::Adwords - an interface which abstracts the Google Adwords SOAP API
  
 =head1 VERSION
  
-This documentation refers to Google::Adwords version 0.2
+This documentation refers to Google::Adwords version 0.4
  
  
 =head1 SYNOPSIS
@@ -28,7 +28,8 @@ This documentation refers to Google::Adwords version 0.2
     # login details
     $service->email('email@domain.com')
             ->password('password')
-            ->token('developer_token');
+            ->developerToken($developer_token)
+            ->applicationToken($app_token);
 
     # if you use a MCC
     #$service->clientEmail('clientemail@domain.com');
@@ -70,20 +71,40 @@ authentication details and other options available
 
 Each API Service belongs to a particular module.
 
-* CampaignService   - L<Google::Adwords::CampaignService>
+* CampaignService       - L<Google::Adwords::CampaignService>
 
-* InfoService       - L<Google::Adwords::InfoService>
+* InfoService           - L<Google::Adwords::InfoService>
  
-* AdGroupService    - L<Google::Adwords::AdGroupService>
+* AdGroupService        - L<Google::Adwords::AdGroupService>
+
+* AccountService        - L<Google::Adwords::AccountService>
+
+* CreativeService       - L<Google::Adwords::CreativeService>
 
 Some services like the CampaignService need to deal with complex data 
 types which are available as objects.
 
-* Campaign          - L<Google::Adwords::Campaign>
+* Campaign              - L<Google::Adwords::Campaign>
 
-* StatsRecord       - L<Google::Adwords::StatsRecord>   
+* StatsRecord           - L<Google::Adwords::StatsRecord>   
 
-* AdGroup           - L<Google::Adwords::AdGroup>   
+* AdGroup               - L<Google::Adwords::AdGroup>   
+
+* ClientUsageRecord     - L<Google::Adwords::ClientUsageRecord>
+
+* AccountInfo           - L<Google::Adwords::AccountInfo>
+
+* EmailPromotionsPreferences  - L<Google::Adwords::EmailPromotionsPreferences>
+
+* Address               - L<Google::Adwords::Address>
+
+* CoverageType          - L<Google::Adwords::CoverageType>
+
+* CreditCard            - L<Google::Adwords::CreditCard>
+
+* Creative              - L<Google::Adwords::Creative>
+
+* Image                 - L<Google::Adwords::Image>
 
 Please read the documentation for the above modules.
  

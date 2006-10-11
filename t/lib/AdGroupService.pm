@@ -321,7 +321,7 @@ EOF
 
 }
 
-sub getAllAdGroups : Test(no_plan)
+sub b_getAllAdGroups : Test(no_plan)
 {
     my $self = shift;
 
@@ -330,7 +330,7 @@ sub getAllAdGroups : Test(no_plan)
     if ($self->{sandbox}) {
         $self->{obj}->debug(1);
         
-        my @adgroups = $self->{obj}->getAllAdGroups(4937);
+        my @adgroups = $self->{obj}->getAllAdGroups(1004);
         
         ok ($adgroups[0]->campaignId == 4937, 'getAllAdGroups');
 

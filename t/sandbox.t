@@ -8,6 +8,8 @@ use lib 't/lib';
 use InfoService;
 use CampaignService;
 use AdGroupService;
+use AccountService;
+use CreativeService;
 
 my $i;
 
@@ -30,7 +32,7 @@ my $params_ref = {
     sandbox => 1,
     email => $email,
     password => $password,
-    token => $email. '++' . $currency,
+    developerToken => $email. '++' . $currency,
 };
 
 
@@ -41,5 +43,11 @@ $i = CampaignService->new($params_ref);
 $i->runtests();
 
 $i = AdGroupService->new($params_ref);
+$i->runtests();
+
+$i = AccountService->new($params_ref);
+$i->runtests();
+
+$i = CreativeService->new($params_ref);
 $i->runtests();
 

@@ -1,7 +1,7 @@
 package Google::Adwords::Campaign;
 use strict; use warnings;
 
-use version; our $VERSION = qv('0.0.1');
+use version; our $VERSION = qv('0.0.2');
 
 use base 'Google::Adwords::Data';
 
@@ -31,7 +31,7 @@ Google::Adwords::Campaign - A Google Adwords Campaign Object
  
 =head1 VERSION
  
-This documentation refers to Google::Adwords::Campaign version 0.0.1
+This documentation refers to Google::Adwords::Campaign version 0.0.2
  
  
 =head1 SYNOPSIS
@@ -57,7 +57,8 @@ This documentation refers to Google::Adwords::Campaign version 0.0.1
     # need to login to the Adwords service
     $campaign_service->email($email_address)
                      ->password($password)
-                     ->token($developer_token);
+                     ->developerToken($developer_token)
+                     ->applicationToken($application_token);
 
     # if you use a MCC
     $campaign_service->clientEmail($client_email);

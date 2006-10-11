@@ -89,15 +89,17 @@ EOF
 }
 
 
-sub getAllAdWordsCampaigns : Test(no_plan)
+sub b_getAllAdWordsCampaigns : Test(no_plan)
 {
     my $self = shift;
 
     #return;
 
     if ($self->{sandbox}) {
-        $self->{'obj'}->debug(0);
+        $self->{'obj'}->debug(1);
         my @campaigns = $self->{'obj'}->getAllAdWordsCampaigns();
+
+        print Dumper(\@campaigns);
 
         # just check that we got back at least one campaign
         my $campaign = shift @campaigns;

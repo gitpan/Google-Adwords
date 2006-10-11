@@ -1,7 +1,7 @@
 package Google::Adwords::AdGroup;
 use strict; use warnings;
 
-use version; our $VERSION = qv('0.0.1');
+use version; our $VERSION = qv('0.0.2');
 
 use base 'Google::Adwords::Data';
 use Data::Dumper;
@@ -29,7 +29,7 @@ Google::Adwords::AdGroup - A Google Adwords AdGroup Object
  
 =head1 VERSION
  
-This documentation refers to Google::Adwords::AdGroup version 0.0.1
+This documentation refers to Google::Adwords::AdGroup version 0.0.2
  
  
 =head1 SYNOPSIS
@@ -53,7 +53,8 @@ This documentation refers to Google::Adwords::AdGroup version 0.0.1
     # need to login to the Adwords service
     $adgroup_service->email($email_address)
                      ->password($password)
-                     ->token($developer_token);
+                     ->developerToken($developer_token)
+                     ->applicationToken($application_token);
 
     # if you use a MCC
     #$adgroup_service->clientEmail($client_email);

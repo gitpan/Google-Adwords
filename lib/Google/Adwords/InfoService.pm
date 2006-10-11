@@ -1,11 +1,12 @@
 package Google::Adwords::InfoService;
 use strict; use warnings;
 
-use version; our $VERSION = qv('0.0.2');
+use version; our $VERSION = qv('0.1.1');
 
 use base 'Google::Adwords::Service';
 use Data::Dumper;
 
+use Google::Adwords::ClientUsageRecord;
 
 ### INSTANCE METHOD ################################################
 # Usage      : my $quota = $obj->getUsageQuotaThisMonth();
@@ -186,6 +187,60 @@ sub getUnitCountForMethod
     return $result->valueof("//getUnitCountForMethodResponse/getUnitCountForMethodReturn");
 }
 
+### INSTANCE METHOD ################################################
+# Usage      : 
+#   my @usage_records = $obj->getUnitCountForClients({
+#       clientEmails => [ $emai1, $email2 ],
+#       startDate => $date,
+#       endDate => $date,
+#   });
+# Purpose    : ????
+# Returns    : ????
+# Parameters : ????
+# Throws     : no exceptions
+# Comments   : none
+# See Also   : n/a
+#######################################################################
+sub getUnitCountForClients
+{
+    my ($self, $args_ref) = @_;
+
+    my @params;
+
+    push @params, SOAP::Data->name('startDate' => $args_ref->{'startDate'})->type('');
+    push @params, SOAP::Data->name('endDate' => $args_ref->{'endDate'})->type('');
+    
+    # clientEmails
+    my @client_emails = ();
+    if ((exists $args_ref->{'clientEmails'}) &&
+        (scalar @{$args_ref->{'clientEmails'}} > 0))
+    {
+        for (@{$args_ref->{'clientEmails'}}) {
+            push @client_emails, $_;
+        }
+    }
+    push @params, SOAP::Data->name('clientEmails' 
+        => @client_emails)->type('');
+
+
+    # call the service
+    # create the SOAP service
+    my $result = $self->_create_service_and_call({
+        service => 'InfoService',
+        method => 'getUnitCountForClients',   
+        params => \@params,
+    });
+
+    my @ret;
+    for ($result->valueof("//getUnitCountForClientsResponse/getUnitCountForClientsReturn"))
+    {
+        push @ret, 
+            $self->_create_object_from_hash($_, 'Google::Adwords::ClientUsageRecord');
+    }
+
+    return @ret;
+}
+
 1;
 
 =pod
@@ -209,7 +264,8 @@ This documentation refers to Google::Adwords::InfoService version 0.0.2
 
     $ginfo->email('email@domain.com')
           ->password('password')
-          ->token('developer_token');
+          ->developerToken('developer_token')
+          ->applicationToken('application_token');
 
     # If you use a MCC
     $ginfo->clientEmail('clientemail@domain.com');
@@ -217,7 +273,12 @@ This documentation refers to Google::Adwords::InfoService version 0.0.2
     my $quota = $ginfo->getFreeUsageQuotaThisMonth;
     print "Free quota this month is $quota\n"; 
 
-  
+    my $operations_count = $ginfo->getOperationCount({
+        startDate => $start_date,
+        endDate => $end_date,
+    });
+    print "Number of operations: $operations_count\n";
+
   
 =head1 METHODS 
  
@@ -486,6 +547,54 @@ A hashref, with keys:
 =over 4
 
 $count - the number of quota units recorded over the given date range
+
+=back
+
+=head2 B<getUnitCountForClients()>
+
+=head3 Description
+
+=over 4
+
+Retrieves the number of quota units recorded for a subset of clients over the
+given date range. The time zone is implicitly assumed to be Pacific time (PST
+or PDT). The given dates are inclusive; to get the unit count for a single
+day, supply it as both the start and end date.
+
+=back
+
+=head3 Usage
+
+=over 4
+
+    my @usage_records = $ginfo->getUnitCountForClients({
+        clientEmails => [ $emai1, $email2 ],
+        startDate => $date,
+        endDate => $date,
+    });
+
+=back
+
+=head3 Parameters
+
+=over 4
+
+A hashref, with keys:
+
+* clientEmails => arrayref of client emails
+
+* startDate  - the beginning of the date range, inclusive. YYYY-MM-DD format.
+
+* endDate    - the end of the date range, inclusive. YYYY-MM-DD format.
+
+
+=back
+
+=head3 Returns
+ 
+=over 4
+
+@usage_records => A list of Google::Adwords::ClientUsageRecord objects
 
 =back
 
