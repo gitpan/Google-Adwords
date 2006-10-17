@@ -2,6 +2,7 @@ Changes
 Makefile.PL
 MANIFEST
 README
+TODO
 examples/getAdGroupStats.pl
 examples/getAllAdGroups.pl
 examples/getAllAdWordsCampaigns.pl
@@ -25,6 +26,8 @@ lib/Google/Adwords/Data.pm
 lib/Google/Adwords/EmailPromotionsPreferences.pm
 lib/Google/Adwords/Image.pm
 lib/Google/Adwords/InfoService.pm
+lib/Google/Adwords/ReportJob.pm
+lib/Google/Adwords/ReportService.pm
 lib/Google/Adwords/Service.pm
 lib/Google/Adwords/StatsRecord.pm
 t/run.t
@@ -36,5 +39,6 @@ t/lib/CampaignService.pm
 t/lib/CreativeService.pm
 t/lib/Data.pm
 t/lib/InfoService.pm
+t/lib/ReportService.pm
 t/lib/Service.pm
 META.yml                                 Module meta-data (added by MakeMaker)

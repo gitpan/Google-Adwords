@@ -10,6 +10,7 @@ use CampaignService;
 use AdGroupService;
 use AccountService;
 use CreativeService;
+use ReportService;
 
 my $i;
 
@@ -49,5 +50,8 @@ $i = AccountService->new($params_ref);
 $i->runtests();
 
 $i = CreativeService->new($params_ref);
+$i->runtests();
+
+$i = ReportService->new($params_ref);
 $i->runtests();
 

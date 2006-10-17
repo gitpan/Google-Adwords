@@ -1,5 +1,11 @@
 Revision history for Perl module Google::Adwords
 
+v0.5    Tue Oct 17 21:57:45 IST 2006
+    - implements the ReportService API calls
+    - New modules
+        * Google::Adwords::ReportService
+        * Google::Adwords::ReportJob
+
 v0.4    Wed Oct 11 20:16:53 IST 2006
     - implements the AccountService and CreativeService API calls
     - uses v6 of the Adwords API

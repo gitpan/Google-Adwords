@@ -9,8 +9,7 @@ use CampaignService;
 use AdGroupService;
 use AccountService;
 use CreativeService;
+use ReportService;
 
 Test::Class->runtests();
-
-
 
