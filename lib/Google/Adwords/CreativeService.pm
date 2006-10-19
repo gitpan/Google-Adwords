@@ -1,12 +1,13 @@
 package Google::Adwords::CreativeService;
 use strict; use warnings;
 
-use version; our $VERSION = qv('0.2');
+use version; our $VERSION = qv('0.3');
 
 use base 'Google::Adwords::Service';
 
 use Google::Adwords::Creative;
 use Google::Adwords::Image;
+use Google::Adwords::StatsRecord;
 
 ### INSTANCE METHOD ################################################
 # Usage      : 
@@ -486,6 +487,67 @@ sub getCreative
     return	$creative;
 }
 
+### INSTANCE METHOD ################################################
+# Usage      : 
+#   my @creative_stats = $obj->getCreativeStats({
+#       adGroupId	=> 1234
+#	    creativeIds	=> [ 3982, 2787, 17872 ],
+#	    startDay 	=> $startDay,
+#	    endDay	=> $endDay,
+#	    inPST	=> 1,
+#   });
+# Purpose    : Get stats on a set of creatives
+# Returns    :  A list of StatsRecord object for each creative
+# Parameters : 
+#   adGroupId : The ad group that contains the creative to be queried
+#	creativeIds  : array reference of creative ids
+#	startDay : starting day of the stats YYYY-MM-DD
+#	endDay : end day of the stats YYYY-MM-DD
+#	inPST : True = get stats in America/Los_Angeles timezone (Google headquarters) regardless of the parent account's localtimezone.
+# Throws     : no exceptions
+# Comments   : none
+# See Also   : n/a
+#######################################################################
+sub getCreativeStats 
+{
+ my ($self, $args_ref) = @_;
+ my $adgroupid	= $args_ref->{adGroupId} || 0;
+ my $ra_id	= $args_ref->{creativeIds} || [];
+ my $startDay	= $args_ref->{startDay} || '';
+ my $endDay	= $args_ref->{endDay}	|| '';
+ my $inPST	= $args_ref->{inPST}	|| 0;
+
+ my @params;
+ push @params,
+      SOAP::Data->name(
+	'adGroupId' => $adgroupid )->type('');
+ push @params,
+      SOAP::Data->name(
+	'creativeIds' => @{ $ra_id } )->type('');
+ push @params,
+      SOAP::Data->name(
+	'startDay' => $startDay )->type('');
+ push @params,
+      SOAP::Data->name(
+	'endDay' => $endDay )->type('');
+ push @params,
+      SOAP::Data->name(
+	'inPST' => $inPST )->type('');
+    
+ my $result	= $self->_create_service_and_call({
+   service	=> 'CreativeService',
+   method	=> 'getCreativeStats',
+   params	=> \@params,
+   });
+
+ my @data;
+ foreach my $c ( $result->valueof("//getCreativeStatsResponse/getCreativeStatsReturn") ) {
+  push @data, $self->_create_object_from_hash($c, 'Google::Adwords::StatsRecord');
+ }
+
+ return	@data;
+}
+
 
 1;
 
@@ -499,7 +561,7 @@ CreativeService API calls
  
 =head1 VERSION
  
-This documentation refers to Google::Adwords::CreativeService version 0.2
+This documentation refers to Google::Adwords::CreativeService version 0.3
  
  
 =head1 SYNOPSIS
@@ -947,6 +1009,65 @@ $creative => The creative info as a Google::Adwords::Creative object
 
 =back
 
+=head2 B<getCreativeStats()>
+
+=head3 Description
+
+=over 4
+
+Get statistics for a list of Creatives. See L<Google::Adwords::StatsRecord> 
+for details about the statistics returned. The time granularity is one day.
+
+Also see - 
+
+http://www.google.com/apis/adwords/developer/StatsRecord.html
+
+=back
+
+=head3 Usage
+
+=over 4
+
+   my @creative_stats = $obj->getCreativeStats({
+        adGroupId   => 1234
+        creativeIds => [ 3982, 2787, 17872 ],
+        startDay    => $startDay,
+        endDay      => $endDay,
+        inPST       => 1,
+    });
+
+=back
+
+=head3 Parameters
+
+Takes a hashref with following keys,
+
+=over 4
+
+* adGroupId => The ad group that contains the creative to be queried
+
+* creativeIds => array reference of creative ids
+
+* startDay => The starting day of the period for which statistics are to 
+be collected in format YYYY-MM-DD
+
+* endDay => The ending day of the period for which statistics are to be
+collected in format YYYY-MM-DD
+
+* inPST => Set to 1 to get stats in America/Los_Angeles timezone (Google
+headquarters) regardless of the parent account's localtimezone.
+
+=back
+
+
+=head3 Returns
+ 
+=over 4
+
+A list of Google::Adwords::StatsRecord objects; one for each creative.
+
+=back
+
 =head1 SEE ALSO
 
 =over 4
@@ -954,6 +1075,8 @@ $creative => The creative info as a Google::Adwords::Creative object
 =item * L<Google::Adwords::Creative>
 
 =item * L<Google::Adwords::Image>
+
+=item * L<Google::Adwords::StatsRecord>
 
 =back
 

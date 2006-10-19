@@ -2,3 +2,5 @@
 * some nice example scripts of Google::Adwords::ReportService in action,
   especially for custom reports
 
+* The sandbox tests need some order so that it works everytime
+

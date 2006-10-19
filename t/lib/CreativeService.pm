@@ -743,6 +743,92 @@ EOF
     }
 }
 
+sub getCreativeStats : Test(no_plan)
+{
+    my $self = shift;
+
+    #return;
+
+    if ($self->{sandbox}) {
+
+        $self->{obj}->debug(1);
+
+       
+
+    }
+    else {
+
+        my $soap = Test::MockModule->new('SOAP::Lite');
+        $soap->mock( call => sub {
+            my $xml .= <<'EOF';
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+ <soapenv:Header>
+  <responseTime soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next"
+soapenv:mustUnderstand="0"
+xmlns="https://adwords.google.com/api/adwords/v5">113</responseTime>
+  <operations soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next"
+soapenv:mustUnderstand="0"
+xmlns="https://adwords.google.com/api/adwords/v5">1</operations>
+  <units soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next"
+soapenv:mustUnderstand="0"
+xmlns="https://adwords.google.com/api/adwords/v5">1</units>
+  <requestId soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next"
+soapenv:mustUnderstand="0"
+xmlns="https://adwords.google.com/api/adwords/v5">54d9ad57aa6d1fa29a253bf66b4717ce</requestId>
+ </soapenv:Header>
+ <soapenv:Body>
+<getCreativeStatsResponse xmlns="">
+   <ns1:getCreativeStatsReturn
+xmlns:ns1="https://adwords.google.com/api/adwords/v5">
+    <ns1:averagePosition>0.0</ns1:averagePosition>
+    <ns1:clicks>10</ns1:clicks>
+    <ns1:conversionRate>0.0</ns1:conversionRate>
+    <ns1:conversions>0</ns1:conversions>
+    <ns1:cost>0</ns1:cost>
+    <ns1:id>1001</ns1:id>
+    <ns1:impressions>0</ns1:impressions>
+   </ns1:getCreativeStatsReturn>
+   <ns2:getCreativeStatsReturn
+xmlns:ns2="https://adwords.google.com/api/adwords/v5">
+    <ns2:averagePosition>0.0</ns2:averagePosition>
+    <ns2:clicks>0</ns2:clicks>
+    <ns2:conversionRate>0.0</ns2:conversionRate>
+    <ns2:conversions>0</ns2:conversions>
+    <ns2:cost>0</ns2:cost>
+    <ns2:id>1002</ns2:id>
+    <ns2:impressions>0</ns2:impressions>
+   </ns2:getCreativeStatsReturn>
+  </getCreativeStatsResponse>
+ </soapenv:Body>
+</soapenv:Envelope>
+EOF
+
+            my $env = SOAP::Deserializer->deserialize($xml);
+            return $env;
+        });
+
+        my $adgroup_id = 1004;
+
+        my @stats = $self->{obj}->getCreativeStats({
+            adGroupId => $adgroup_id,
+            creativeIds => [ 1001, 1002 ],
+            startDay => '2006-09-01',
+            endDay => '2006-09-15',
+            inPST => 1,
+        });
+
+        ok ($stats[0]->id == 1001, 'getCreativeStats');
+        ok ($stats[0]->clicks == 10, 'getCreativeStats');
+        ok ($stats[1]->id == 1002, 'getCreativeStats');
+        
+
+    }
+
+
+}
+
 1;
 
 

@@ -1,5 +1,8 @@
 Revision history for Perl module Google::Adwords
 
+v0.5.1  Thu Oct 19 16:58:44 IST 2006
+    - added getCreativeStats method to the CreativeService module
+
 v0.5    Tue Oct 17 21:57:45 IST 2006
     - implements the ReportService API calls
     - New modules

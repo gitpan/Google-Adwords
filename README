@@ -1,5 +1,5 @@
-Google-Adwords version 0.5
-==========================
+Google-Adwords version 0.5.1
+============================
 
 This module provides an interface to the Google Adwords SOAP API.
 
