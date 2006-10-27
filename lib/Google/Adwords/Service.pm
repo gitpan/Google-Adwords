@@ -7,7 +7,7 @@ use base qw/ Class::Accessor::Chained Google::Adwords /;
 use SOAP::Lite;
 use Readonly;
 
-Readonly my $user_agent => "Google::Adwords v0.5.1";
+Readonly my $user_agent => "Google::Adwords v0.6";
 Readonly my $endpoint => 'https://adwords.google.com/api/adwords/v6';
 Readonly my $endpoint_sandbox => 'https://sandbox.google.com/api/adwords/v6';
 Readonly my $soap_timeout => 20;

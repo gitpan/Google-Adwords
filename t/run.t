@@ -10,6 +10,7 @@ use AdGroupService;
 use AccountService;
 use CreativeService;
 use ReportService;
+use TrafficEstimatorService;
 
 Test::Class->runtests();
 

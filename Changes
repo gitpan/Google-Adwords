@@ -1,5 +1,16 @@
 Revision history for Perl module Google::Adwords
 
+v0.6    Fri Oct 27 19:45:58 IST 2006
+    - implements the TrafficEstimatorService API calls
+    - New modules
+        * Google::Adwords::TrafficEstimatorService
+        * Google::Adwords::KeywordRequest
+        * Google::Adwords::KeywordEstimate
+        * Google::Adwords::AdGroupRequest
+        * Google::Adwords::AdGroupEstimate
+        * Google::Adwords::CampaignRequest
+        * Google::Adwords::CampaignEstimate
+
 v0.5.1  Thu Oct 19 16:58:44 IST 2006
     - added getCreativeStats method to the CreativeService module
 

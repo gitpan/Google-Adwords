@@ -1,7 +1,7 @@
 package Google::Adwords;
 use strict; use warnings;
 
-use version; our $VERSION = qv('0.5.1');
+use version; our $VERSION = qv('0.6');
 
 1;
 
@@ -14,7 +14,7 @@ Google::Adwords - an interface which abstracts the Google Adwords SOAP API
  
 =head1 VERSION
  
-This documentation refers to Google::Adwords version 0.5.1
+This documentation refers to Google::Adwords version 0.6
  
  
 =head1 SYNOPSIS
@@ -83,6 +83,8 @@ Each API Service belongs to a particular module.
 
 * ReportService         - L<Google::Adwords::ReportService>
 
+* TrafficEstimatorService - L<Google::Adwords::TrafficEstimatorService>
+
 Some services like the CampaignService need to deal with complex data 
 types which are available as objects.
 
@@ -109,6 +111,19 @@ types which are available as objects.
 * Image                 - L<Google::Adwords::Image>
 
 * ReportJob             - L<Google::Adwords::ReportJob>
+
+* KeywordRequest        - L<Google::Adwords::KeywordRequest>
+
+* KeywordEstimate       - L<Google::Adwords::KeywordEstimate>
+
+* AdGroupRequest        - L<Google::Adwords::AdGroupRequest>
+
+* AdGroupEstimate       - L<Google::Adwords::AdGroupEstimate>
+
+* CampaignRequest       - L<Google::Adwords::CampaignRequest>
+
+* CampaignEstimate      - L<Google::Adwords::CampaignEstimate>
+
 
 Please read the documentation for the above modules.
  

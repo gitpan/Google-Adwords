@@ -13,9 +13,13 @@ lib/Google/Adwords.pm
 lib/Google/Adwords/AccountInfo.pm
 lib/Google/Adwords/AccountService.pm
 lib/Google/Adwords/Address.pm
+lib/Google/Adwords/AdGroupEstimate.pm
 lib/Google/Adwords/AdGroup.pm
+lib/Google/Adwords/AdGroupRequest.pm
 lib/Google/Adwords/AdGroupService.pm
+lib/Google/Adwords/CampaignEstimate.pm
 lib/Google/Adwords/Campaign.pm
+lib/Google/Adwords/CampaignRequest.pm
 lib/Google/Adwords/CampaignService.pm
 lib/Google/Adwords/ClientUsageRecord.pm
 lib/Google/Adwords/CoverageType.pm
@@ -26,10 +30,13 @@ lib/Google/Adwords/Data.pm
 lib/Google/Adwords/EmailPromotionsPreferences.pm
 lib/Google/Adwords/Image.pm
 lib/Google/Adwords/InfoService.pm
+lib/Google/Adwords/KeywordEstimate.pm
+lib/Google/Adwords/KeywordRequest.pm
 lib/Google/Adwords/ReportJob.pm
 lib/Google/Adwords/ReportService.pm
 lib/Google/Adwords/Service.pm
 lib/Google/Adwords/StatsRecord.pm
+lib/Google/Adwords/TrafficEstimatorService.pm
 t/run.t
 t/sandbox.t
 t/lib/AccountService.pm
@@ -41,4 +48,5 @@ t/lib/Data.pm
 t/lib/InfoService.pm
 t/lib/ReportService.pm
 t/lib/Service.pm
+t/lib/TrafficEstimatorService.pm
 META.yml                                 Module meta-data (added by MakeMaker)

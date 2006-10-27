@@ -11,6 +11,7 @@ use AdGroupService;
 use AccountService;
 use CreativeService;
 use ReportService;
+use TrafficEstimatorService;
 
 my $i;
 
@@ -53,5 +54,8 @@ $i = CreativeService->new($params_ref);
 $i->runtests();
 
 $i = ReportService->new($params_ref);
+$i->runtests();
+
+$i = TrafficEstimatorService->new($params_ref);
 $i->runtests();
 
