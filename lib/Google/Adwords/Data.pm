@@ -4,11 +4,28 @@ use strict; use warnings;
 use version; our $VERSION = qv('0.0.1');
 
 use base qw/ Class::Accessor::Chained Google::Adwords /;
-use Data::Dumper;
-use Readonly;
+
+use HTML::Entities;
 
 __PACKAGE__->mk_accessors(qw/
 /);
+
+sub get
+{
+    my $self = shift;
+
+    my $key = shift;
+    my $value = $self->{$key};
+
+    # check if called from within Google::Adwords:: namespace
+    my $package = caller 1;
+    if ($package =~ /^Google::Adwords::\w+Service$/) {
+        return encode_entities($value);
+    }
+    else {
+        return $value;
+    }
+}
 
 1;
 

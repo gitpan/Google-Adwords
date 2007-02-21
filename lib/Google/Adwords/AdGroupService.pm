@@ -574,7 +574,7 @@ same Campaign.
 
 =over 4
 
-    my @adgroups = $obj->addAdGroupList($campaignId, @adgroups_to_add);
+    my @adgroups = $obj->addAdGroupList($campaignId, \@adgroups_to_add);
 
 =back
 
@@ -584,7 +584,7 @@ same Campaign.
 
 =item * $campaignId => Campaign ID
 
-=item * @adgroups_to_add => List of Google::Adwords::AdGroup objects
+=item * \@adgroups_to_add => arrayref of Google::Adwords::AdGroup objects
 
 =back
 

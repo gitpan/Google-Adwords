@@ -1,7 +1,7 @@
 package Google::Adwords::CampaignService;
 use strict; use warnings;
 
-use version; our $VERSION = qv('0.1.2');
+use version; our $VERSION = qv('0.5');
 
 use base 'Google::Adwords::Service';
 use Date::Manip;
@@ -9,28 +9,25 @@ use Date::Manip;
 # data types
 use Google::Adwords::Campaign;
 use Google::Adwords::StatsRecord;
+use Google::Adwords::AdSchedule;
+use Google::Adwords::SchedulingInterval;
+use Google::Adwords::BudgetOptimizerSettings;
 
-
-### INSTANCE METHOD ################################################
-# Usage      : 
-#   my $campaign = $obj->addCampaign($campaign);
-# Purpose    : Add a new campaign
+### INTERNAL UTILITY ################################################
+# Usage      : @campaign_params = _create_campaign_params($campaign);
+# Purpose    : Create SOAP::Data request params from a campaign object
 # Returns    : ????
 # Parameters : ????
 # Throws     : no exceptions
 # Comments   : none
 # See Also   : n/a
 #######################################################################
-sub addCampaign
+sub _create_campaign_params
 {
-    my ($self, $campaign) = @_;
-
-    # daily_budget should be present
-    if (not defined $campaign->dailyBudget) {
-        die "dailyBudget should be set for the campaign object";
-    }
-
+    my $campaign = shift;
     my @campaign_params;
+
+    # dailyBudget
     push @campaign_params, SOAP::Data->name(
         'dailyBudget' => $campaign->dailyBudget )->type('');
 
@@ -58,11 +55,60 @@ sub addCampaign
             'endDay' => $campaign->endDay )->type('');
     }
 
+    # Ad schedule
+    if (defined $campaign->schedule) {
+
+        my @schedule_params;
+
+        # status
+        push @schedule_params, SOAP::Data->name(
+            'status' => $campaign->schedule->status)->type('');
+
+        # intervals
+        foreach my $interval (@{$campaign->schedule->intervals}) {
+            my @interval_params;
+            for (qw/day endHour endMinute multiplier startHour startMinute/) {
+                if (defined $interval->$_) {
+                    push @interval_params, SOAP::Data->name(
+                        $_ => $interval->$_)->type('');
+                }
+            }
+            push @schedule_params, SOAP::Data->name(
+                'intervals' => \SOAP::Data->value(@interval_params))->type('');
+        }
+
+        push @campaign_params, SOAP::Data->name(
+            'schedule' => \SOAP::Data->value(@schedule_params))->type('');
+    }
+
+    # budget optimizer settings
+    if (defined $campaign->budgetOptimizerSettings) {
+        
+        my @budget_params;
+        my $budget = $campaign->budgetOptimizerSettings;
+        
+        for (qw/bidCeiling enabled takeOnOptimizedBids/) {
+            if (defined $budget->$_) {
+                push @budget_params, SOAP::Data->name(
+                    $_ => $budget->$_ )->type('');
+            }
+        }
+
+        push @campaign_params, SOAP::Data->name(
+            'budgetOptimizerSettings' => \SOAP::Data->value(@budget_params) )->type('');
+
+
+    }
+
 
     # language_targeting
-    if (defined $campaign->languageTargeting) {
+    if ((defined $campaign->languageTargeting) &&
+        (ref $campaign->languageTargeting eq 'HASH')
+    ) {
         my $langs_ref = $campaign->languageTargeting;
-        if (scalar @{$langs_ref->{'languages'}} > 0) {
+        if ((exists $langs_ref->{'languages'}) &&
+            (scalar @{$langs_ref->{'languages'}} > 0)
+        ) {
             push @campaign_params, SOAP::Data->name(
             'languageTargeting' 
                 => \SOAP::Data->name('languages' 
@@ -72,12 +118,14 @@ sub addCampaign
     }
 
     # geo_targeting
-    if (defined $campaign->geoTargeting) {
+    if ((defined $campaign->geoTargeting) &&
+        (ref $campaign->geoTargeting eq 'HASH')
+    ) {
         my $geo_ref = $campaign->geoTargeting;
         my @geo_data;
 
         for (qw/countries cities metros regions/) {
-            if ((defined $geo_ref->{$_}) and
+            if ((exists $geo_ref->{$_}) and
                 (scalar @{$geo_ref->{$_}} > 0))
             {
                 push @geo_data, SOAP::Data->name($_  
@@ -85,15 +133,21 @@ sub addCampaign
             }
         }
         
-        push @campaign_params, SOAP::Data->name(
-            'geoTargeting' => \SOAP::Data->value(@geo_data),
-        )->type('');
+        if (scalar @geo_data > 0) {
+            push @campaign_params, SOAP::Data->name(
+                'geoTargeting' => \SOAP::Data->value(@geo_data),
+            )->type('');
+        }
     }
 
     # network_targeting
-    if (defined $campaign->networkTargeting) {
+    if ((defined $campaign->networkTargeting) &&
+        (ref $campaign->networkTargeting eq 'HASH')
+    ) {
         my $network_ref = $campaign->networkTargeting;
-        if (scalar @{$network_ref->{'networkTypes'}} > 0) {
+        if ((exists $network_ref->{networkTypes}) &&
+            (scalar @{$network_ref->{'networkTypes'}} > 0) 
+        ) {
             push @campaign_params, SOAP::Data->name(
             'networkTargeting' 
                 => \SOAP::Data->name('networkTypes' 
@@ -101,6 +155,95 @@ sub addCampaign
             )->type('');
         }
     }
+    
+    return @campaign_params;
+}
+
+
+### INTERNAL UTILITY ##################################################
+# Usage      : $campaign = $self->_create_campaign_object($data_ref);
+# Purpose    : Create a campaign object from a hashref
+# Returns    : ????
+# Parameters : ????
+# Throws     : no exceptions
+# Comments   : none
+# See Also   : n/a
+#######################################################################
+sub _create_campaign_object
+{
+    my ($self, $data) = @_;
+
+    # format dates
+    $data->{'startDay'} 
+        = UnixDate(ParseDate($data->{'startDay'}), "%Y-%m-%d %H:%M:%S");
+    $data->{'endDay'} 
+        = UnixDate(ParseDate($data->{'endDay'}), "%Y-%m-%d %H:%M:%S");
+
+    # budgetOptimizerSettings
+    if (exists $data->{budgetOptimizerSettings}) {
+        $data->{budgetOptimizerSettings} 
+            = $self->_create_object_from_hash(
+                $data->{budgetOptimizerSettings},
+                'Google::Adwords::BudgetOptimizerSettings'
+                );
+    }
+
+    # ad schedule
+    my @intervals;
+    if (exists $data->{schedule}{intervals}) {
+        
+        # check if we have multiple intervals
+        if (ref $data->{schedule}{intervals} eq 'ARRAY') {
+            for (@{$data->{schedule}{intervals}}) {
+                push @intervals, 
+                    $self->_create_object_from_hash($_,
+                        "Google::Adwords::SchedulingInterval");
+            }
+        }
+        else {
+            # just a single interval
+            push @intervals, 
+                $self->_create_object_from_hash($data->{schedule}{intervals}, 
+                    "Google::Adwords::SchedulingInterval");
+        }
+    }
+    if (scalar @intervals > 0) {
+        $data->{schedule}{intervals} = \@intervals;
+    }
+    my $ad_schedule 
+        = $self->_create_object_from_hash($data->{schedule},
+        "Google::Adwords::AdSchedule");
+
+    $data->{schedule} = $ad_schedule;
+
+
+    # get campaign object
+    my $campaign_response 
+        = $self->_create_object_from_hash($data, 'Google::Adwords::Campaign');
+    
+    return $campaign_response;
+}
+
+### INSTANCE METHOD ################################################
+# Usage      : 
+#   my $campaign = $obj->addCampaign($campaign);
+# Purpose    : Add a new campaign
+# Returns    : ????
+# Parameters : ????
+# Throws     : no exceptions
+# Comments   : none
+# See Also   : n/a
+#######################################################################
+sub addCampaign
+{
+    my ($self, $campaign) = @_;
+
+    # daily_budget should be present
+    if (not defined $campaign->dailyBudget) {
+        die "dailyBudget should be set for the campaign object";
+    }
+
+    my @campaign_params = _create_campaign_params($campaign);
 
     my @params;
     push @params, SOAP::Data->name(
@@ -116,17 +259,7 @@ sub addCampaign
     # get response data in a hash
     my $data = $result->valueof("//addCampaignResponse/addCampaignReturn");
 
-    # format dates
-    $data->{'startDay'} 
-        = UnixDate(ParseDate($data->{'startDay'}), "%Y-%m-%d %H:%M:%S");
-    $data->{'endDay'} 
-        = UnixDate(ParseDate($data->{'endDay'}), "%Y-%m-%d %H:%M:%S");
-
-    # get campaign object
-    my $campaign_response 
-        = $self->_create_object_from_hash($data, 'Google::Adwords::Campaign');
-    
-    return $campaign_response;
+    return $self->_create_campaign_object($data);
 }
 
 ### INSTANCE METHOD ################################################
@@ -150,83 +283,14 @@ sub addCampaignList
         }
     }
 
+    # request params
     my @params;
 
     # loop over campaign objects
     for (@campaigns) {
 
-        my @campaign_params;
-        push @campaign_params, SOAP::Data->name(
-            'dailyBudget' => $_->dailyBudget )->type('');
-    
-        # campaign name
-        if (defined $_->name) {
-            push @campaign_params, SOAP::Data->name(
-                'name' => $_->name )->type('');
-        }
-    
-        # status
-        if (defined $_->status) {
-            push @campaign_params, SOAP::Data->name(
-                'status' => $_->status )->type('');
-        }
-    
-        # start_day
-        if (defined $_->startDay) {
-            push @campaign_params, SOAP::Data->name(
-                'startDay' => $_->startDay )->type('');
-        }
-    
-        # end_day
-        if (defined $_->endDay) {
-            push @campaign_params, SOAP::Data->name(
-                'endDay' => $_->endDay )->type('');
-        }
-    
-    
-        # language_targeting
-        if (defined $_->languageTargeting) {
-            my $langs_ref = $_->languageTargeting;
-            if (scalar @{$langs_ref->{'languages'}} > 0) {
-                push @campaign_params, SOAP::Data->name(
-                'languageTargeting' 
-                    => \SOAP::Data->name('languages' 
-                        => @{$langs_ref->{'languages'}})->type('')
-                )->type('');
-            }
-        }
-    
-        # geo_targeting
-        if (defined $_->geoTargeting) {
-            my $geo_ref = $_->geoTargeting;
-            my @geo_data;
-    
-            for (qw/countries cities metros regions/) {
-                if ((defined $geo_ref->{$_}) and
-                    (scalar @{$geo_ref->{$_}} > 0))
-                {
-                    push @geo_data, SOAP::Data->name($_  
-                        => @{$geo_ref->{$_}})->type('');
-                }
-            }
-            
-            push @campaign_params, SOAP::Data->name(
-                'geoTargeting' => \SOAP::Data->value(@geo_data),
-            )->type('');
-        }
-    
-        # network_targeting
-        if (defined $_->networkTargeting) {
-            my $network_ref = $_->networkTargeting;
-            if (scalar @{$network_ref->{'networkTypes'}} > 0) {
-                push @campaign_params, SOAP::Data->name(
-                'networkTargeting' 
-                    => \SOAP::Data->name('networkTypes' 
-                        => @{$network_ref->{'networkTypes'}})->type('')
-                )->type('');
-            }
-        }
-    
+        my @campaign_params = _create_campaign_params($_);
+
         push @params, SOAP::Data->name(
             'campaign' => \SOAP::Data->value(@campaign_params) )->type('');
 
@@ -242,12 +306,7 @@ sub addCampaignList
     my @data;
     foreach my $c ($result->valueof("//addCampaignListResponse/addCampaignListReturn") ) 
     {
-        # format dates
-        $c->{'startDay'} 
-            = UnixDate(ParseDate($c->{'startDay'}), "%Y-%m-%d %H:%M:%S");
-        $c->{'endDay'} 
-            = UnixDate(ParseDate($c->{'endDay'}), "%Y-%m-%d %H:%M:%S");
-        push @data, $self->_create_object_from_hash($c, 'Google::Adwords::Campaign');
+        push @data, $self->_create_campaign_object($c);
     }
 
     return @data;
@@ -280,13 +339,7 @@ sub getAllAdWordsCampaigns
     
     my @data;
     foreach my $c ( $result->valueof("//getAllAdWordsCampaignsResponse/getAllAdWordsCampaignsReturn") ) {
-
-        # format dates
-        $c->{'startDay'} 
-            = UnixDate(ParseDate($c->{'startDay'}), "%Y-%m-%d %H:%M:%S");
-        $c->{'endDay'} 
-            = UnixDate(ParseDate($c->{'endDay'}), "%Y-%m-%d %H:%M:%S");
-        push @data, $self->_create_object_from_hash($c, 'Google::Adwords::Campaign');
+        push @data, $self->_create_campaign_object($c);
     }
 
     return	@data;
@@ -319,16 +372,7 @@ sub getCampaign
     
     my $data = $result->valueof("//getCampaignResponse/getCampaignReturn");
 
-    # format dates
-    $data->{'startDay'} 
-        = UnixDate(ParseDate($data->{'startDay'}), "%Y-%m-%d %H:%M:%S");
-    $data->{'endDay'} 
-        = UnixDate(ParseDate($data->{'endDay'}), "%Y-%m-%d %H:%M:%S");
-
-    my $campaign_response 
-     = $self->_create_object_from_hash($data, 'Google::Adwords::Campaign');
-
-    return	$campaign_response;
+    return $self->_create_campaign_object($data);
 }
 
 ### INSTANCE METHOD ################################################
@@ -359,12 +403,7 @@ sub getCampaignList
     my @data;
     foreach my $c ($result->valueof("//getCampaignListResponse/getCampaignListReturn")) 
     {
-        # format dates
-        $c->{'startDay'} 
-            = UnixDate(ParseDate($c->{'startDay'}), "%Y-%m-%d %H:%M:%S");
-        $c->{'endDay'} 
-            = UnixDate(ParseDate($c->{'endDay'}), "%Y-%m-%d %H:%M:%S");
-        push @data, $self->_create_object_from_hash($c, 'Google::Adwords::Campaign');
+        push @data, $self->_create_campaign_object($c);
     }
 
     return @data;
@@ -512,82 +551,14 @@ sub updateCampaign
 {
     my ($self, $campaign) = @_;
 
-    my @campaign_params;
-    
     # id should be present
     if (not defined $campaign->id) {
         die "id should be set for the campaign object";
     }
+
+    my @campaign_params = _create_campaign_params($campaign);
     push @campaign_params, SOAP::Data->name(
         'id' => $campaign->id )->type('');
-
-    # daily_budget
-    if (defined $campaign->dailyBudget) {
-        push @campaign_params, SOAP::Data->name(
-            'dailyBudget' => $campaign->dailyBudget )->type('');
-    }
-
-    # campaign name
-    if (defined $campaign->name) {
-        push @campaign_params, SOAP::Data->name(
-            'name' => $campaign->name )->type('');
-    }
-
-    # status
-    if (defined $campaign->status) {
-        push @campaign_params, SOAP::Data->name(
-            'status' => $campaign->status )->type('');
-    }
-
-    # end_day
-    if (defined $campaign->endDay) {
-        push @campaign_params, SOAP::Data->name(
-            'endDay' => $campaign->endDay )->type('');
-    }
-
-
-    # language_targeting
-    if (defined $campaign->languageTargeting) {
-        my $langs_ref = $campaign->languageTargeting;
-        if (scalar @{$langs_ref->{'languages'}} > 0) {
-            push @campaign_params, SOAP::Data->name(
-            'languageTargeting' 
-                => \SOAP::Data->name('languages' 
-                    => @{$langs_ref->{'languages'}})->type('')
-            )->type('');
-        }
-    }
-
-    # geo_targeting
-    if (defined $campaign->geoTargeting) {
-        my $geo_ref = $campaign->geoTargeting;
-        my @geo_data;
-
-        for (qw/countries cities metros regions/) {
-            if ((defined $geo_ref->{$_}) and
-                (scalar @{$geo_ref->{$_}} > 0))
-            {
-                push @geo_data, SOAP::Data->name($_  
-                    => @{$geo_ref->{$_}})->type('');
-            }
-        }
-        
-        push @campaign_params, SOAP::Data->name(
-            'geoTargeting' => \SOAP::Data->value(@geo_data),
-        )->type('');
-    }
-
-    # network_targeting
-    if (defined $campaign->networkTargeting) {
-        my $network_ref = $campaign->networkTargeting;
-        if (scalar @{$network_ref->{'networkTypes'}} > 0) {
-            push @campaign_params, SOAP::Data->name(
-            'networkTargeting' 
-                => \SOAP::Data->name('networkTypes' 
-                    => @{$network_ref->{'networkTypes'}})->type('')
-            )->type('');
-        }
-    }
 
     my @params;
     push @params, SOAP::Data->name(
@@ -600,7 +571,7 @@ sub updateCampaign
         params => \@params,
     });
 
-    return	1;
+    return 1;
 }
 
 ### INSTANCE METHOD ################################################
@@ -629,78 +600,9 @@ sub updateCampaignList
     # loop over campaign objects
     for my $campaign (@campaigns) {
 
-        my @campaign_params;
-
+        my @campaign_params = _create_campaign_params($campaign);
         push @campaign_params, SOAP::Data->name(
             'id' => $campaign->id )->type('');
-    
-        # daily_budget
-        if (defined $campaign->dailyBudget) {
-            push @campaign_params, SOAP::Data->name(
-                'dailyBudget' => $campaign->dailyBudget )->type('');
-        }
-    
-        # campaign name
-        if (defined $campaign->name) {
-            push @campaign_params, SOAP::Data->name(
-                'name' => $campaign->name )->type('');
-        }
-    
-        # status
-        if (defined $campaign->status) {
-            push @campaign_params, SOAP::Data->name(
-                'status' => $campaign->status )->type('');
-        }
-    
-        # end_day
-        if (defined $campaign->endDay) {
-            push @campaign_params, SOAP::Data->name(
-                'endDay' => $campaign->endDay )->type('');
-        }
-    
-    
-        # language_targeting
-        if (defined $campaign->languageTargeting) {
-            my $langs_ref = $campaign->languageTargeting;
-            if (scalar @{$langs_ref->{'languages'}} > 0) {
-                push @campaign_params, SOAP::Data->name(
-                'languageTargeting' 
-                    => \SOAP::Data->name('languages' 
-                        => @{$langs_ref->{'languages'}})->type('')
-                )->type('');
-            }
-        }
-    
-        # geo_targeting
-        if (defined $campaign->geoTargeting) {
-            my $geo_ref = $campaign->geoTargeting;
-            my @geo_data;
-    
-            for (qw/countries cities metros regions/) {
-                if ((defined $geo_ref->{$_}) and
-                    (scalar @{$geo_ref->{$_}} > 0))
-                {
-                    push @geo_data, SOAP::Data->name($_  
-                        => @{$geo_ref->{$_}})->type('');
-                }
-            }
-            
-            push @campaign_params, SOAP::Data->name(
-                'geoTargeting' => \SOAP::Data->value(@geo_data),
-            )->type('');
-        }
-    
-        # network_targeting
-        if (defined $campaign->networkTargeting) {
-            my $network_ref = $campaign->networkTargeting;
-            if (scalar @{$network_ref->{'networkTypes'}} > 0) {
-                push @campaign_params, SOAP::Data->name(
-                'networkTargeting' 
-                    => \SOAP::Data->name('networkTypes' 
-                        => @{$network_ref->{'networkTypes'}})->type('')
-                )->type('');
-            }
-        }
     
         push @params, SOAP::Data->name(
             'campaign' => \SOAP::Data->value(@campaign_params) )->type('');
@@ -725,13 +627,12 @@ sub updateCampaignList
 
 =head1 NAME
  
-Google::Adwords::CampaignService - Interact with the Google Adwords
-CampaignService API calls
+Google::Adwords::CampaignService - Interface to the Google Adwords CampaignService API calls
  
  
 =head1 VERSION
  
-This documentation refers to Google::Adwords::CampaignService version 0.1.2
+This documentation refers to Google::Adwords::CampaignService version 0.5
  
  
 =head1 SYNOPSIS
@@ -790,11 +691,7 @@ Create a new campaign.
 
 =head3 Usage
 
-=over 4
-
     my $campaign_response = $obj->addCampaign($campaign);
-
-=back
 
 =head3 Parameters
 
@@ -824,11 +721,11 @@ Add a list of new Campaigns
 
 =head3 Usage
 
-=over 4
-
     my @campaign_responses = $obj->addCampaignList(@campaigns_to_add);
 
-=back
+    # or even
+    my @campaign_responses 
+        = $obj->addCampaignList($campaign1, $campaign2);
 
 =head3 Parameters
 
@@ -862,11 +759,7 @@ returned campaigns.
 
 =head3 Usage
 
-=over 4
-
 	my @campaigns = $obj->getAllAdWordsCampaigns();
-
-=back
 
 =head3 Parameters
 
@@ -892,11 +785,7 @@ Return all information about a specified Campaign.
 
 =head3 Usage
 
-=over 4
-
     my $campaign = $obj->getCampaign($id);
-
-=back
 
 =head3 Parameters
 
@@ -916,17 +805,13 @@ $campaign => The campaign details as a Google::Adwords::Campaign object
 
 =over 4
 
-Return all information about a list of Campaigns.
+Return information about a list of Campaigns.
 
 =back
 
 =head3 Usage
 
-=over 4
-
     my @campaigns = $obj->getCampaignList(@campaign_ids);
-
-=back
 
 =head3 Parameters
 
@@ -957,16 +842,12 @@ L<http://www.google.com/apis/adwords/developer/StatsRecord.html>
 
 =head3 Usage
 
-=over 4
-
     my @campaign_stats = $obj->getCampaignStats({
         campaignids	=> [ 3567, 4567, 8819 ],
         startDay => '2006-08-01',
         endDay	=> '2006-08-31',
         inPST	=> 1;
     });
-
-=back
 
 =head3 Parameters
 
@@ -1122,9 +1003,9 @@ Update the settings for a list of existing campaigns.
 
 =head3 Returns
 
-Returns 1 on success
- 
 =over 4
+
+Returns 1 on success
 
 =back
 
@@ -1135,6 +1016,12 @@ Returns 1 on success
 =item * L<Google::Adwords::Campaign>
 
 =item * L<Google::Adwords::StatsRecord>
+
+=item * L<Google::Adwords::AdSchedule>
+
+=item * L<Google::Adwords::SchedulingInterval>
+
+=item * L<Google::Adwords::BudgetOptimizerSettings>
 
 =back
 

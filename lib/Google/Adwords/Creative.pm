@@ -7,7 +7,6 @@ use base 'Google::Adwords::Data';
 
 my @fields = qw/
     adGroupId
-    deleted
     description1
     description2
     destinationUrl
@@ -17,6 +16,7 @@ my @fields = qw/
     headline
     id
     image
+    status
 /;
 
 __PACKAGE__->mk_accessors(@fields);

@@ -6,14 +6,37 @@ use Test::MockModule;
 
 sub test_class { return "Google::Adwords::InfoService"; }
 
-sub get_usage_quota_this_month : Test(1)
+# which tests should be run
+my %tests = (
+    getFreeUsageQuotaThisMonth  => 1,
+    getMethodCost               => 1,
+    getOperationCount           => 1,
+    getUnitCount                => 1,
+    getUnitCountForClients      => 1,
+    getUnitCountForMethod       => 1,
+    getUsageQuotaThisMonth      => 1,
+);
+
+sub start_of_each_test : Test(setup)
+{
+    my $self = shift;
+
+    # set debug to whatever was passed in as param
+    $self->{obj}->debug($self->{debug});
+}
+
+sub getUsageQuotaThisMonth : Test(1)
 {
     my $self = shift;
     
-    #return;
+    $sub_name = (caller 0)[3];
+    $sub_name =~ s/^.+:://;
+    if (not $tests{$sub_name}) {
+        return;
+    }
 
     if ($self->{'sandbox'}) {
-        $self->{'obj'}->debug(1);
+
         my $expected = '9223372036854775807';
         my $got = $self->{'obj'}->getUsageQuotaThisMonth();
         is ($got, $expected, 'getUsageQuotaThisMonth');
@@ -23,22 +46,13 @@ sub get_usage_quota_this_month : Test(1)
     my $soap = Test::MockModule->new('SOAP::Lite');
     $soap->mock( call => sub {
         my $xml .= <<'EOF';
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
- <soapenv:Header>
-  <responseTime soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">39</responseTime>
-  <operations soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</operations>
-  <units soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</units>
-  <requestId soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">f7912565442e4adeb1bf30cbbf2f8fd2</requestId>
- </soapenv:Header>
- <soapenv:Body>
   <getUsageQuotaThisMonthResponse xmlns="">
    <ns1:getUsageQuotaThisMonthReturn xmlns:ns1="https://adwords.google.com/api/adwords/v6">9223372036854775</ns1:getUsageQuotaThisMonthReturn>
   </getUsageQuotaThisMonthResponse>
- </soapenv:Body>
-</soapenv:Envelope>
 EOF
 
-        my $env = SOAP::Deserializer->deserialize($xml);
+        my $full_xml = $self->gen_full_response($xml);
+        my $env = SOAP::Deserializer->deserialize($full_xml);
         return $env;
     });
 
@@ -49,14 +63,17 @@ EOF
     }
 }
 
-sub get_free_usage_quota_this_month : Test(1)
+sub getFreeUsageQuotaThisMonth : Test(1)
 {
     my $self = shift;
 
-    #return;
+    $sub_name = (caller 0)[3];
+    $sub_name =~ s/^.+:://;
+    if (not $tests{$sub_name}) {
+        return;
+    }
 
     if ($self->{'sandbox'}) {
-        $self->{'obj'}->debug(1);
         my $expected = '9223372036854775807';
         my $got = $self->{'obj'}->getFreeUsageQuotaThisMonth();
         is ($got, $expected, 'getFreeUsageQuotaThisMonth');
@@ -65,23 +82,13 @@ sub get_free_usage_quota_this_month : Test(1)
 
     my $soap = Test::MockModule->new('SOAP::Lite');
     $soap->mock( call => sub {
-        my $xml .= <<'EOF';
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
- <soapenv:Header>
-  <responseTime soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">39</responseTime>
-  <operations soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</operations>
-  <units soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</units>
-  <requestId soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">f7912565442e4adeb1bf30cbbf2f8fd2</requestId>
- </soapenv:Header>
- <soapenv:Body>
+        my $method_xml .= <<'EOF';
   <getFreeUsageQuotaThisMonthResponse xmlns="">
    <ns1:getFreeUsageQuotaThisMonthReturn xmlns:ns1="https://adwords.google.com/api/adwords/v6">9223372036854775</ns1:getFreeUsageQuotaThisMonthReturn>
   </getFreeUsageQuotaThisMonthResponse>
- </soapenv:Body>
-</soapenv:Envelope>
 EOF
-
-        my $env = SOAP::Deserializer->deserialize($xml);
+        my $full_xml = $self->gen_full_response($method_xml);
+        my $env = SOAP::Deserializer->deserialize($full_xml);
         return $env;
     });
 
@@ -92,17 +99,22 @@ EOF
     }
 }
 
-sub get_method_cost : Test(1)
+sub getMethodCost : Test(1)
 {
     my $self = shift;
 
-    #return;
+
+    $sub_name = (caller 0)[3];
+    $sub_name =~ s/^.+:://;
+    if (not $tests{$sub_name}) {
+        return;
+    }
 
     if ($self->{'sandbox'}) {
         my $expected = '1';
         my $got = $self->{'obj'}->getMethodCost({
             service => 'InfoService',
-            method => 'getFreeUsageQuotaThisMonth',
+            method => 'getMethodCost',
             date => '2006-08-02',
         });
         is ($got, $expected, 'getMethodCost');
@@ -112,40 +124,36 @@ sub get_method_cost : Test(1)
     my $soap = Test::MockModule->new('SOAP::Lite');
     $soap->mock( call => sub {
         my $xml .= <<'EOF';
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
- <soapenv:Header>
-  <responseTime soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">39</responseTime>
-  <operations soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</operations>
-  <units soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</units>
-  <requestId soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">f7912565442e4adeb1bf30cbbf2f8fd2</requestId>
- </soapenv:Header>
- <soapenv:Body>
   <getMethodCostResponse xmlns="">
    <ns1:getMethodCostReturn xmlns:ns1="https://adwords.google.com/api/adwords/v6">1</ns1:getMethodCostReturn>
   </getMethodCostResponse>
- </soapenv:Body>
-</soapenv:Envelope>
 EOF
 
-        my $env = SOAP::Deserializer->deserialize($xml);
+        my $full_xml = $self->gen_full_response($xml);
+        my $env = SOAP::Deserializer->deserialize($full_xml);
         return $env;
     });
 
     my $expected = 1;
     my $got = $self->{'obj'}->getMethodCost({
         service => 'InfoService',
-        method => 'getFreeUsageQuotaThisMonth',
+        method => 'getMethodCost',
         date => '2006-08-02T00:00:00',
     });
     ok ($got == $expected, 'getMethodCost');
     }
 }
 
-sub get_operation_count : Test(1)
+sub getOperationCount : Test(1)
 {
     my $self = shift;
 
-    #return;
+
+    $sub_name = (caller 0)[3];
+    $sub_name =~ s/^.+:://;
+    if (not $tests{$sub_name}) {
+        return;
+    }
 
     if ($self->{'sandbox'}) {
         my $expected = '0';
@@ -160,22 +168,13 @@ sub get_operation_count : Test(1)
     my $soap = Test::MockModule->new('SOAP::Lite');
     $soap->mock( call => sub {
         my $xml .= <<'EOF';
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
- <soapenv:Header>
-  <responseTime soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">39</responseTime>
-  <operations soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</operations>
-  <units soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</units>
-  <requestId soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">f7912565442e4adeb1bf30cbbf2f8fd2</requestId>
- </soapenv:Header>
- <soapenv:Body>
   <getOperationCountResponse xmlns="">
    <ns1:getOperationCountReturn xmlns:ns1="https://adwords.google.com/api/adwords/v6">0</ns1:getOperationCountReturn>
   </getOperationCountResponse>
- </soapenv:Body>
-</soapenv:Envelope>
 EOF
 
-        my $env = SOAP::Deserializer->deserialize($xml);
+        my $full_xml = $self->gen_full_response($xml);
+        my $env = SOAP::Deserializer->deserialize($full_xml);
         return $env;
     });
 
@@ -188,11 +187,16 @@ EOF
     }
 }
 
-sub get_unit_count : Test(1)
+sub getUnitCount : Test(1)
 {
     my $self = shift;
 
-    #return;
+
+    $sub_name = (caller 0)[3];
+    $sub_name =~ s/^.+:://;
+    if (not $tests{$sub_name}) {
+        return;
+    }
 
     if ($self->{'sandbox'}) {
         my $expected = '0';
@@ -207,21 +211,12 @@ sub get_unit_count : Test(1)
     my $soap = Test::MockModule->new('SOAP::Lite');
     $soap->mock( call => sub {
         my $xml .= <<'EOF';
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
- <soapenv:Header>
-  <responseTime soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">39</responseTime>
-  <operations soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</operations>
-  <units soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</units>
-  <requestId soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">f7912565442e4adeb1bf30cbbf2f8fd2</requestId>
- </soapenv:Header>
- <soapenv:Body>
   <getUnitCountResponse xmlns="">
    <ns1:getUnitCountReturn xmlns:ns1="https://adwords.google.com/api/adwords/v6">0</ns1:getUnitCountReturn>
   </getUnitCountResponse>
- </soapenv:Body>
-</soapenv:Envelope>
 EOF
 
+        $xml = $self->gen_full_response($xml);
         my $env = SOAP::Deserializer->deserialize($xml);
         return $env;
     });
@@ -235,18 +230,22 @@ EOF
     }
 }
 
-sub get_unit_count_for_method : Test(1)
+sub getUnitCountForMethod : Test(1)
 {
     my $self = shift;
 
-    #return;
+
+    $sub_name = (caller 0)[3];
+    $sub_name =~ s/^.+:://;
+    if (not $tests{$sub_name}) {
+        return;
+    }
 
     if ($self->{'sandbox'}) {
-        $self->{obj}->debug(1);
         my $expected = '0';
         my $got = $self->{'obj'}->getUnitCountForMethod({
             service => 'InfoService',
-            method => 'getFreeUsageQuotaThisMonth',
+            method => 'getUnitCountForMethod',
             startDate => '2006-08-02',
             endDate => '2006-08-12',
         });
@@ -257,28 +256,19 @@ sub get_unit_count_for_method : Test(1)
     my $soap = Test::MockModule->new('SOAP::Lite');
     $soap->mock( call => sub {
         my $xml .= <<'EOF';
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
- <soapenv:Header>
-  <responseTime soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">39</responseTime>
-  <operations soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</operations>
-  <units soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</units>
-  <requestId soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">f7912565442e4adeb1bf30cbbf2f8fd2</requestId>
- </soapenv:Header>
- <soapenv:Body>
   <getUnitCountForMethodResponse xmlns="">
    <ns1:getUnitCountForMethodReturn xmlns:ns1="https://adwords.google.com/api/adwords/v6">0</ns1:getUnitCountForMethodReturn>
   </getUnitCountForMethodResponse>
- </soapenv:Body>
-</soapenv:Envelope>
 EOF
 
+        $xml = $self->gen_full_response($xml);
         my $env = SOAP::Deserializer->deserialize($xml);
         return $env;
     });
         my $expected = '0';
         my $got = $self->{'obj'}->getUnitCountForMethod({
             service => 'InfoService',
-            method => 'getFreeUsageQuotaThisMonth',
+            method => 'getUnitCountForMethod',
             startDate => '2006-08-02T00:00:00',
             endDate => '2006-08-12T00:00:00',
         });
@@ -291,16 +281,19 @@ sub getUnitCountForClients : Test(no_plan)
 {
     my ($self) = @_;
 
-    #return;
+
+    $sub_name = (caller 0)[3];
+    $sub_name =~ s/^.+:://;
+    if (not $tests{$sub_name}) {
+        return;
+    }
 
     if ($self->{sandbox}) {
 
-        $self->{obj}->debug(1);
-
         #$self->{obj}->getUnitCountForClients({
         #    clientEmails => [ 'rohan', 'tohan' ],
-        #    startDate => '2006-10-09',
-        #    endDate => '2006-10-09',
+        #    startDate => '2006-12-09',
+        #    endDate => '2006-12-10',
         #});
 
         return;
@@ -310,14 +303,6 @@ sub getUnitCountForClients : Test(no_plan)
     my $soap = Test::MockModule->new('SOAP::Lite');
     $soap->mock( call => sub {
         my $xml .= <<'EOF';
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
- <soapenv:Header>
-  <responseTime soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">39</responseTime>
-  <operations soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</operations>
-  <units soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</units>
-  <requestId soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">f7912565442e4adeb1bf30cbbf2f8fd2</requestId>
- </soapenv:Header>
- <soapenv:Body>
   <getUnitCountForClientsResponse xmlns="">
    <ns1:getUnitCountForClientsReturn xmlns:ns1="https://adwords.google.com/api/adwords/v6">
     <clientEmail>email1@domain.com</clientEmail>
@@ -328,10 +313,9 @@ sub getUnitCountForClients : Test(no_plan)
     <quotaUnits>10</quotaUnits>
    </ns1:getUnitCountForClientsReturn>
   </getUnitCountForClientsResponse>
- </soapenv:Body>
-</soapenv:Envelope>
 EOF
 
+        $xml = $self->gen_full_response($xml);
         my $env = SOAP::Deserializer->deserialize($xml);
         return $env;
     });
@@ -343,9 +327,9 @@ EOF
         });
 
         ok ($usage_records[0]->clientEmail eq 'email1@domain.com',
-                'getUnitCountForClients');
+                'getUnitCountForClients (1)');
         ok ($usage_records[1]->clientEmail eq 'email2@domain.com',
-                'getUnitCountForClients');
+                'getUnitCountForClients (2)');
 
     }
 }

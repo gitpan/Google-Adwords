@@ -9,9 +9,24 @@ use InfoService;
 use CampaignService;
 use AdGroupService;
 use AccountService;
-use CreativeService;
+use AdService;
 use ReportService;
 use TrafficEstimatorService;
+use CriterionService;
+use KeywordToolService;
+
+# which tests to actually run
+my @modules = (
+    { InfoService               => 1, },
+    { CampaignService           => 1, },
+    { AdGroupService            => 1, },
+    { AccountService            => 1, },
+    { AdService                 => 1, },
+    { ReportService             => 1, },
+    { TrafficEstimatorService   => 1, },
+    { CriterionService          => 1, },
+    { KeywordToolService        => 1, },
+);
 
 my $i;
 
@@ -24,38 +39,35 @@ if ($answer ne 'y') {
 }
 
 my $email = prompt "Your gmail address: ";
-my $password = prompt "Your password: ";
+my $password = prompt "-e", '*', "Your password: ";
 my $currency = prompt "Your currence code (3 digit): ";
+my $client_num = prompt "Which client email number to use (1,2,3,4,5): ";
 $email = $email->{value};
 $password = $password->{value};
 $currency = $currency->{value};
+$client_num = $client_num->{value};
+
+# test values during development
+#my $email = '';
+#my $password = '';
+#my $currency = '';
+#my $client_num = '1';
 
 my $params_ref = {
     sandbox => 1,
+    debug => 0,
     email => $email,
     password => $password,
     developerToken => $email. '++' . $currency,
+    clientEmail => 'client_' . $client_num . '+' . $email,
 };
 
+for (@modules) {
+    my ($key) = keys %{$_};
+    if ($_->{$key} == 1) {
+        $i = $key->new($params_ref);
+        $i->runtests();
+    }
+}
 
-$i = InfoService->new($params_ref);
-$i->runtests();
-
-$i = CampaignService->new($params_ref);
-$i->runtests();
-
-$i = AdGroupService->new($params_ref);
-$i->runtests();
-
-$i = AccountService->new($params_ref);
-$i->runtests();
-
-$i = CreativeService->new($params_ref);
-$i->runtests();
-
-$i = ReportService->new($params_ref);
-$i->runtests();
-
-$i = TrafficEstimatorService->new($params_ref);
-$i->runtests();
 

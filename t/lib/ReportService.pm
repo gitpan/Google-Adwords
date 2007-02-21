@@ -8,35 +8,48 @@ use Google::Adwords::ReportJob;
 
 sub test_class { return "Google::Adwords::ReportService"; }
 
+# tests to run
+my %tests = (
+    deleteReport                => 0,
+    z2_getAllJobs               => 1,
+    getGzipReportDownloadUrl    => 0,
+    z1_getReportJobStatus       => 1,
+    z0_scheduleReportJob        => 1,
+);
+
+sub start_of_each_test : Test(setup)
+{
+    my $self = shift;
+
+    # set debug to whatever was passed in as param
+    $self->{obj}->debug($self->{debug});
+}
+
 sub deleteReport : Test(no_plan)
 {
     my $self = shift;
 
-    #return;
+    $sub_name = (caller 0)[3];
+    $sub_name =~ s/^.+:://;
+    if (not $tests{$sub_name}) {
+        return;
+    }
+
 
     if ($self->{sandbox}) {
-        $self->{obj}->debug(1);
 
         #$self->{obj}->deleteReport(11);
+        return;
 
     }
     else {
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock( call => sub {
             my $xml .= <<'EOF';
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
- <soapenv:Header>
-  <responseTime soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">39</responseTime>
-  <operations soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</operations>
-  <units soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</units>
-  <requestId soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">f7912565442e4adeb1bf30cbbf2f8fd2</requestId>
- </soapenv:Header>
- <soapenv:Body>
   <deleteReportResponse xmlns="" />
- </soapenv:Body>
-</soapenv:Envelope>
 EOF
 
+            $xml = $self->gen_full_response($xml);
             my $env = SOAP::Deserializer->deserialize($xml);
             return $env;
         });
@@ -48,18 +61,22 @@ EOF
 
 }
 
-sub getAllJobs : Test(no_plan)
+sub z2_getAllJobs : Test(no_plan)
 {
     my $self = shift;
 
-    #return;
+
+    $sub_name = (caller 0)[3];
+    $sub_name =~ s/^.+:://;
+    if (not $tests{$sub_name}) {
+        return;
+    }
 
     if ($self->{sandbox}) {
-        $self->{obj}->debug(1);
 
         my @jobs = $self->{obj}->getAllJobs;
         for (@jobs) {
-            ok ($_->id =~ /\d+/, 'getAllJobs');
+            ok ($_->id =~ /\d+/, 'getAllJobs id: ' . $_->id);
         }
 
     }
@@ -67,14 +84,6 @@ sub getAllJobs : Test(no_plan)
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock( call => sub {
             my $xml .= <<'EOF';
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
- <soapenv:Header>
-  <responseTime soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">39</responseTime>
-  <operations soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</operations>
-  <units soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</units>
-  <requestId soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">f7912565442e4adeb1bf30cbbf2f8fd2</requestId>
- </soapenv:Header>
- <soapenv:Body>
   <getAllJobsResponse xmlns="">
    <ns1:getAllJobsReturn xsi:type="ns1:KeywordReportJob"
 xmlns:ns1="https://adwords.google.com/api/adwords/v6">
@@ -100,17 +109,16 @@ xmlns:ns2="https://adwords.google.com/api/adwords/v6">
     <ns2:status>InProgress</ns2:status>
    </ns2:getAllJobsReturn>
   </getAllJobsResponse>
- </soapenv:Body>
-</soapenv:Envelope>
 EOF
 
+            $xml = $self->gen_full_response($xml);
             my $env = SOAP::Deserializer->deserialize($xml);
             return $env;
         });
 
         my @jobs = $self->{obj}->getAllJobs;
         for (@jobs) {
-            ok ($_->id =~ /\d+/, 'getAllJobs');
+            ok ($_->id =~ /\d+/, 'getAllJobs id: ' . $_->id);
         }
 
 
@@ -122,10 +130,14 @@ sub getGzipReportDownloadUrl : Test(no_plan)
 {
     my $self = shift;
 
-    #return;
+
+    $sub_name = (caller 0)[3];
+    $sub_name =~ s/^.+:://;
+    if (not $tests{$sub_name}) {
+        return;
+    }
 
     if ($self->{sandbox}) {
-        $self->{obj}->debug(1);
 
         my $url = $self->{obj}->getGzipReportDownloadUrl(1935159656);
 
@@ -134,43 +146,10 @@ sub getGzipReportDownloadUrl : Test(no_plan)
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock( call => sub {
             my $xml .= <<'EOF';
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
- <soapenv:Header>
-  <responseTime soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">39</responseTime>
-  <operations soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</operations>
-  <units soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</units>
-  <requestId soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">f7912565442e4adeb1bf30cbbf2f8fd2</requestId>
- </soapenv:Header>
- <soapenv:Body>
-  <getAllJobsResponse xmlns="">
-   <ns1:getAllJobsReturn xsi:type="ns1:KeywordReportJob"
-xmlns:ns1="https://adwords.google.com/api/adwords/v6">
-    <ns1:aggregationType>Daily</ns1:aggregationType>
-    <ns1:clientEmails>client_1+rohan.almeida@gmail.com</ns1:clientEmails>
-    <ns1:crossClient>false</ns1:crossClient>
-    <ns1:endDay>2006-10-17-07:00</ns1:endDay>
-    <ns1:id>11</ns1:id>
-    <ns1:name>report [11]</ns1:name>
-    <ns1:startDay>2006-10-17-07:00</ns1:startDay>
-    <ns1:status>Pending</ns1:status>
-    <ns1:includeZeroImpression>false</ns1:includeZeroImpression>
-   </ns1:getAllJobsReturn>
-   <ns2:getAllJobsReturn xsi:type="ns2:AdTextReportJob"
-xmlns:ns2="https://adwords.google.com/api/adwords/v6">
-    <ns2:aggregationType>Daily</ns2:aggregationType>
-    <ns2:clientEmails>client_1+rohan.almeida@gmail.com</ns2:clientEmails>
-    <ns2:crossClient>false</ns2:crossClient>
-    <ns2:endDay>2006-10-17-07:00</ns2:endDay>
-    <ns2:id>22</ns2:id>
-    <ns2:name>report [22]</ns2:name>
-    <ns2:startDay>2006-10-17-07:00</ns2:startDay>
-    <ns2:status>InProgress</ns2:status>
-   </ns2:getAllJobsReturn>
-  </getAllJobsResponse>
- </soapenv:Body>
-</soapenv:Envelope>
+  <getGzipReportDownloadUrlResponse xmlns="" />
 EOF
 
+            $xml = $self->gen_full_response($xml);
             my $env = SOAP::Deserializer->deserialize($xml);
             return $env;
         });
@@ -185,16 +164,20 @@ EOF
 
 }
 
-sub getReportJobStatus : Test(no_plan)
+sub z1_getReportJobStatus : Test(no_plan)
 {
     my $self = shift;
 
-    #return;
+    $sub_name = (caller 0)[3];
+    $sub_name =~ s/^.+:://;
+    if (not $tests{$sub_name}) {
+        return;
+    }
+
 
     if ($self->{sandbox}) {
-        $self->{obj}->debug(1);
 
-        my $status = $self->{obj}->getReportJobStatus(11);
+        my $status = $self->{obj}->getReportJobStatus($self->{_job_id});
         ok ($status eq 'Pending', 'getReportJobStatus');
 
     }
@@ -202,22 +185,13 @@ sub getReportJobStatus : Test(no_plan)
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock( call => sub {
             my $xml .= <<'EOF';
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
- <soapenv:Header>
-  <responseTime soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">39</responseTime>
-  <operations soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</operations>
-  <units soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</units>
-  <requestId soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">f7912565442e4adeb1bf30cbbf2f8fd2</requestId>
- </soapenv:Header>
- <soapenv:Body>
   <getReportJobStatusResponse xmlns="">
    <ns1:getReportJobStatusReturn
 xmlns:ns1="https://adwords.google.com/api/adwords/v6">Pending</ns1:getReportJobStatusReturn>
   </getReportJobStatusResponse>
- </soapenv:Body>
-</soapenv:Envelope>
 EOF
 
+            $xml = $self->gen_full_response($xml);
             my $env = SOAP::Deserializer->deserialize($xml);
             return $env;
         });
@@ -229,14 +203,18 @@ EOF
 
 }
 
-sub scheduleReportJob : Test(no_plan)
+sub z0_scheduleReportJob : Test(no_plan)
 {
     my $self = shift;
 
-    #return;
+    $sub_name = (caller 0)[3];
+    $sub_name =~ s/^.+:://;
+    if (not $tests{$sub_name}) {
+        return;
+    }
+
 
     if ($self->{sandbox}) {
-        $self->{obj}->debug(1);
 
         my $job = Google::Adwords::ReportJob->new
             ->startDay('2006-08-01')
@@ -247,30 +225,22 @@ sub scheduleReportJob : Test(no_plan)
 
         my $job_id 
             = $self->{obj}->scheduleReportJob('AccountReportJob', $job);
-        ok ($job_id =~ /\d+/, 'scheduleReportJob');
+        ok ($job_id =~ /\d+/, 'scheduleReportJob id: ' . $job_id);
 
-
+        # save for further use
+        $self->{_job_id} = $job_id;
     }
     else {
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock( call => sub {
             my $xml .= <<'EOF';
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
- <soapenv:Header>
-  <responseTime soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">39</responseTime>
-  <operations soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</operations>
-  <units soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</units>
-  <requestId soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">f7912565442e4adeb1bf30cbbf2f8fd2</requestId>
- </soapenv:Header>
- <soapenv:Body>
   <scheduleReportJobResponse
 xmlns="https://adwords.google.com/api/adwords/v6">
    <scheduleReportJobReturn>1935158656</scheduleReportJobReturn>
   </scheduleReportJobResponse>
- </soapenv:Body>
-</soapenv:Envelope>
 EOF
 
+            $xml = $self->gen_full_response($xml);
             my $env = SOAP::Deserializer->deserialize($xml);
             return $env;
         });

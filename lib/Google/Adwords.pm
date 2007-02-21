@@ -1,7 +1,7 @@
 package Google::Adwords;
 use strict; use warnings;
 
-use version; our $VERSION = qv('0.6');
+use version; our $VERSION = qv('1.0.1');
 
 1;
 
@@ -14,8 +14,12 @@ Google::Adwords - an interface which abstracts the Google Adwords SOAP API
  
 =head1 VERSION
  
-This documentation refers to Google::Adwords version 0.6
+This documentation refers to Google::Adwords version 1.0.1
  
+
+=head1 API VERSION
+
+Google::Adwords currently uses version 8 (v8) of the Adwords API
  
 =head1 SYNOPSIS
  
@@ -64,68 +68,105 @@ This collection of modules under Google::Adwords provides an easy
 to use object oriented interface to the Google Adwords SOAP API. 
 You don't need to understand SOAP or web services to use this module.
 
-* Base Service Class - L<Google::Adwords::Service>
+=over
+
+* Base Service Class        -   L<Google::Adwords::Service>
+
+=back
 
 Read the manual page for this module in order to see how to setup your
 authentication details and other options available
 
-Each API Service belongs to a particular module.
+B<Each API Service belongs to a module of the same name as the service>
 
-* CampaignService       - L<Google::Adwords::CampaignService>
+=over
 
-* InfoService           - L<Google::Adwords::InfoService>
+* CampaignService           -   L<Google::Adwords::CampaignService>
+
+* InfoService               -   L<Google::Adwords::InfoService>
  
-* AdGroupService        - L<Google::Adwords::AdGroupService>
+* AdGroupService            -   L<Google::Adwords::AdGroupService>
 
-* AccountService        - L<Google::Adwords::AccountService>
+* AccountService            -   L<Google::Adwords::AccountService>
 
-* CreativeService       - L<Google::Adwords::CreativeService>
+* AdService                 -   L<Google::Adwords::AdService>
 
-* ReportService         - L<Google::Adwords::ReportService>
+* ReportService             -   L<Google::Adwords::ReportService>
 
-* TrafficEstimatorService - L<Google::Adwords::TrafficEstimatorService>
+* TrafficEstimatorService   -   L<Google::Adwords::TrafficEstimatorService>
 
-Some services like the CampaignService need to deal with complex data 
-types which are available as objects.
+* CriterionService          -   L<Google::Adwords::CriterionService>
 
-* Campaign              - L<Google::Adwords::Campaign>
+* KeywordToolService        -   L<Google::Adwords::KeywordToolService>
 
-* StatsRecord           - L<Google::Adwords::StatsRecord>   
-
-* AdGroup               - L<Google::Adwords::AdGroup>   
-
-* ClientUsageRecord     - L<Google::Adwords::ClientUsageRecord>
-
-* AccountInfo           - L<Google::Adwords::AccountInfo>
-
-* EmailPromotionsPreferences  - L<Google::Adwords::EmailPromotionsPreferences>
-
-* Address               - L<Google::Adwords::Address>
-
-* CoverageType          - L<Google::Adwords::CoverageType>
-
-* CreditCard            - L<Google::Adwords::CreditCard>
-
-* Creative              - L<Google::Adwords::Creative>
-
-* Image                 - L<Google::Adwords::Image>
-
-* ReportJob             - L<Google::Adwords::ReportJob>
-
-* KeywordRequest        - L<Google::Adwords::KeywordRequest>
-
-* KeywordEstimate       - L<Google::Adwords::KeywordEstimate>
-
-* AdGroupRequest        - L<Google::Adwords::AdGroupRequest>
-
-* AdGroupEstimate       - L<Google::Adwords::AdGroupEstimate>
-
-* CampaignRequest       - L<Google::Adwords::CampaignRequest>
-
-* CampaignEstimate      - L<Google::Adwords::CampaignEstimate>
+=back
 
 
-Please read the documentation for the above modules.
+B<Many services need to deal with complex data types which are available as objects>
+
+=over
+
+* Campaign                  -   L<Google::Adwords::Campaign>
+
+* AdSchedule                -   L<Google::Adwords::AdSchedule>
+
+* SchedulingInterval        -   L<Google::Adwords::SchedulingInterval>
+
+* BudgetOptimizerSettings   -   L<Google::Adwords::BudgetOptimizerSettings>
+
+* StatsRecord               -   L<Google::Adwords::StatsRecord>   
+
+* AdGroup                   -   L<Google::Adwords::AdGroup>   
+
+* ClientUsageRecord         -   L<Google::Adwords::ClientUsageRecord>
+
+* AccountInfo               -   L<Google::Adwords::AccountInfo>
+
+* EmailPromotionsPreferences    - L<Google::Adwords::EmailPromotionsPreferences>
+
+* Address                   -   L<Google::Adwords::Address>
+
+* CoverageType              -   L<Google::Adwords::CoverageType>
+
+* CreditCard                -   L<Google::Adwords::CreditCard>
+
+* Creative                  -   L<Google::Adwords::Creative>
+
+* Image                     -   L<Google::Adwords::Image>
+
+* ReportJob                 -   L<Google::Adwords::ReportJob>
+
+* KeywordRequest            -   L<Google::Adwords::KeywordRequest>
+
+* KeywordEstimate           -   L<Google::Adwords::KeywordEstimate>
+
+* AdGroupRequest            -   L<Google::Adwords::AdGroupRequest>
+
+* AdGroupEstimate           -   L<Google::Adwords::AdGroupEstimate>
+
+* CampaignRequest           -   L<Google::Adwords::CampaignRequest>
+
+* CampaignEstimate          -   L<Google::Adwords::CampaignEstimate>
+
+* Business                  -   L<Google::Adwords::Business>
+
+* Criterion                 -   L<Google::Adwords::Criterion>
+
+* Ad                        -   L<Google::Adwords::Ad>
+
+* KeywordVariation          -   L<Google::Adwords::KeywordVariation>
+
+* KeywordVariations         -   L<Google::Adwords::KeywordVariations>
+
+* SeedKeyword               -   L<Google::Adwords::SeedKeyword>
+
+* SiteKeyword               -   L<Google::Adwords::SiteKeyword>
+
+* SiteKeywordGroups         -   L<Google::Adwords::SiteKeywordGroups>
+
+=back
+
+
  
 =head1 DEPENDENCIES
  

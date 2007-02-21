@@ -4,7 +4,6 @@ use strict; use warnings;
 use version; our $VERSION = qv('0.1.1');
 
 use base 'Google::Adwords::Service';
-use Data::Dumper;
 
 use Google::Adwords::ClientUsageRecord;
 

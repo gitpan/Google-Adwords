@@ -1,6 +1,9 @@
 
-* some nice example scripts of Google::Adwords::ReportService in action,
-  especially for custom reports
+* Lots more good examples
 
-* The sandbox tests need some order so that it works everytime
+* CriterionService.checkCriteria()
+
+* CreativeService.checkCreative() and CreativeService.checkCreativeList()
+
+* Error handling - ApiException and ApiError objects
 

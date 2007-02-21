@@ -11,85 +11,6 @@ use Google::Adwords::StatsRecord;
 
 ### INSTANCE METHOD ################################################
 # Usage      : 
-#   my $ret = $obj->activateCreative($adGroupId, $creativeId);
-# Purpose    : Activate a given creative in a given adgroup
-# Returns    : Always return 1
-# Parameters : AdGroup Id and Creative Id
-# Throws     : no exceptions
-# Comments   : none
-# See Also   : n/a
-#######################################################################
-sub activateCreative
-{
-    my ($self, $adgroupid, $creativeid) = @_;
-
-    my @params;
-    push @params,
-     SOAP::Data->name(
-      'adGroupId' => $adgroupid )->type('');
-    push @params,
-     SOAP::Data->name(
-      'creativeId' => $creativeid )->type('');
-
-    my $result	= $self->_create_service_and_call({
-     service	=> 'CreativeService',
-     method	=> 'activateCreative',
-     params	=> \@params,
-    });
-
-    return	1;
-}
-
-### INSTANCE METHOD ################################################
-# Usage      : 
-#   my $ret = $obj->activateCreativeList(
-#       {
-#           adGroupId => 1,
-#           creativeId => 1,
-#       },
-#       {
-#           adGroupId => 5,
-#           creativeId => 2,
-#       },
-#   );
-# Purpose    : Mark a list of creatives as active
-# Returns    : Always return 1
-# Parameters : A list of hashrefs
-# Throws     : no exceptions
-# Comments   : none
-# See Also   : n/a
-#######################################################################
-sub activateCreativeList
-{
-    my ($self, @pairs) = @_;
-
-    my @adgroupids;
-    my @creativeids;
-
-    for ( @pairs ) {
-     push @adgroupids, $_->{adGroupId};
-     push @creativeids, $_->{creativeId};
-    }
-
-    my @params;
-    push @params,
-     SOAP::Data->name(
-      'adGroupIds' => @adgroupids )->type('');
-    push @params,
-     SOAP::Data->name(
-      'creativeIds' => @creativeids )->type('');
-
-    my $result	= $self->_create_service_and_call({
-     service	=> 'CreativeService',
-     method	=> 'activateCreativeList',
-     params	=> \@params,
-    });
-
-    return	1;
-}
-
-### INSTANCE METHOD ################################################
-# Usage      : 
 #   my $addcreative = $obj->addCreative($creative);
 # Purpose    : Add a new creative 
 # Returns    : Return a creative object
@@ -295,86 +216,6 @@ sub addCreativeList
 
 ### INSTANCE METHOD ################################################
 # Usage      : 
-#   my $ret = $obj->deleteCreative($adGroupId, $creativeId);
-# Purpose    : Mark a creative as deleted
-# Returns    : Always return 1
-# Parameters : The adgroupid and the creative id to be deleted
-# Throws     : no exceptions
-# Comments   : none
-# See Also   : n/a
-#######################################################################
-sub deleteCreative
-{
-    my ($self, $adgroupid, $creativeid) = @_;
-
-    my @params;
-    push @params,
-     SOAP::Data->name(
-      'adGroupId' => $adgroupid )->type('');
-    push @params,
-     SOAP::Data->name(
-      'creativeId' => $creativeid )->type('');
-
-    my $result	= $self->_create_service_and_call({
-     service	=> 'CreativeService',
-     method	=> 'deleteCreative',
-     params	=> \@params,
-    });
-
-    return	1;
-}
-
-### INSTANCE METHOD ################################################
-# Usage      : 
-#   my $ret = $obj->deleteCreativeList(
-#       {
-#           adGroupId => 1,
-#           creativeId => 1,
-#       },
-#       {
-#           adGroupId => 5,
-#           creativeId => 2,
-#       },
-#   );
-# Purpose    : Mark a list of creatives as deleted
-# Returns    : Always return 1
-# Parameters : A list of hashrefs
-# Throws     : no exceptions
-# Comments   : none
-# See Also   : n/a
-#######################################################################
-sub deleteCreativeList
-{
-    my ($self, @pairs) = @_;
-
-    my @adgroupids;
-    my @creativeids;
-
-    for ( @pairs ) {
-     push @adgroupids, $_->{adGroupId};
-     push @creativeids, $_->{creativeId};
-    }
-
-    my @params;
-    push @params,
-     SOAP::Data->name(
-      'adGroupIds' => @adgroupids )->type('');
-    push @params,
-     SOAP::Data->name(
-      'creativeIds' => @creativeids )->type('');
-
-    my $result	= $self->_create_service_and_call({
-     service	=> 'CreativeService',
-     method	=> 'deleteCreativeList',
-     params	=> \@params,
-    });
-
-    return	1;
-}
-
-
-### INSTANCE METHOD ################################################
-# Usage      : 
 #   my @creatives = $obj->getActiveCreatives($adgroupid);
 # Purpose    : Get all the active creatives for a given AdGroup
 # Returns    : A list of Google::Adwords::Creative objects
@@ -548,6 +389,61 @@ sub getCreativeStats
  return	@data;
 }
 
+
+### INSTANCE METHOD ###################################################
+# Usage      : $ret = $obj->updateCreatives(@creatives);
+# Purpose    : update status of creatives
+# Returns    : 1 on success
+# Parameters : 
+#   @creatives => List of Creative objects
+# Throws     : no exceptions
+# Comments   : Only the status filed can be updated
+# See Also   : n/a
+#######################################################################
+sub updateCreatives
+{
+    my ($self, @creatives) = @_;
+
+    my @params;
+
+    foreach my $creative ( @creatives ) {
+
+     my @creative_params;
+      
+     if ( !UNIVERSAL::isa($creative, 'Google::Adwords::Creative') ) {
+      die "Object is a not a Google::Adwords::Creative object.";
+     }
+
+     if (not defined $creative->id) {
+        die "id must be set for the Cretive object\n";
+     }
+     if (not defined $creative->adGroupId) {
+        die "adGroupId must be set for the Cretive object\n";
+     }
+     if (not defined $creative->status) {
+        die "status must be set for the Cretive object\n";
+     }
+
+      push @creative_params, SOAP::Data->name(
+	'id' => $creative->id )->type('');
+      push @creative_params, SOAP::Data->name(
+	'adGroupId' => $creative->adGroupId )->type('');
+      push @creative_params, SOAP::Data->name(
+	'status' => $creative->status )->type('');
+     
+     push @params, SOAP::Data->name(
+      'creative' => \SOAP::Data->value(@creative_params) )->type('');
+    }
+
+
+    my $result	= $self->_create_service_and_call({
+     service	=> 'CreativeService',
+     method	=> 'updateCreatives',
+     params	=> \@params,
+    });
+    
+    return 1; 
+}
 
 1;
 

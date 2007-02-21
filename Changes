@@ -1,5 +1,40 @@
 Revision history for Perl module Google::Adwords
 
+v1.0.1  Wed Feb 21 15:26:04 IST 2007
+    - v8 implemented
+    - added field proxyMaxCpc to the AdGroup object
+    - KeywordToolService implemented
+        * Added module Google::Adwords::KeywordToolService
+        * Added Google::Adwords::KeywordVariation
+        * Added Google::Adwords::KeywordVariations
+        * Added Google::Adwords::SeedKeyword
+        * Added Google::Adwords::SiteKeyword
+        * Added Google::Adwords::SiteKeywordGroups
+    - Campaign object supports budgetOptimizerSettings()
+        * Added module Google::Adwords::BudgetOptimizerSettings
+    - All sandbox tests are passing!
+    - CreativeService deprecated. Module is in distro, but please do not use it. Use
+      AdService instead.
+    - All calls of AdService implemented (previously CreativeService)
+        * CreativeService module still exists, but use AdService
+        * Added module Google::Adwords::AdService
+        * Added module Google::Adwords::Ad
+        * Added module Google::Adwords::Business
+    - CampaignService supports Ad Schedules
+        * Google::Adwords::Campaign object supports the schedule() accessor
+        * Added module Google::Adwords::AdSchedule
+        * Added module Google::Adwords::SchedulingInterval
+    - Makefile.PL does not have dependencies on actual version numbers
+    - Implements CriterionService
+    - Bug fix for Google::Adwords::Campaign object, so that single values are
+      returned in an arrayref and not as a string
+    - For all data objects, the get() method. i.e. the accessor now escapes HTML
+      entities
+    - Dependency for Test::MockModule added to Makefile
+    - Added examples/init_sandbox_accounts.pl which initializes the client accounts
+      in the sandbox
+    - Added examples/findBusinesses.pl script
+
 v0.6    Fri Oct 27 19:45:58 IST 2006
     - implements the TrafficEstimatorService API calls
     - New modules

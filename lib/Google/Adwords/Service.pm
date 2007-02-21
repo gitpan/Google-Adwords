@@ -1,16 +1,16 @@
 package Google::Adwords::Service;
 use strict; use warnings;
 
-use version; our $VERSION = qv('0.3');
+use version; our $VERSION = qv('0.5');
 
 use base qw/ Class::Accessor::Chained Google::Adwords /;
 use SOAP::Lite;
 use Readonly;
 
-Readonly my $user_agent => "Google::Adwords v0.6";
-Readonly my $endpoint => 'https://adwords.google.com/api/adwords/v6';
-Readonly my $endpoint_sandbox => 'https://sandbox.google.com/api/adwords/v6';
-Readonly my $soap_timeout => 20;
+Readonly my $user_agent => "Google::Adwords v1.0.1";
+Readonly my $endpoint => 'https://adwords.google.com/api/adwords/v8';
+Readonly my $endpoint_sandbox => 'https://sandbox.google.com/api/adwords/v8';
+Readonly my $soap_timeout => 35;
 
 __PACKAGE__->mk_accessors(qw/
     email
@@ -26,6 +26,11 @@ __PACKAGE__->mk_accessors(qw/
     operations
     units
     responseTime
+/);
+
+# Read only accessors
+__PACKAGE__->mk_ro_accessors(qw/
+    api_version
 /);
 
 ### CLASS METHOD ##################################################
@@ -54,6 +59,9 @@ sub new
 
     # default useragent
     $self->{'useragent'} = $user_agent;
+
+    # Adwords API version
+    $self->{api_version} = 'v8';
 
     bless $self, $class;
     return $self;
@@ -198,7 +206,6 @@ sub _call
         $self->$_($result->headerof("//$_")->value);
     }
 
-    
     return $result; 
 }
 
@@ -266,125 +273,87 @@ Google::Adwords::Service - Base class for the Service modules
  
 =head1 VERSION
  
-This documentation refers to Google::Adwords::Service version 0.3
+This documentation refers to Google::Adwords::Service version 0.5
  
  
 =head1 DESCRIPTION
  
 This module is not supposed to be used directly. Use the child 
-Service modules.
+Service modules. See the L<Google::Adwords> documentation for the list of available
+child Service modules.
  
 =head1 METHODS
 
-These accessors are available across all the child Service modules
+These accessors/methods are available across all the child Service modules
 
 =head2 B<new()>
 
 =head3 Description
 
-=over 4
-
-Creates a new Google::Adwords::Service object
-
-=back
+    Creates a new Google::Adwords::*Service object
 
 =head3 Usage
 
-=over 4
-
     my $service = Google::Adwords::CampaignService->new();
-
-=back
 
 =head3 Parameters
 
-=over 4
-
-NONE
-
-=back
+    NONE
 
 =head3 Returns
  
-=over 4
-
-A Google::Adwords::Service object
-
-=back
+    A Google::Adwords::*Service object
 
 =head2 B<email()>
 
-=over 4
-
-Set/Get your Google Adwords account name (your email address). This 
-value should be set before calling any other API methods
-
-=back
+    Set your Google Adwords account name (your email address). This 
+    value should be set before calling any other API methods
 
 =head2 B<password()>
 
-=over 4
+    Set your Google Adwords account password. This 
+    value should be set before calling any other API methods
 
-Set/Get your Google Adwords account password. This 
-value should be set before calling any other API methods
+=head2 B<developerToken()>
 
-=back
+    Set your Google Adwords developer token. This 
+    value should be set before calling any other API methods
 
-=head2 B<token()>
+=head2 B<applicationToken()>
 
-=over 4
-
-Set/Get your Google Adwords developer token. This 
-value should be set before calling any other API methods
-
-=back
+    Set your Google Adwords application token. This 
+    value should be set before calling any other API methods
 
 =head2 B<clientEmail()>
 
-=over 4
-
-Use this if you have a MCC (My Client Center) account. Set/Get the actual
-client email which will be used for the API calls.
-
-=back
+    Use this if you have a MCC (My Client Center) account. Set the actual
+    client email which will be used for the API calls.
 
 =head2 B<useragent()>
 
-=over 4
-
-Set this to an arbitrary string that identifies the customer sending the
-request. Default value is "Google::Adwords $VERSION"
-
-=back
+    Set this to an arbitrary string that identifies the customer sending the
+    request. Default value is "Google::Adwords $VERSION"
 
 =head2 B<use_sandbox()>
 
-=over 4
-
-If you do $obj->use_sandbox(1), then this module will use the 
-sandbox for all API calls. 
-
-=back
+    If you do $obj->use_sandbox(1), then this module will use the 
+    sandbox for all API calls. 
 
 =head2 B<timeout()>
 
-=over 4
-
-Set the SOAP timeout value in seconds. Default value is 20.
-
-=back
+    Set the SOAP timeout value in seconds. Default value is 35 seconds.
 
 =head2 B<debug()>
 
-=over 4
+    Use $obj->debug(1) if you want to trace the request/response XML
 
-Use $obj->debug(1) if you want to see the request/response XML
+=head2 B<api_version()>
 
-=back
+    Returns version information for the Adwords API
 
 
-The following accessors are available after an API call is done. These give
-information about the response.
+B<The following accessors are available after an API call is done. These give
+information about the response>
 
 =head2 B<requestId()>
 

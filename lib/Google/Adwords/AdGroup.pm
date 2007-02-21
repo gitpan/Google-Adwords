@@ -1,10 +1,9 @@
 package Google::Adwords::AdGroup;
 use strict; use warnings;
 
-use version; our $VERSION = qv('0.0.2');
+use version; our $VERSION = qv('0.2');
 
 use base 'Google::Adwords::Data';
-use Data::Dumper;
 
 my @fields = qw/
     campaignId
@@ -13,6 +12,7 @@ my @fields = qw/
     maxCpc
     maxCpm
     name
+    proxyMaxCpc
     status
 /;
 
@@ -29,7 +29,7 @@ Google::Adwords::AdGroup - A Google Adwords AdGroup Object
  
 =head1 VERSION
  
-This documentation refers to Google::Adwords::AdGroup version 0.0.2
+This documentation refers to Google::Adwords::AdGroup version 0.2
  
  
 =head1 SYNOPSIS
@@ -83,6 +83,8 @@ B<Mutators (read/write)>
 * maxCpc
 
 * maxContentCpc
+
+* proxyMaxCpc
 
 * status
 

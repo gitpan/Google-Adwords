@@ -1,11 +1,12 @@
 package Google::Adwords::Campaign;
 use strict; use warnings;
 
-use version; our $VERSION = qv('0.0.2');
+use version; our $VERSION = qv('0.3');
 
 use base 'Google::Adwords::Data';
 
 my @fields = qw/
+    budgetOptimizerSettings
     dailyBudget
     enableSeparateContentBids
     id
@@ -16,9 +17,104 @@ my @fields = qw/
     languageTargeting
     geoTargeting
     networkTargeting
+    schedule
 /;
 
 __PACKAGE__->mk_accessors(@fields);
+
+sub new
+{
+    my $proto = shift;
+
+    my $class = ref $proto || $proto;
+
+    if (@_) {
+        my $obj = $class->SUPER::new();
+        my $hashref = shift;
+        for (keys %{$hashref}) {
+            $obj->$_($hashref->{$_});
+        }
+        return $obj;
+    }
+    else {
+        return $class->SUPER::new();
+    }
+}
+
+sub languageTargeting
+{
+    my $self = shift;
+
+    my $sub_name = (caller 0)[3];
+
+    # if its a get
+    if (not @_) {
+        my $lang_ref = $self->get($sub_name);
+        
+        # check if not array ref
+        for (keys %{$lang_ref}) {
+            if ((ref $lang_ref->{$_}) ne 'ARRAY') {
+                #my @langs = split /, ?/, $lang_ref->{$_};
+                $lang_ref->{$_} = [ $lang_ref->{$_} ];
+            }
+        }
+        return $lang_ref;
+    }
+    else {
+        # set
+        return $self->set($sub_name, @_);
+    }
+}
+
+sub geoTargeting
+{
+    my $self = shift;
+    
+    my $sub_name = (caller 0)[3];
+
+    # if its a get
+    if (not @_) {
+        my $lang_ref = $self->get($sub_name);
+        
+        # check if not array ref
+        for (keys %{$lang_ref}) {
+            if ((ref $lang_ref->{$_}) ne 'ARRAY') {
+                #my @langs = split /, ?/, $lang_ref->{$_};
+                $lang_ref->{$_} = [ $lang_ref->{$_} ];
+            }
+        }
+        return $lang_ref;
+    }
+    else {
+        # set
+        return $self->set($sub_name, @_);
+    }
+}
+
+sub networkTargeting
+{
+    my $self = shift;
+    
+    my $sub_name = (caller 0)[3];
+
+    # if its a get
+    if (not @_) {
+        my $lang_ref = $self->get($sub_name);
+        
+        # check if not array ref
+        for (keys %{$lang_ref}) {
+            if ((ref $lang_ref->{$_}) ne 'ARRAY') {
+                #my @langs = split /, ?/, $lang_ref->{$_};
+                $lang_ref->{$_} = [ $lang_ref->{$_} ];
+            }
+        }
+        return $lang_ref;
+    }
+    else {
+        # set
+        return $self->set($sub_name, @_);
+    }
+}
 
 1;
 
@@ -31,7 +127,7 @@ Google::Adwords::Campaign - A Google Adwords Campaign Object
  
 =head1 VERSION
  
-This documentation refers to Google::Adwords::Campaign version 0.0.2
+This documentation refers to Google::Adwords::Campaign version 0.3
  
  
 =head1 SYNOPSIS
@@ -78,6 +174,8 @@ This object should be used with the CampaignService API calls
  
 B<Mutators (read/write)>
 
+* budgetOptimizerSettings
+
 * dailyBudget
 
 * enableSeparateContentBids
@@ -85,6 +183,8 @@ B<Mutators (read/write)>
 * name
 
 * status
+
+* schedule
 
 * startDay
 
@@ -254,6 +354,12 @@ http://www.google.com/apis/adwords/developer/NetworkTarget.html
 =over 4
 
 =item * L<Google::Adwords::CampaignService>
+
+=item * L<Google::Adwords::AdSchedule>
+
+=item * L<Google::Adwords::SchedulingInterval>
+
+=item * L<Google::Adwords::BudgetOptimizerSettings>
 
 =back
 

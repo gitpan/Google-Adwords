@@ -9,159 +9,72 @@ use Google::Adwords::Image;
 
 sub test_class { return "Google::Adwords::CreativeService"; }
 
+# tests to run
+my %tests = (
+    addCreative             => 0,
+    addCreative_Image       => 0,
+    addCreativeList         => 0,
+    getActiveCreatives      => 0,
+    getAllCreatives         => 0,
+    getCreative             => 0,
+    getCreativeStats        => 0,
+    updateCreatives         => 0,
+);
 
-sub activateCreative : Test(no_plan)
+sub start_of_each_test : Test(setup)
 {
     my $self = shift;
 
-    #return;
-
-    if ($self->{sandbox}) {
-
-        return;
-
-    }
-    else {
-        my $soap = Test::MockModule->new('SOAP::Lite');
-        $soap->mock( call => sub {
-            my $xml .= <<'EOF';
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
- <soapenv:Header>
-  <responseTime soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">39</responseTime>
-  <operations soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</operations>
-  <units soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</units>
-  <requestId soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">f7912565442e4adeb1bf30cbbf2f8fd2</requestId>
- </soapenv:Header>
- <soapenv:Body>
-  <activateCreativeResponse xmlns="" />
- </soapenv:Body>
-</soapenv:Envelope>
-EOF
-
-            my $env = SOAP::Deserializer->deserialize($xml);
-            return $env;
-        });
-
-
-            my $ret = $self->{obj}->activateCreative(1, 1);
-            ok ($ret == 1, 'activateCreative');
-            
-
-    }
-
-
+    # set debug to whatever was passed in as param
+    $self->{obj}->debug($self->{debug});
 }
 
-sub activateCreativeList : Test(no_plan)
-{
-    my $self = shift;
-
-    #return;
-
-    if ($self->{sandbox}) {
-
-        $self->{obj}->debug(1);
-
-        my @pairs = (
-            {
-                adGroupId => 1345,
-                creativeId => 14,
-            },
-            {
-                adGroupId => 1892,
-                creativeId => 299,
-            },
-        );
-
-        my $ret = $self->{obj}->activateCreativeList(@pairs);
-
-        return;
-
-
-
-    }
-    else {
-        my $soap = Test::MockModule->new('SOAP::Lite');
-        $soap->mock( call => sub {
-            my $xml .= <<'EOF';
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
- <soapenv:Header>
-  <responseTime soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">39</responseTime>
-  <operations soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</operations>
-  <units soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</units>
-  <requestId soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">f7912565442e4adeb1bf30cbbf2f8fd2</requestId>
- </soapenv:Header>
- <soapenv:Body>
-  <activateCreativeListResponse />
- </soapenv:Body>
-</soapenv:Envelope>
-EOF
-
-            my $env = SOAP::Deserializer->deserialize($xml);
-            return $env;
-        });
-
-        my @pairs = (
-            {
-                adGroupId => 1,
-                creativeId => 1,
-            },
-            {
-                adGroupId => 2,
-                creativeId => 2,
-            },
-        );
-
-        my $ret = $self->{obj}->activateCreativeList(@pairs);
-        ok ($ret == 1, 'activateCreativeList');
-
-
-    }
-
-
-}
 
 sub addCreative : Test(no_plan)
 {
     my $self = shift;
 
-    #return;
+    $sub_name = (caller 0)[3];
+    $sub_name =~ s/^.+:://;
+    if (not $tests{$sub_name}) {
+        return;
+    }
+
 
     if ($self->{sandbox}) {
 
-        $self->{obj}->debug(1);
+
+        #my $adgroup_id = $self->_get_adgroup_id();
+        my $adgroup_id = 20048;
 
         my $creative = Google::Adwords::Creative->new;
 
-        $creative->headline('lalala');
-        $creative->description1('kakakakaka');
-        $creative->description2('kakakakaka');
-        $creative->adGroupId(1001);
+        $creative->headline('The world is indeed flat!');
+        $creative->description1('<b>really</b>');
+        $creative->description2('really');
+        $creative->adGroupId($adgroup_id);
         $creative->destinationUrl('http://aarohan.biz');
-        $creative->displayUrl('aarohan.biz');
+        $creative->displayUrl('http://aarohan.biz');
 
         my $creative_response = $self->{obj}->addCreative($creative);
-        ok ($creative_response->adGroupId == 1001, 'addCreative');
+        ok ($creative_response->adGroupId eq $adgroup_id, 'addCreative');
+        ok ($creative_response->id =~ /\d+/, 
+            'addCreative id: ' . $creative_response->id);
+
+        # save for further use
+        $self->{_creative_id} = $creative_response->id;
 
     }
     else {
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock( call => sub {
             my $xml .= <<'EOF';
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
- <soapenv:Header>
-  <responseTime soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">39</responseTime>
-  <operations soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</operations>
-  <units soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</units>
-  <requestId soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">f7912565442e4adeb1bf30cbbf2f8fd2</requestId>
- </soapenv:Header>
- <soapenv:Body>
 <addCreativeResponse xmlns="">
    <ns1:addCreativeReturn
-xmlns:ns1="https://adwords.google.com/api/adwords/v6">
+xmlns:ns1="https://adwords.google.com/api/adwords/v7">
     <ns1:adGroupId>1001</ns1:adGroupId>
     <ns1:deleted>false</ns1:deleted>
-    <ns1:description1>kakakakaka</ns1:description1>
+    <ns1:description1>&lt;b&gt;kakakakaka&lt;/b&gt;</ns1:description1>
     <ns1:description2>kakakakaka</ns1:description2>
     <ns1:destinationUrl>http://aarohan.biz</ns1:destinationUrl>
     <ns1:disapproved>false</ns1:disapproved>
@@ -170,10 +83,9 @@ xmlns:ns1="https://adwords.google.com/api/adwords/v6">
     <ns1:id>20984</ns1:id>
    </ns1:addCreativeReturn>
   </addCreativeResponse>
- </soapenv:Body>
-</soapenv:Envelope>
 EOF
 
+            $xml = $self->gen_full_response($xml);
             my $env = SOAP::Deserializer->deserialize($xml);
             return $env;
         });
@@ -181,14 +93,15 @@ EOF
         my $creative = Google::Adwords::Creative->new;
 
         $creative->headline('lalala');
-        $creative->description1('kakakakaka');
+        $creative->description1('<b>kakakakaka</b>');
         $creative->description2('kakakakaka');
-        $creative->adGroupId(1001);
+        $creative->adGroupId(20048);
         $creative->destinationUrl('http://aarohan.biz');
         $creative->displayUrl('aarohan.biz');
 
         my $creative_response = $self->{obj}->addCreative($creative);
         ok ($creative_response->adGroupId == 1001, 'addCreative');
+        ok ($creative_response->description1 eq '<b>kakakakaka</b>', 'addCreative');
 
 
 
@@ -196,46 +109,46 @@ EOF
 
 }
 
-sub addCreativeImage: Test(no_plan)
+sub addCreative_Image : Test(no_plan)
 {
     my $self = shift;
 
-    #return;
+    $sub_name = (caller 0)[3];
+    $sub_name =~ s/^.+:://;
+    if (not $tests{$sub_name}) {
+        return;
+    }
+
 
     if ($self->{sandbox}) {
 
-        $self->{obj}->debug(1);
+        my $adgroup_id = $self->_get_adgroup_id();
 
         my $creative = Google::Adwords::Creative->new;
 
-        $creative->adGroupId(1001);
+        $creative->adGroupId($adgroup_id);
         $creative->destinationUrl('http://aarohan.biz');
         $creative->displayUrl('aarohan.biz');
 
         my $image = Google::Adwords::Image->new;
         $image->name('rohan.jpg');
         $image->data('asjajkjasdkjasd');
-
         $creative->image($image);
 
         my $creative_response = $self->{obj}->addCreative($creative);
-        ok ($creative_response->adGroupId == 1001, 'addCreative');
+        ok ($creative_response->adGroupId eq $adgroup_id, 'addCreative');
+        ok ($creative_response->id =~ /\d+/, 
+            'addCreative id: ' . $creative_response->id);
+
+
 
     }
     else {
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock( call => sub {
             my $xml .= <<'EOF';
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
- <soapenv:Header>
-  <responseTime soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">39</responseTime>
-  <operations soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</operations>
-  <units soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</units>
-  <requestId soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">f7912565442e4adeb1bf30cbbf2f8fd2</requestId>
- </soapenv:Header>
- <soapenv:Body>
   <addCreativeResponse xmlns="">
-    <ns1:addCreativeReturn xmlns:ns1="https://adwords.google.com/api/adwords/v6">
+    <ns1:addCreativeReturn xmlns:ns1="https://adwords.google.com/api/adwords/v7">
     <ns1:adGroupId>1001</ns1:adGroupId>
     <ns1:deleted>false</ns1:deleted>
     <ns1:description1 xsi:nil="true"/>
@@ -256,10 +169,9 @@ sub addCreativeImage: Test(no_plan)
     </ns1:image>
    </ns1:addCreativeReturn>
   </addCreativeResponse>
- </soapenv:Body>
-</soapenv:Envelope>
 EOF
 
+            $xml = $self->gen_full_response($xml);
             my $env = SOAP::Deserializer->deserialize($xml);
             return $env;
         });
@@ -288,14 +200,19 @@ sub addCreativeList: Test(no_plan)
 {
     my $self = shift;
 
-    #return;
+    $sub_name = (caller 0)[3];
+    $sub_name =~ s/^.+:://;
+    if (not $tests{$sub_name}) {
+        return;
+    }
+
 
     if ($self->{sandbox}) {
 
-        $self->{obj}->debug(1);
+        my $adgroup_id = $self->_get_adgroup_id();
 
         my $creative1 = Google::Adwords::Creative->new;
-        $creative1->adGroupId(1001);
+        $creative1->adGroupId($adgroup_id);
         $creative1->destinationUrl('http://aarohan.biz');
         $creative1->displayUrl('aarohan.biz');
         $creative1->headline('lalala');
@@ -303,7 +220,7 @@ sub addCreativeList: Test(no_plan)
         $creative1->description2('kakakakaka');
 
         my $creative2 = Google::Adwords::Creative->new;
-        $creative2->adGroupId(1001);
+        $creative2->adGroupId($adgroup_id);
         $creative2->destinationUrl('http://aarohan.biz');
         $creative2->displayUrl('aarohan.biz');
         my $image = Google::Adwords::Image->new;
@@ -314,22 +231,18 @@ sub addCreativeList: Test(no_plan)
         my @creatives 
             = $self->{obj}->addCreativeList($creative1, $creative2);
 
-        ok ($creatives[0]->adGroupId == 1001, 'addCreativeList');
-        ok ($creatives[1]->image->height == 60, 'addCreativeList');
+        ok ($creatives[0]->id =~ /\d+/, 
+            'addCreativeList id: ' . $creatives[0]->id);
+        ok ($creatives[1]->id =~ /\d+/, 
+            'addCreativeList id: ' . $creatives[1]->id);
+
+
 
     }
     else {
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock( call => sub {
             my $xml .= <<'EOF';
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
- <soapenv:Header>
-  <responseTime soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">39</responseTime>
-  <operations soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</operations>
-  <units soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</units>
-  <requestId soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">f7912565442e4adeb1bf30cbbf2f8fd2</requestId>
- </soapenv:Header>
- <soapenv:Body>
   <addCreativeListResponse xmlns="">
    <ns1:addCreativeListReturn
 xmlns:ns1="https://adwords.google.com/api/adwords/v6">
@@ -365,10 +278,9 @@ xmlns:ns2="https://adwords.google.com/api/adwords/v6">
     </ns2:image>
    </ns2:addCreativeListReturn>
   </addCreativeListResponse>
- </soapenv:Body>
-</soapenv:Envelope>
 EOF
 
+            $xml = $self->gen_full_response($xml);
             my $env = SOAP::Deserializer->deserialize($xml);
             return $env;
         });
@@ -401,142 +313,35 @@ EOF
 
 }
 
-sub deleteCreative : Test(no_plan)
-{
-    my $self = shift;
-
-    #return;
-
-    if ($self->{sandbox}) {
-
-        return 1;
-
-    }
-    else {
-        my $soap = Test::MockModule->new('SOAP::Lite');
-        $soap->mock( call => sub {
-            my $xml .= <<'EOF';
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
- <soapenv:Header>
-  <responseTime soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">39</responseTime>
-  <operations soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</operations>
-  <units soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</units>
-  <requestId soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">f7912565442e4adeb1bf30cbbf2f8fd2</requestId>
- </soapenv:Header>
- <soapenv:Body>
-   <deleteCreativeResponse />
- </soapenv:Body>
-</soapenv:Envelope>
-EOF
-
-            my $env = SOAP::Deserializer->deserialize($xml);
-            return $env;
-        });
-
-        my $ret = $self->{obj}->deleteCreative(1, 1);
-        ok ($ret == 1, 'deleteCreative');
-
-    }
-
-}
-
-sub deleteCreativeList : Test(no_plan)
-{
-    my $self = shift;
-
-    #return;
-
-    if ($self->{sandbox}) {
-
-        $self->{obj}->debug(1);
-
-        my @pairs = (
-            {
-                adGroupId => 1,
-                creativeId => 1,
-            },
-            {
-                adGroupId => 2,
-                creativeId => 2,
-            },
-        );
-
-        #my $ret = $self->{obj}->activateCreativeList(@pairs);
-
-        return;
-
-
-
-    }
-    else {
-        my $soap = Test::MockModule->new('SOAP::Lite');
-        $soap->mock( call => sub {
-            my $xml .= <<'EOF';
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
- <soapenv:Header>
-  <responseTime soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">39</responseTime>
-  <operations soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</operations>
-  <units soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</units>
-  <requestId soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">f7912565442e4adeb1bf30cbbf2f8fd2</requestId>
- </soapenv:Header>
- <soapenv:Body>
-  <deleteCreativeListResponse />
- </soapenv:Body>
-</soapenv:Envelope>
-EOF
-
-            my $env = SOAP::Deserializer->deserialize($xml);
-            return $env;
-        });
-
-        my @pairs = (
-            {
-                adGroupId => 1,
-                creativeId => 1,
-            },
-            {
-                adGroupId => 2,
-                creativeId => 2,
-            },
-        );
-
-        my $ret = $self->{obj}->deleteCreativeList(@pairs);
-        ok ($ret == 1, 'deleteCreativeList');
-
-
-    }
-
-
-}
-
 sub getActiveCreatives : Test(no_plan)
 {
     my $self = shift;
 
-    #return;
+
+    $sub_name = (caller 0)[3];
+    $sub_name =~ s/^.+:://;
+    if (not $tests{$sub_name}) {
+        return;
+    }
 
     if ($self->{sandbox}) {
 
-        $self->{obj}->debug(1);
+        my $adgroup_id = $self->_get_adgroup_id();
 
-        my @creatives = $self->{obj}->getActiveCreatives(1001);
+        my @creatives = $self->{obj}->getActiveCreatives($adgroup_id);
 
-        ok ($creatives[0]->adGroupId == 1001, 'getActiveCreatives');
-        ok ($creatives[1]->adGroupId == 1001, 'getActiveCreatives');
+        # should get three or more
+        ok (scalar @creatives >= 3, 'getActiveCreatives');
+
+        for (@creatives) {
+            ok ($_->id =~ /\d+/, 'getActiveCreatives id: ' . $_->id);
+        }
 
     }
     else {
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock( call => sub {
             my $xml .= <<'EOF';
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
- <soapenv:Header>
-  <responseTime soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">39</responseTime>
-  <operations soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</operations>
-  <units soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</units>
-  <requestId soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">f7912565442e4adeb1bf30cbbf2f8fd2</requestId>
- </soapenv:Header>
- <soapenv:Body>
   <getActiveCreativesResponse>
     <ns10:getActiveCreativesReturn
 xmlns:ns10="https://adwords.google.com/api/adwords/v6">
@@ -572,10 +377,9 @@ xmlns:ns11="https://adwords.google.com/api/adwords/v6">
     </ns11:image>
    </ns11:getActiveCreativesReturn>
   </getActiveCreativesResponse>
- </soapenv:Body>
-</soapenv:Envelope>
 EOF
 
+            $xml = $self->gen_full_response($xml);
             my $env = SOAP::Deserializer->deserialize($xml);
             return $env;
         });
@@ -597,30 +401,33 @@ sub getAllCreatives : Test(no_plan)
 {
     my $self = shift;
 
-    #return;
+
+    $sub_name = (caller 0)[3];
+    $sub_name =~ s/^.+:://;
+    if (not $tests{$sub_name}) {
+        return;
+    }
 
     if ($self->{sandbox}) {
 
-        $self->{obj}->debug(1);
+        my $adgroup_id = $self->_get_adgroup_id();
 
-        my @creatives = $self->{obj}->getAllCreatives(1001);
+        my @creatives = $self->{obj}->getAllCreatives($adgroup_id);
 
-        ok ($creatives[0]->adGroupId == 1001, 'getAllCreatives');
-        ok ($creatives[1]->adGroupId == 1001, 'getAllCreatives');
+        # should get three or more
+        ok (scalar @creatives >= 3, 'getAllCreatives');
+
+        for (@creatives) {
+            ok ($_->id =~ /\d+/, 'getAllCreatives id: ' . $_->id);
+        }
+
+
 
     }
     else {
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock( call => sub {
             my $xml .= <<'EOF';
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
- <soapenv:Header>
-  <responseTime soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">39</responseTime>
-  <operations soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</operations>
-  <units soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</units>
-  <requestId soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">f7912565442e4adeb1bf30cbbf2f8fd2</requestId>
- </soapenv:Header>
- <soapenv:Body>
   <getAllCreativesResponse>
     <ns10:getAllCreativesReturn
 xmlns:ns10="https://adwords.google.com/api/adwords/v6">
@@ -656,10 +463,9 @@ xmlns:ns11="https://adwords.google.com/api/adwords/v6">
     </ns11:image>
    </ns11:getAllCreativesReturn>
   </getAllCreativesResponse>
- </soapenv:Body>
-</soapenv:Envelope>
 EOF
 
+            $xml = $self->gen_full_response($xml);
             my $env = SOAP::Deserializer->deserialize($xml);
             return $env;
         });
@@ -679,30 +485,28 @@ sub getCreative : Test(no_plan)
 {
     my $self = shift;
 
-    #return;
+    $sub_name = (caller 0)[3];
+    $sub_name =~ s/^.+:://;
+    if (not $tests{$sub_name}) {
+        return;
+    }
+
 
     if ($self->{sandbox}) {
 
-        $self->{obj}->debug(1);
+        my $adgroup_id = $self->_get_adgroup_id();
+        my $creative_id = $self->{_creative_id};
+        
+        my $creative = $self->{obj}->getCreative($adgroup_id, $creative_id);
 
-        my $creative = $self->{obj}->getCreative(1001, 21111);
-
-        ok ($creative->adGroupId == 1001, 'getCreative');
-        ok ($creative->image->height == 60, 'getCreative');
+        ok ($creative->adGroupId eq $adgroup_id, 'getCreative');
+        ok ($creative->id eq $self->{_creative_id}, 'getCreative');
 
     }
     else {
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock( call => sub {
             my $xml .= <<'EOF';
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
- <soapenv:Header>
-  <responseTime soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">39</responseTime>
-  <operations soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</operations>
-  <units soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</units>
-  <requestId soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">f7912565442e4adeb1bf30cbbf2f8fd2</requestId>
- </soapenv:Header>
- <soapenv:Body>
   <getCreativeResponse xmlns="">
    <ns1:getCreativeReturn
 xmlns:ns1="https://adwords.google.com/api/adwords/v6">
@@ -726,10 +530,9 @@ xmlns:ns1="https://adwords.google.com/api/adwords/v6">
     </ns1:image>
    </ns1:getCreativeReturn>
   </getCreativeResponse>
- </soapenv:Body>
-</soapenv:Envelope>
 EOF
 
+            $xml = $self->gen_full_response($xml);
             my $env = SOAP::Deserializer->deserialize($xml);
             return $env;
         });
@@ -747,11 +550,26 @@ sub getCreativeStats : Test(no_plan)
 {
     my $self = shift;
 
-    #return;
+    $sub_name = (caller 0)[3];
+    $sub_name =~ s/^.+:://;
+    if (not $tests{$sub_name}) {
+        return;
+    }
+
 
     if ($self->{sandbox}) {
 
-        $self->{obj}->debug(1);
+        my $adgroup_id = $self->_get_adgroup_id();
+
+        my @stats = $self->{obj}->getCreativeStats({
+            adGroupId => $adgroup_id,
+            creativeIds => [ $self->{_creative_id} ],
+            startDay => '2006-12-01',
+            endDay => '2006-12-15',
+            inPST => 1,
+        });
+
+        ok ($stats[0]->id == $self->{_creative_id}, 'getCreativeStats');
 
        
 
@@ -761,24 +579,6 @@ sub getCreativeStats : Test(no_plan)
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock( call => sub {
             my $xml .= <<'EOF';
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
-xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
- <soapenv:Header>
-  <responseTime soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next"
-soapenv:mustUnderstand="0"
-xmlns="https://adwords.google.com/api/adwords/v5">113</responseTime>
-  <operations soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next"
-soapenv:mustUnderstand="0"
-xmlns="https://adwords.google.com/api/adwords/v5">1</operations>
-  <units soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next"
-soapenv:mustUnderstand="0"
-xmlns="https://adwords.google.com/api/adwords/v5">1</units>
-  <requestId soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next"
-soapenv:mustUnderstand="0"
-xmlns="https://adwords.google.com/api/adwords/v5">54d9ad57aa6d1fa29a253bf66b4717ce</requestId>
- </soapenv:Header>
- <soapenv:Body>
 <getCreativeStatsResponse xmlns="">
    <ns1:getCreativeStatsReturn
 xmlns:ns1="https://adwords.google.com/api/adwords/v5">
@@ -801,10 +601,9 @@ xmlns:ns2="https://adwords.google.com/api/adwords/v5">
     <ns2:impressions>0</ns2:impressions>
    </ns2:getCreativeStatsReturn>
   </getCreativeStatsResponse>
- </soapenv:Body>
-</soapenv:Envelope>
 EOF
 
+            $xml = $self->gen_full_response($xml);
             my $env = SOAP::Deserializer->deserialize($xml);
             return $env;
         });
@@ -826,6 +625,71 @@ EOF
 
     }
 
+
+}
+
+sub updateCreatives: Test(no_plan)
+{
+    my $self = shift;
+
+    $sub_name = (caller 0)[3];
+    $sub_name =~ s/^.+:://;
+    if (not $tests{$sub_name}) {
+        return;
+    }
+
+
+    if ($self->{sandbox}) {
+
+        my $adgroup_id = $self->_get_adgroup_id();
+
+        my $creative1 = Google::Adwords::Creative->new;
+        $creative1->adGroupId($adgroup_id);
+        $creative1->id($self->{_creative_id});
+        $creative1->status('Paused');
+
+        my $ret = $self->{obj}->updateCreatives($creative1);
+        ok ($ret == 1, 'updateCreatives');
+
+        # reset
+        $creative1->adGroupId($adgroup_id);
+        $creative1->id($self->{_creative_id});
+        $creative1->status('Enabled');
+        $ret = $self->{obj}->updateCreatives($creative1);
+        ok ($ret == 1, 'updateCreatives');
+
+    }
+    else {
+        my $soap = Test::MockModule->new('SOAP::Lite');
+        $soap->mock( call => sub {
+            my $xml .= <<'EOF';
+  <updateCreativesResponse xmlns=""/>
+EOF
+
+            $xml = $self->gen_full_response($xml);
+            my $env = SOAP::Deserializer->deserialize($xml);
+            return $env;
+        });
+
+        my $adgroup_id = '4728';
+
+        my $creative1 = Google::Adwords::Creative->new;
+        $creative1->adGroupId($adgroup_id);
+        $creative1->id(16516);
+        $creative1->status('Paused');
+
+        my $ret = $self->{obj}->updateCreatives($creative1);
+        ok ($ret == 1, 'updateCreatives');
+
+        # reset
+        $creative1->adGroupId($adgroup_id);
+        $creative1->id(16516);
+        $creative1->status('Enabled');
+        $ret = $self->{obj}->updateCreatives($creative1);
+        ok ($ret == 1, 'updateCreatives');
+
+
+    }
 
 }
 

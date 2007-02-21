@@ -4,22 +4,53 @@ use base qw/ Service /;
 use Test::More;
 use Test::MockModule;
 use Google::Adwords::Campaign;
+use Google::Adwords::AdSchedule;
+use Google::Adwords::SchedulingInterval;
+
+use Data::Dumper;
 
 sub test_class { return "Google::Adwords::CampaignService"; }
 
-sub add_campaign_default : Test(no_plan)
+# tests to be run
+my %tests = (
+    addCampaign             => 1,
+    addCampaign_schedule    => 1,
+    addCampaignList         => 1,
+    getAllAdWordsCampaigns  => 1,
+    getCampaign             => 1,
+    getCampaignList         => 1,
+    getCampaignStats        => 1,
+    getOptimizeAdServing    => 1,
+    setOptimizeAdServing    => 1,
+    updateCampaign          => 1,
+    updateCampaignList      => 1,
+);
+
+sub start_of_each_test : Test(setup)
 {
     my $self = shift;
 
-    #return;
+    # set debug to whatever was passed in as param
+    $self->{obj}->debug($self->{debug});
+}
+
+sub addCampaign : Test(no_plan)
+{
+    my $self = shift;
+
+    $sub_name = (caller 0)[3];
+    $sub_name =~ s/^.+:://;
+    if (not $tests{$sub_name}) {
+        return;
+    }
 
     my $campaign = Google::Adwords::Campaign->new();
 
     #$campaign->name('Rohan Campaign');
     $campaign->dailyBudget(100000);
-    #$campaign->language_targeting({
-    #    languages => [ 'en', 'es' ],
-    #});
+    $campaign->languageTargeting({
+        languages => 'en',
+    });
     #$campaign->geo_targeting({
     #    countries => [ 'US', 'IN' ],
     #    #metros => [ 600, 606 ],
@@ -29,14 +60,15 @@ sub add_campaign_default : Test(no_plan)
     #});
 
     if ($self->{'sandbox'}) {
-        $self->{obj}->debug(0);
         my $camp = $self->{'obj'}->addCampaign($campaign);
-        ok ($camp->dailyBudget == 100000, 'campaign dailyBudget');
-        ok ($camp->id =~ /\d+/, 'campaign id');
-        ok ($camp->status eq 'Active', 'campaign status');
+        ok ($camp->dailyBudget == 100000, 'addCampaign');
+        ok ($camp->id =~ /\d+/, 'addCampaign - id: ' . $camp->id);
         
         # save campaign id
         $self->{_campaign_id} = $camp->id;
+
+        # save it for other test modules
+        $self->_set_campaign_id($camp->id);
     }
 
     else {
@@ -44,14 +76,6 @@ sub add_campaign_default : Test(no_plan)
     my $soap = Test::MockModule->new('SOAP::Lite');
     $soap->mock( call => sub {
         my $xml .= <<'EOF';
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
- <soapenv:Header>
-  <responseTime soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v4">39</responseTime>
-  <operations soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v4">1</operations>
-  <units soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v4">1</units>
-  <requestId soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v4">f7912565442e4adeb1bf30cbbf2f8fd2</requestId>
- </soapenv:Header>
- <soapenv:Body>
 <addCampaignResponse xmlns="">
    <ns1:addCampaignReturn xmlns:ns1="https://adwords.google.com/api/adwords/v4">
     <ns1:dailyBudget>100000</ns1:dailyBudget>
@@ -59,20 +83,24 @@ sub add_campaign_default : Test(no_plan)
     <ns1:endDay>2011-01-01-05:00</ns1:endDay>
     <ns1:geoTargeting xsi:nil="true"/>
     <ns1:id>3987</ns1:id>
-    <ns1:languageTargeting xsi:nil="true"/>
+    <ns1:languageTargeting>
+      <ns1:languages>en</ns1:languages>
+    </ns1:languageTargeting>
     <ns1:name>Campaign #1</ns1:name>
     <ns1:networkTargeting>
      <ns1:networkTypes>SearchNetwork</ns1:networkTypes>
      <ns1:networkTypes>ContentNetwork</ns1:networkTypes>
     </ns1:networkTargeting>
+    <ns1:schedule>
+      <ns1:status>Disabled</ns1:status>
+    </ns1:schedule>
     <ns1:startDay>2006-08-20-04:00</ns1:startDay>
     <ns1:status>Active</ns1:status>
    </ns1:addCampaignReturn>
   </addCampaignResponse>
- </soapenv:Body>
-</soapenv:Envelope>
 EOF
 
+        $xml = $self->gen_full_response($xml);
         my $env = SOAP::Deserializer->deserialize($xml);
         return $env;
     });
@@ -83,41 +111,152 @@ EOF
     ok ($campaign_obj->enableSeparateContentBids eq 'false', 'enableSeparateContentBids');
     ok ($campaign_obj->dailyBudget == 100000, 'dailyBudget');
 
+    my $lang_ref = $campaign_obj->languageTargeting;
+    ok ($lang_ref->{languages}[0] eq 'en', 'languageTargeting');
+
+    ok ($campaign_obj->schedule->status eq 'Disabled', 'ad schedule disabled');
+
+
+    }
+
+}
+
+sub addCampaign_schedule: Test(no_plan)
+{
+    my $self = shift;
+
+    $sub_name = (caller 0)[3];
+    $sub_name =~ s/^.+:://;
+    if (not $tests{$sub_name}) {
+        return;
+    }
+
+    my $campaign = Google::Adwords::Campaign->new();
+
+    #$campaign->name('Rohan Campaign');
+    $campaign->dailyBudget(100000);
+    $campaign->languageTargeting({
+        languages => 'en',
+    });
+
+    # ad schedule
+    my $schedule1 = Google::Adwords::SchedulingInterval->new();
+    $schedule1->day('Monday')
+              ->startHour(1)
+              ->endHour(10)
+              ->multiplier(1)
+    ;
+    my @intervals = ( $schedule1 );
+    my $ad_schedule = Google::Adwords::AdSchedule->new();
+    $ad_schedule->status('Enabled');
+    $ad_schedule->intervals(\@intervals);
+
+    $campaign->schedule($ad_schedule);
+
+    if ($self->{'sandbox'}) {
+        my $camp = $self->{'obj'}->addCampaign($campaign);
+        ok ($camp->dailyBudget == 100000, 'addCampaign');
+        ok ($camp->id =~ /\d+/, 'addCampaign - id: ' . $camp->id);
+        
+        # save campaign id
+        $self->{_campaign_id} = $camp->id;
+
+        # save it for other test modules
+        $self->_set_campaign_id($camp->id);
+    }
+
+    else {
+
+    my $soap = Test::MockModule->new('SOAP::Lite');
+    $soap->mock( call => sub {
+        my $xml .= <<'EOF';
+<addCampaignResponse xmlns="">
+   <ns1:addCampaignReturn xmlns:ns1="https://adwords.google.com/api/adwords/v4">
+    <ns1:dailyBudget>100000</ns1:dailyBudget>
+    <ns1:enableSeparateContentBids>false</ns1:enableSeparateContentBids>
+    <ns1:endDay>2011-01-01-05:00</ns1:endDay>
+    <ns1:geoTargeting xsi:nil="true"/>
+    <ns1:id>3987</ns1:id>
+    <ns1:languageTargeting>
+      <ns1:languages>en</ns1:languages>
+    </ns1:languageTargeting>
+    <ns1:name>Campaign #1</ns1:name>
+    <ns1:schedule>
+     <ns1:intervals>
+      <ns1:day>Monday</ns1:day>
+      <ns1:startHour>1</ns1:startHour>
+      <ns1:startMinute>0</ns1:startMinute>
+      <ns1:endHour>10</ns1:endHour>
+      <ns1:endMinute>0</ns1:endMinute>
+      <ns1:multiplier>1.0</ns1:multiplier>
+     </ns1:intervals>
+     <ns1:status>Enabled</ns1:status>
+    </ns1:schedule>
+    <ns1:networkTargeting>
+     <ns1:networkTypes>SearchNetwork</ns1:networkTypes>
+     <ns1:networkTypes>ContentNetwork</ns1:networkTypes>
+    </ns1:networkTargeting>
+    <ns1:startDay>2006-08-20-04:00</ns1:startDay>
+    <ns1:status>Active</ns1:status>
+   </ns1:addCampaignReturn>
+  </addCampaignResponse>
+EOF
+
+        $xml = $self->gen_full_response($xml);
+        my $env = SOAP::Deserializer->deserialize($xml);
+        return $env;
+    });
+
+    my $campaign_obj = $self->{'obj'}->addCampaign($campaign);
+    ok ($campaign_obj->id == 3987, 'campaign id');
+    ok ($campaign_obj->name eq 'Campaign #1' , 'campaign name');
+    ok ($campaign_obj->enableSeparateContentBids eq 'false', 'enableSeparateContentBids');
+    ok ($campaign_obj->dailyBudget == 100000, 'dailyBudget');
+
+    # Ad Schedule
+    ok ($campaign_obj->schedule->status eq 'Enabled', 'schedule status Enabled');
+    my $intervals_ref = $campaign_obj->schedule->intervals;
+    #die Dumper $intervals_ref;
+    ok ($intervals_ref->[0]->day eq 'Monday', 'interval');
+    
+
+    my $lang_ref = $campaign_obj->languageTargeting;
+    ok ($lang_ref->{languages}[0] eq 'en', 'languageTargeting');
+
 
     }
 
 }
 
 
-sub b_getAllAdWordsCampaigns : Test(no_plan)
+
+sub getAllAdWordsCampaigns : Test(no_plan)
 {
     my $self = shift;
 
-    #return;
+
+    $sub_name = (caller 0)[3];
+    $sub_name =~ s/^.+:://;
+    if (not $tests{$sub_name}) {
+        return;
+    }
 
     if ($self->{sandbox}) {
-        $self->{'obj'}->debug(1);
         my @campaigns = $self->{'obj'}->getAllAdWordsCampaigns();
 
-        print Dumper(\@campaigns);
+        #print Dumper(\@campaigns);
 
-        # just check that we got back at least one campaign
-        my $campaign = shift @campaigns;
-        ok ($campaign->id =~ /\d+/, 'getAllAdWordsCampaigns');
+        # we added 3 campaigns. check it.
+        ok (scalar @campaigns >= 3, 'getAllAdWordsCampaigns (got more than three)');
+        for (@campaigns) {
+            ok ($_->id =~ /\d+/, 'getAllAdWordsCampaigns - id: ' . $_->id);
+        }
     }
     else {
 
     my $soap = Test::MockModule->new('SOAP::Lite');
     $soap->mock( call => sub {
         my $xml .= <<'EOF';
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
- <soapenv:Header>
-  <responseTime soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v4">39</responseTime>
-  <operations soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v4">1</operations>
-  <units soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v4">1</units>
-  <requestId soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v4">f7912565442e4adeb1bf30cbbf2f8fd2</requestId>
- </soapenv:Header>
- <soapenv:Body>
 <getAllAdWordsCampaignsResponse xmlns="">
    <ns1:getAllAdWordsCampaignsReturn xmlns:ns1="https://adwords.google.com/api/adwords/v4">
     <ns1:dailyBudget>100000</ns1:dailyBudget>
@@ -150,10 +289,9 @@ sub b_getAllAdWordsCampaigns : Test(no_plan)
     <ns1:status>Active</ns1:status>
    </ns1:getAllAdWordsCampaignsReturn>
   </getAllAdWordsCampaignsResponse>
- </soapenv:Body>
-</soapenv:Envelope>
 EOF
 
+        $xml = $self->gen_full_response($xml);
         my $env = SOAP::Deserializer->deserialize($xml);
         return $env;
     });
@@ -172,12 +310,17 @@ sub getCampaign : Test(no_plan)
 {
     my $self = shift;
 
-    #return;
+    $sub_name = (caller 0)[3];
+    $sub_name =~ s/^.+:://;
+    if (not $tests{$sub_name}) {
+        return;
+    }
+
 
     if ($self->{sandbox}) {
-        $self->{obj}->debug(0);
         my $campaign = $self->{obj}->getCampaign($self->{_campaign_id});
-        ok ($campaign->id == $self->{_campaign_id}, 'getCampaign');
+        ok ($campaign->id == $self->{_campaign_id}, 
+            'getCampaign - id: ' . $campaign->id);
     }
 
     else {
@@ -185,14 +328,6 @@ sub getCampaign : Test(no_plan)
     my $soap = Test::MockModule->new('SOAP::Lite');
     $soap->mock( call => sub {
         my $xml .= <<'EOF';
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
- <soapenv:Header>
-  <responseTime soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v4">39</responseTime>
-  <operations soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v4">1</operations>
-  <units soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v4">1</units>
-  <requestId soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v4">f7912565442e4adeb1bf30cbbf2f8fd2</requestId>
- </soapenv:Header>
- <soapenv:Body>
 <getCampaignResponse xmlns="">
    <ns1:getCampaignReturn xmlns:ns1="https://adwords.google.com/api/adwords/v4">
     <ns1:dailyBudget>100000</ns1:dailyBudget>
@@ -210,10 +345,9 @@ sub getCampaign : Test(no_plan)
     <ns1:status>Active</ns1:status>
    </ns1:getCampaignReturn>
   </getCampaignResponse>
- </soapenv:Body>
-</soapenv:Envelope>
 EOF
 
+        $xml = $self->gen_full_response($xml);
         my $env = SOAP::Deserializer->deserialize($xml);
         return $env;
     });
@@ -225,15 +359,18 @@ EOF
 
 }
 
-sub f_setOptimizeAdServing : Test(no_plan)
+sub setOptimizeAdServing : Test(no_plan)
 {
     my $self = shift;
 
-    #return;
+    $sub_name = (caller 0)[3];
+    $sub_name =~ s/^.+:://;
+    if (not $tests{$sub_name}) {
+        return;
+    }
 
     if ($self->{sandbox}) {
 
-        $self->{obj}->debug(0);
         my $ret = $self->{obj}->setOptimizeAdServing($self->{_campaign_id}, 1);
         #my $ret = $self->{obj}->setOptimizeAdServing(3987, 1);
         ok ($ret == 1, 'setOptimizeAdServing');
@@ -244,21 +381,12 @@ sub f_setOptimizeAdServing : Test(no_plan)
     my $soap = Test::MockModule->new('SOAP::Lite');
     $soap->mock( call => sub {
         my $xml .= <<'EOF';
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
- <soapenv:Header>
-  <responseTime soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v4">39</responseTime>
-  <operations soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v4">1</operations>
-  <units soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v4">1</units>
-  <requestId soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v4">f7912565442e4adeb1bf30cbbf2f8fd2</requestId>
- </soapenv:Header>
- <soapenv:Body>
 <setOptimizeAdServingResponse xmlns="">
    <ns1:setOptimizeAdServingReturn xmlns:ns1="https://adwords.google.com/api/adwords/v4">true</ns1:setOptimizeAdServingReturn>
   </setOptimizeAdServingResponse>
- </soapenv:Body>
-</soapenv:Envelope>
 EOF
 
+        $xml = $self->gen_full_response($xml);
         my $env = SOAP::Deserializer->deserialize($xml);
         return $env;
     });
@@ -274,11 +402,15 @@ sub getOptimizeAdServing : Test(no_plan)
 {
     my $self = shift;
 
-    #return;
+
+    $sub_name = (caller 0)[3];
+    $sub_name =~ s/^.+:://;
+    if (not $tests{$sub_name}) {
+        return;
+    }
 
     if ($self->{sandbox}) {
 
-        $self->{obj}->debug(0);
         my $ret = $self->{obj}->getOptimizeAdServing($self->{_campaign_id});
         #my $ret = $self->{obj}->getOptimizeAdServing(3987);
         ok ($ret == 1, 'getOptimizeAdServing');
@@ -289,21 +421,12 @@ sub getOptimizeAdServing : Test(no_plan)
     my $soap = Test::MockModule->new('SOAP::Lite');
     $soap->mock( call => sub {
         my $xml .= <<'EOF';
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
- <soapenv:Header>
-  <responseTime soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v4">39</responseTime>
-  <operations soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v4">1</operations>
-  <units soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v4">1</units>
-  <requestId soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v4">f7912565442e4adeb1bf30cbbf2f8fd2</requestId>
- </soapenv:Header>
- <soapenv:Body>
 <getOptimizeAdServingResponse xmlns="">
    <ns1:getOptimizeAdServingReturn xmlns:ns1="https://adwords.google.com/api/adwords/v4">true</ns1:getOptimizeAdServingReturn>
   </getOptimizeAdServingResponse>
- </soapenv:Body>
-</soapenv:Envelope>
 EOF
 
+        $xml = $self->gen_full_response($xml);
         my $env = SOAP::Deserializer->deserialize($xml);
         return $env;
     });
@@ -319,10 +442,13 @@ sub addCampaignList : Test(no_plan)
 {
     my $self = shift;
 
-    #return;
+    $sub_name = (caller 0)[3];
+    $sub_name =~ s/^.+:://;
+    if (not $tests{$sub_name}) {
+        return;
+    }
 
     if ($self->{sandbox}) {
-        $self->{obj}->debug(0);
         
         my @campaigns;
         my $campaign1 = Google::Adwords::Campaign->new();
@@ -334,9 +460,13 @@ sub addCampaignList : Test(no_plan)
 
         my @responses = $self->{obj}->addCampaignList(@campaigns);
         
-        # check first campaign
+        # check campaigns
         ok ($responses[0]->dailyBudget == 100000, 'addCampaignList');
+        ok ($responses[0]->id =~ /\d+/, 
+                'addCampaignList id: ' . $responses[0]->id);
         ok ($responses[1]->dailyBudget == 200000, 'addCampaignList');
+        ok ($responses[1]->id =~ /\d+/, 
+                'addCampaignList id: ' . $responses[1]->id);
 
         # save campaign ids for use in getCampaignList
         $self->{_campaign_id_0} = $responses[0]->id;
@@ -348,14 +478,6 @@ sub addCampaignList : Test(no_plan)
     my $soap = Test::MockModule->new('SOAP::Lite');
     $soap->mock( call => sub {
         my $xml .= <<'EOF';
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
- <soapenv:Header>
-  <responseTime soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v4">39</responseTime>
-  <operations soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v4">1</operations>
-  <units soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v4">1</units>
-  <requestId soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v4">f7912565442e4adeb1bf30cbbf2f8fd2</requestId>
- </soapenv:Header>
- <soapenv:Body>
 <addCampaignListResponse xmlns="">
    <ns1:addCampaignListReturn xmlns:ns1="https://adwords.google.com/api/adwords/v4">
     <ns1:dailyBudget>100000</ns1:dailyBudget>
@@ -388,10 +510,9 @@ sub addCampaignList : Test(no_plan)
     <ns1:status>Active</ns1:status>
    </ns1:addCampaignListReturn>
   </addCampaignListResponse>
- </soapenv:Body>
-</soapenv:Envelope>
 EOF
 
+        $xml = $self->gen_full_response($xml);
         my $env = SOAP::Deserializer->deserialize($xml);
         return $env;
     });
@@ -421,18 +542,25 @@ sub getCampaignList : Test(no_plan)
 {
     my $self = shift;
 
-    #return;
+
+    $sub_name = (caller 0)[3];
+    $sub_name =~ s/^.+:://;
+    if (not $tests{$sub_name}) {
+        return;
+    }
 
     if ($self->{sandbox}) {
 
-        #$self->{obj}->debug(0);
-        my @campaigns = $self->{obj}->getCampaignList([
+        # use the stored campaign ids
+        my @campaigns = $self->{obj}->getCampaignList(
+            $self->{_campaign_id},
             $self->{_campaign_id_0},
             $self->{_campaign_id_1},
-        ]);
+        );
 
-        ok ($campaigns[0]->id == $self->{_campaign_id_0}, 'getCampaignList');
-        ok ($campaigns[1]->id == $self->{_campaign_id_1}, 'getCampaignList');
+        ok ($campaigns[0]->id == $self->{_campaign_id}, 'getCampaignList');
+        ok ($campaigns[1]->id == $self->{_campaign_id_0}, 'getCampaignList');
+        ok ($campaigns[2]->id == $self->{_campaign_id_1}, 'getCampaignList');
 
     }
     else {
@@ -440,14 +568,6 @@ sub getCampaignList : Test(no_plan)
     my $soap = Test::MockModule->new('SOAP::Lite');
     $soap->mock( call => sub {
         my $xml .= <<'EOF';
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
- <soapenv:Header>
-  <responseTime soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v4">39</responseTime>
-  <operations soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v4">1</operations>
-  <units soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v4">1</units>
-  <requestId soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v4">f7912565442e4adeb1bf30cbbf2f8fd2</requestId>
- </soapenv:Header>
- <soapenv:Body>
 <getCampaignListResponse xmlns="">
    <ns1:getCampaignListReturn xmlns:ns1="https://adwords.google.com/api/adwords/v4">
     <ns1:dailyBudget>100000</ns1:dailyBudget>
@@ -480,10 +600,9 @@ sub getCampaignList : Test(no_plan)
     <ns1:status>Active</ns1:status>
    </ns1:getCampaignListReturn>
   </getCampaignListResponse>
- </soapenv:Body>
-</soapenv:Envelope>
 EOF
 
+        $xml = $self->gen_full_response($xml);
         my $env = SOAP::Deserializer->deserialize($xml);
         return $env;
     });
@@ -505,11 +624,15 @@ sub updateCampaign : Test(no_plan)
 {
     my $self = shift;
 
-    #return;
+
+    $sub_name = (caller 0)[3];
+    $sub_name =~ s/^.+:://;
+    if (not $tests{$sub_name}) {
+        return;
+    }
 
     if ($self->{sandbox}) {
 
-        $self->{obj}->debug(0);
         
         my $campaign = Google::Adwords::Campaign->new();
         $campaign->id($self->{_campaign_id});
@@ -525,19 +648,10 @@ sub updateCampaign : Test(no_plan)
     my $soap = Test::MockModule->new('SOAP::Lite');
     $soap->mock( call => sub {
         my $xml .= <<'EOF';
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
- <soapenv:Header>
-  <responseTime soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v4">39</responseTime>
-  <operations soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v4">1</operations>
-  <units soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v4">1</units>
-  <requestId soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v4">f7912565442e4adeb1bf30cbbf2f8fd2</requestId>
- </soapenv:Header>
- <soapenv:Body>
 <updateCampaignResponse xmlns="" />
- </soapenv:Body>
-</soapenv:Envelope>
 EOF
 
+        $xml = $self->gen_full_response($xml);
         my $env = SOAP::Deserializer->deserialize($xml);
         return $env;
     });
@@ -560,11 +674,15 @@ sub updateCampaignList : Test(no_plan)
 {
     my $self = shift;
 
-    #return;
+    $sub_name = (caller 0)[3];
+    $sub_name =~ s/^.+:://;
+    if (not $tests{$sub_name}) {
+        return;
+    }
+
 
     if ($self->{sandbox}) {
 
-        $self->{obj}->debug(0);
 
         my @campaigns;
 
@@ -574,7 +692,7 @@ sub updateCampaignList : Test(no_plan)
     
         my $campaign1 = Google::Adwords::Campaign->new();
         $campaign1->id($self->{_campaign_id_1});
-        $campaign1->dailyBudget(2000);
+        $campaign1->dailyBudget(8000000);
 
         push @campaigns, $campaign0, $campaign1;
 
@@ -588,19 +706,10 @@ sub updateCampaignList : Test(no_plan)
     my $soap = Test::MockModule->new('SOAP::Lite');
     $soap->mock( call => sub {
         my $xml .= <<'EOF';
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
- <soapenv:Header>
-  <responseTime soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v4">39</responseTime>
-  <operations soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v4">1</operations>
-  <units soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v4">1</units>
-  <requestId soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v4">f7912565442e4adeb1bf30cbbf2f8fd2</requestId>
- </soapenv:Header>
- <soapenv:Body>
 <updateCampaignListResponse xmlns="" />
- </soapenv:Body>
-</soapenv:Envelope>
 EOF
 
+        $xml = $self->gen_full_response($xml);
         my $env = SOAP::Deserializer->deserialize($xml);
         return $env;
     });
@@ -629,16 +738,20 @@ sub getCampaignStats : Test(no_plan)
 {
     my $self = shift;
 
-    #return;
+    $sub_name = (caller 0)[3];
+    $sub_name =~ s/^.+:://;
+    if (not $tests{$sub_name}) {
+        return;
+    }
+
 
     if ($self->{sandbox}) {
         
-        $self->{obj}->debug(0);
 
         my @stats = $self->{obj}->getCampaignStats({
             campaignids => [ $self->{_campaign_id_0}, $self->{_campaign_id_1} ],
-            startDay => '2006-08-01',
-            endDay => '2006-08-31',
+            startDay => '2006-12-01',
+            endDay => '2006-12-31',
             inPST => 1,
         });
 
@@ -652,14 +765,6 @@ sub getCampaignStats : Test(no_plan)
     my $soap = Test::MockModule->new('SOAP::Lite');
     $soap->mock( call => sub {
         my $xml .= <<'EOF';
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
- <soapenv:Header>
-  <responseTime soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v4">39</responseTime>
-  <operations soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v4">1</operations>
-  <units soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v4">1</units>
-  <requestId soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v4">f7912565442e4adeb1bf30cbbf2f8fd2</requestId>
- </soapenv:Header>
- <soapenv:Body>
 <getCampaignStatsResponse xmlns="">
    <ns1:getCampaignStatsReturn
 xmlns:ns1="https://adwords.google.com/api/adwords/v5">
@@ -682,10 +787,9 @@ xmlns:ns2="https://adwords.google.com/api/adwords/v5">
     <ns2:impressions>0</ns2:impressions>
    </ns2:getCampaignStatsReturn>
   </getCampaignStatsResponse>
- </soapenv:Body>
-</soapenv:Envelope>
 EOF
 
+        $xml = $self->gen_full_response($xml);
         my $env = SOAP::Deserializer->deserialize($xml);
         return $env;
     });
@@ -703,9 +807,6 @@ EOF
 
 
     }
-
-
-
 
 }
 

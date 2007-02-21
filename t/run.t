@@ -8,9 +8,11 @@ use Campaign;
 use CampaignService;
 use AdGroupService;
 use AccountService;
-use CreativeService;
+use AdService;
 use ReportService;
 use TrafficEstimatorService;
+use CriterionService;
+use KeywordToolService;
 
 Test::Class->runtests();
 

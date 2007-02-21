@@ -10,15 +10,34 @@ use Google::Adwords::CampaignRequest;
 
 sub test_class { return "Google::Adwords::TrafficEstimatorService"; }
 
+# tests to run
+my %tests = (
+    estimateAdGroupList     => 1,
+    estimateCampaignList    => 1,
+    estimateKeywordList     => 1,
+);
+
+sub start_of_each_test : Test(setup)
+{
+    my $self = shift;
+
+    # set debug to whatever was passed in as param
+    $self->{obj}->debug($self->{debug});
+}
+
 sub estimateAdGroupList : Test(no_plan)
 {
     my $self = shift;
 
-    #return;
+    $sub_name = (caller 0)[3];
+    $sub_name =~ s/^.+:://;
+    if (not $tests{$sub_name}) {
+        return;
+    }
+
 
     if ($self->{sandbox}) {
 
-        $self->{obj}->debug(1);
 
          my $kwreq1 = Google::Adwords::KeywordRequest->new
             ->text('web marketing')
@@ -46,14 +65,6 @@ sub estimateAdGroupList : Test(no_plan)
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock( call => sub {
             my $xml .= <<'EOF';
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
- <soapenv:Header>
-  <responseTime soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">39</responseTime>
-  <operations soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</operations>
-  <units soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</units>
-  <requestId soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">f7912565442e4adeb1bf30cbbf2f8fd2</requestId>
- </soapenv:Header>
- <soapenv:Body>
   <estimateAdGroupListResponse xmlns="">
    <ns1:estimateAdGroupListReturn
 xmlns:ns1="https://adwords.google.com/api/adwords/v6">
@@ -78,10 +89,9 @@ xmlns:ns1="https://adwords.google.com/api/adwords/v6">
     </ns1:keywordEstimates>
    </ns1:estimateAdGroupListReturn>
   </estimateAdGroupListResponse>
- </soapenv:Body>
-</soapenv:Envelope>
 EOF
 
+            $xml = $self->gen_full_response($xml);
             my $env = SOAP::Deserializer->deserialize($xml);
             return $env;
         });
@@ -117,11 +127,15 @@ sub estimateCampaignList : Test(no_plan)
 {
     my $self = shift;
 
-    #return;
+    $sub_name = (caller 0)[3];
+    $sub_name =~ s/^.+:://;
+    if (not $tests{$sub_name}) {
+        return;
+    }
+
 
     if ($self->{sandbox}) {
 
-        $self->{obj}->debug(1);
 
          my $kwreq1 = Google::Adwords::KeywordRequest->new
             ->text('web marketing')
@@ -161,14 +175,6 @@ sub estimateCampaignList : Test(no_plan)
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock( call => sub {
             my $xml .= <<'EOF';
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
- <soapenv:Header>
-  <responseTime soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">39</responseTime>
-  <operations soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</operations>
-  <units soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</units>
-  <requestId soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">f7912565442e4adeb1bf30cbbf2f8fd2</requestId>
- </soapenv:Header>
- <soapenv:Body>
   <estimateCampaignListResponse xmlns="">
    <ns1:estimateCampaignListReturn
 xmlns:ns1="https://adwords.google.com/api/adwords/v6">
@@ -196,10 +202,9 @@ xmlns:ns1="https://adwords.google.com/api/adwords/v6">
     <ns1:id>-1</ns1:id>
    </ns1:estimateCampaignListReturn>
   </estimateCampaignListResponse>
- </soapenv:Body>
-</soapenv:Envelope>
 EOF
 
+            $xml = $self->gen_full_response($xml);
             my $env = SOAP::Deserializer->deserialize($xml);
             return $env;
         });
@@ -247,9 +252,15 @@ sub estimateKeywordList : Test(no_plan)
 {
     my $self = shift;
 
+    $sub_name = (caller 0)[3];
+    $sub_name =~ s/^.+:://;
+    if (not $tests{$sub_name}) {
+        return;
+    }
+
+
     if ($self->{sandbox}) {
 
-        $self->{obj}->debug(1);
 
          my $kwreq1 = Google::Adwords::KeywordRequest->new
             ->text('web marketing')
@@ -272,14 +283,6 @@ sub estimateKeywordList : Test(no_plan)
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock( call => sub {
             my $xml .= <<'EOF';
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
- <soapenv:Header>
-  <responseTime soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">39</responseTime>
-  <operations soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</operations>
-  <units soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">1</units>
-  <requestId soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next" soapenv:mustUnderstand="0" xmlns="https://adwords.google.com/api/adwords/v6">f7912565442e4adeb1bf30cbbf2f8fd2</requestId>
- </soapenv:Header>
- <soapenv:Body>
   <estimateKeywordListResponse xmlns="">
    <ns1:estimateKeywordListReturn
 xmlns:ns1="https://adwords.google.com/api/adwords/v6">
@@ -302,10 +305,9 @@ xmlns:ns2="https://adwords.google.com/api/adwords/v6">
     <ns2:upperCpc>866139</ns2:upperCpc>
    </ns2:estimateKeywordListReturn>
   </estimateKeywordListResponse>
- </soapenv:Body>
-</soapenv:Envelope>
 EOF
 
+            $xml = $self->gen_full_response($xml);
             my $env = SOAP::Deserializer->deserialize($xml);
             return $env;
         });
