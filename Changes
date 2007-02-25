@@ -1,5 +1,9 @@
 Revision history for Perl module Google::Adwords
 
+v1.1    Sun Feb 25 21:35:02 IST 2007
+    - api_version is now a mutator for the *Service modules, so that you can specify
+      which version of the Adwords API to use
+
 v1.0.1  Wed Feb 21 15:26:04 IST 2007
     - v8 implemented
     - added field proxyMaxCpc to the AdGroup object

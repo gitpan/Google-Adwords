@@ -1,15 +1,15 @@
 package Google::Adwords::Service;
 use strict; use warnings;
 
-use version; our $VERSION = qv('0.5');
+use version; our $VERSION = qv('0.6');
 
 use base qw/ Class::Accessor::Chained Google::Adwords /;
 use SOAP::Lite;
 use Readonly;
 
-Readonly my $user_agent => "Google::Adwords v1.0.1";
-Readonly my $endpoint => 'https://adwords.google.com/api/adwords/v8';
-Readonly my $endpoint_sandbox => 'https://sandbox.google.com/api/adwords/v8';
+Readonly my $user_agent => "Google::Adwords v1.1";
+Readonly my $endpoint => 'https://adwords.google.com/api/adwords';
+Readonly my $endpoint_sandbox => 'https://sandbox.google.com/api/adwords';
 Readonly my $soap_timeout => 35;
 
 __PACKAGE__->mk_accessors(qw/
@@ -18,6 +18,7 @@ __PACKAGE__->mk_accessors(qw/
     developerToken
     applicationToken
     useragent
+    api_version
     use_sandbox
     clientEmail
     timeout
@@ -28,10 +29,6 @@ __PACKAGE__->mk_accessors(qw/
     responseTime
 /);
 
-# Read only accessors
-__PACKAGE__->mk_ro_accessors(qw/
-    api_version
-/);
 
 ### CLASS METHOD ##################################################
 # Usage      : Google::Adwords::Service->new();
@@ -113,10 +110,10 @@ sub _endpoint
     my ($self) = @_;
 
     if ($self->use_sandbox) {
-        return $endpoint_sandbox;
+        return $endpoint_sandbox . '/' . $self->api_version;
     }
     else {
-        return $endpoint;
+        return $endpoint . '/' . $self->api_version;
     }
 }
 
@@ -333,6 +330,11 @@ These accessors/methods are available across all the child Service modules
 
     Set this to an arbitrary string that identifies the customer sending the
     request. Default value is "Google::Adwords $VERSION"
+
+=head2 B<api_version()>
+
+    The Adwords API version you want to use. In format 'v*'. So, to use 
+    version 7 of the API, set this to a value of 'v7'. Default value is 'v8'.
 
 =head2 B<use_sandbox()>
 
