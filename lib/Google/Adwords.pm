@@ -1,7 +1,7 @@
 package Google::Adwords;
 use strict; use warnings;
 
-use version; our $VERSION = qv('1.1');
+use version; our $VERSION = qv('1.1.1');
 
 1;
 
@@ -14,12 +14,18 @@ Google::Adwords - an interface which abstracts the Google Adwords SOAP API
  
 =head1 VERSION
  
-This documentation refers to Google::Adwords version 1.1
+This documentation refers to Google::Adwords version 1.1.1
  
 
 =head1 API VERSION
 
-Google::Adwords currently uses version 8 (v8) of the Adwords API
+Google::Adwords currently uses version 8 (v8) of the Adwords API which is the
+default. You can also opt to use version 7 if you wish. Just set the api_version() in
+your *Service objects to 'v7'. 
+
+    # use v7 of the Adwords API
+    $campaign_service->api_version('v7');
+
  
 =head1 SYNOPSIS
  
@@ -39,7 +45,7 @@ Google::Adwords currently uses version 8 (v8) of the Adwords API
     #$service->clientEmail('clientemail@domain.com');
 
     # To use an earlier version of the Adwords API
-    $service->api_version('v7');
+    #$service->api_version('v7');
 
     # if you want SOAP trace output
     #$service->debug(1);
@@ -181,6 +187,10 @@ B<Many services need to deal with complex data types which are available as obje
 
 * betonmarkets.com - For the initial requirement and funding
 
+
+=head1 SEE ALSO
+
+Mailing List at L<https://lists.sourceforge.net/lists/listinfo/google-adwords-perl>
 
 =head1 AUTHORS
  

@@ -1,4 +1,6 @@
 
+* *Service objects should be a singleton
+
 * Lots more good examples
 
 * CriterionService.checkCriteria()

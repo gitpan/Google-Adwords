@@ -721,17 +721,14 @@ Remove a list of Criteria from an AdGroup.
 
 =head3 Usage
 
-=over 4
-
     my $ret = $obj->removeCriteria($adGroupId, [ $criterionId ]);
-
-=back
 
 =head3 Parameters
 
 =over 4
 
 =item 1) $adGroupId : the id of the adgroup
+
 =item 2) array ref of criterion Ids
 
 =back
