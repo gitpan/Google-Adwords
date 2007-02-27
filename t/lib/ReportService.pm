@@ -10,11 +10,11 @@ sub test_class { return "Google::Adwords::ReportService"; }
 
 # tests to run
 my %tests = (
-    deleteReport                => 0,
-    z2_getAllJobs               => 1,
+    deleteReport                => 1,
+    z1_getAllJobs               => 1,
     getGzipReportDownloadUrl    => 0,
-    z1_getReportJobStatus       => 1,
-    z0_scheduleReportJob        => 1,
+    z2_getReportJobStatus       => 0,
+    z0_scheduleReportJob        => 0,
 );
 
 sub start_of_each_test : Test(setup)
@@ -61,7 +61,7 @@ EOF
 
 }
 
-sub z2_getAllJobs : Test(no_plan)
+sub z1_getAllJobs : Test(no_plan)
 {
     my $self = shift;
 
@@ -164,7 +164,7 @@ EOF
 
 }
 
-sub z1_getReportJobStatus : Test(no_plan)
+sub z2_getReportJobStatus : Test(no_plan)
 {
     my $self = shift;
 
@@ -217,8 +217,8 @@ sub z0_scheduleReportJob : Test(no_plan)
     if ($self->{sandbox}) {
 
         my $job = Google::Adwords::ReportJob->new
-            ->startDay('2006-08-01')
-            ->endDay('2006-08-01')
+            ->startDay('2007-02-25')
+            ->endDay('2007-02-27')
             ->name('test')
             ->aggregationType('Summary')
         ;

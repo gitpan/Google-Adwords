@@ -439,7 +439,7 @@ sub getCriterionStats
 	'inPST' => $inPST )->type('');
     
  my $result	= $self->_create_service_and_call({
-   service	=> 'CreativeService',
+   service	=> 'CriterionService',
    method	=> 'getCriterionStats',
    params	=> \@params,
    });
