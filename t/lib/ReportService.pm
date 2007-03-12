@@ -12,9 +12,9 @@ sub test_class { return "Google::Adwords::ReportService"; }
 my %tests = (
     deleteReport                => 1,
     z1_getAllJobs               => 1,
-    getGzipReportDownloadUrl    => 0,
-    z2_getReportJobStatus       => 0,
-    z0_scheduleReportJob        => 0,
+    z3_getGzipReportDownloadUrl => 0,
+    z2_getReportJobStatus       => 1,
+    z0_scheduleReportJob        => 1,
 );
 
 sub start_of_each_test : Test(setup)
@@ -126,7 +126,7 @@ EOF
 
 }
 
-sub getGzipReportDownloadUrl : Test(no_plan)
+sub z3_getGzipReportDownloadUrl : Test(no_plan)
 {
     my $self = shift;
 
@@ -139,7 +139,7 @@ sub getGzipReportDownloadUrl : Test(no_plan)
 
     if ($self->{sandbox}) {
 
-        my $url = $self->{obj}->getGzipReportDownloadUrl(1935159656);
+        my $url = $self->{obj}->getGzipReportDownloadUrl($self->{_job_id});
 
     }
     else {

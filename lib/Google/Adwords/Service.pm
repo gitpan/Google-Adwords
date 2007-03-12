@@ -1,13 +1,13 @@
 package Google::Adwords::Service;
 use strict; use warnings;
 
-use version; our $VERSION = qv('0.6.2');
+use version; our $VERSION = qv('0.6.3');
 
 use base qw/ Class::Accessor::Chained Google::Adwords /;
 use SOAP::Lite;
 use Readonly;
 
-Readonly my $user_agent => "Google::Adwords v1.1.2";
+Readonly my $user_agent => "Google::Adwords v1.1.3";
 Readonly my $endpoint => 'https://adwords.google.com/api/adwords';
 Readonly my $endpoint_sandbox => 'https://sandbox.google.com/api/adwords';
 Readonly my $soap_timeout => 35;
@@ -177,7 +177,7 @@ sub _call
 
     # set uri endpoint if requested
     if ( (defined $args_ref->{'with_uri'}) && ($args_ref->{'with_uri'}) ) {
-        $method->uri($endpoint)->prefix('');
+        $method->uri($endpoint . '/' . $self->api_version)->prefix('');
     }
 
     # call the SOAP service
@@ -270,7 +270,7 @@ Google::Adwords::Service - Base class for the Service modules
  
 =head1 VERSION
  
-This documentation refers to Google::Adwords::Service version 0.6.2
+This documentation refers to Google::Adwords::Service version 0.6.3
  
  
 =head1 DESCRIPTION

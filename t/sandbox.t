@@ -28,8 +28,6 @@ my @modules = (
     { KeywordToolService        => 1, },
 );
 
-my $i;
-
 # check if user wants to run sandbox tests
 my $answer = prompt "Do you want to run sandbox tests? (y/n): ";
 
@@ -65,9 +63,8 @@ my $params_ref = {
 for (@modules) {
     my ($key) = keys %{$_};
     if ($_->{$key} == 1) {
-        $i = $key->new($params_ref);
+        my $i = $key->new($params_ref);
         $i->runtests();
     }
 }
-
 

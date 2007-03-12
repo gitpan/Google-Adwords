@@ -1,7 +1,7 @@
 package Google::Adwords::Criterion;
 use strict; use warnings;
 
-use version; our $VERSION = qv('0.2');
+use version; our $VERSION = qv('0.2.1');
 
 use base 'Google::Adwords::Data';
 
@@ -36,7 +36,7 @@ Google::Adwords::Criterion - A Google Adwords Criterion object.
  
 =head1 VERSION
  
-This documentation refers to Google::Adwords::Criterion version 0.2
+This documentation refers to Google::Adwords::Criterion version 0.2.1
  
  
 =head1 SYNOPSIS
@@ -61,14 +61,14 @@ This documentation refers to Google::Adwords::Criterion version 0.2
     # get all the criteria for an adgroup
     my @getallcriteria	= $criterion_service->getAllCriteria($adgroupid);
     for ( @getallcriteria ) {
-        print "Criterion name : " . $_->name . " , Id : " . $_->id . "\n";
+        print "Criterion text : " . $_->text . " , Id : " . $_->id . "\n";
     }
 
     # get a specific criterion from an AdGroup
     my $criterionid	= 987654321;
 
     my $getcriterion = $criterion_service->getCriteria($adgroupid, [ $criterionid ]);
-    print "Get criterion: " . $getcriterion->name . ", Id : " . $getcriterion->id . "\n";
+    print "Get criterion: " . $getcriterion->text . ", Id : " . $getcriterion->id . "\n";
 
     # remove a criterion
     my $ret	= $criterion_service->removeCriteria($adgroupid, [ $criterionid ]);

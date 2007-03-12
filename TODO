@@ -1,11 +1,8 @@
 
-* *Service objects should be a singleton
-
-* Lots more good examples
-
-* CriterionService.checkCriteria()
-
-* CreativeService.checkCreative() and CreativeService.checkCreativeList()
-
-* Error handling - ApiException and ApiError objects
+- Unicode and HTML entities handling
+- *Service objects should be a singleton
+- Lots more good examples
+- CriterionService.checkCriteria()
+- CreativeService.checkCreative() and CreativeService.checkCreativeList()
+- Error handling - ApiException and ApiError objects
 
