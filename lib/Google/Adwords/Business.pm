@@ -55,6 +55,8 @@ This documentation refers to Google::Adwords::Business version 0.0.1
 
     # if you have a MCC
     $service->clientEmail($client_email);
+    # or 
+    $service->clientCustomerId($customerid);
 
     # find businesses
     my @businesses = $service->findBusinesses({

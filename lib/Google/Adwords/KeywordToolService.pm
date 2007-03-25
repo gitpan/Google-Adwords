@@ -203,6 +203,8 @@ This documentation refers to Google::Adwords::KeywordToolService version 0.2
 
     # if you have a MCC
     $kwtool_service->clientEmail($client_email);
+    # or 
+    $kwtool_service->clientCustomerId($customerid);
 
     # getKeywordsFromSite
     my $sitekeywordgroups = $kwtool_service->getKeywordsFromSite({

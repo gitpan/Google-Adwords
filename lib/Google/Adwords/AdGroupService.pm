@@ -517,6 +517,8 @@ This documentation refers to Google::Adwords::AdGroupService version 0.0.2
 
     # if you use a MCC
     #$adgroup_service->clientEmail($client_email);
+    # or 
+    #$adgroup_service->clientCustomerId($customerid);
 
     # now create the adgroup
     my $campaignId = 1234; # within this campaign

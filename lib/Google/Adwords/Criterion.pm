@@ -55,6 +55,8 @@ This documentation refers to Google::Adwords::Criterion version 0.2.1
 
     # if you have a MCC
     $criterion_service->clientEmail($client_email);
+    # or 
+    $criterion_service->clientCustomerId($customer_id);
 
     my $adgroupid	= 123456789;
 

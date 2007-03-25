@@ -50,6 +50,8 @@ This documentation refers to Google::Adwords::Creative version 0.0.1
 
     # if you have a MCC
     $creative_service->clientEmail($client_email);
+    # or 
+    $creative_service->clientCustomerId($customerid);
 
     # get a specific creative from an AdGroup
     my $adgroupid = 1123

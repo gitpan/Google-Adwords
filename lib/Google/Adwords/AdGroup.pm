@@ -58,6 +58,8 @@ This documentation refers to Google::Adwords::AdGroup version 0.2
 
     # if you use a MCC
     #$adgroup_service->clientEmail($client_email);
+    # or 
+    $adgroup_service->clientCustomerId($customerid);
 
     # now create the adgroup 
     my $adgroup_response = $adgroup_service->addAdGroup($campaign_id, $adgroup);

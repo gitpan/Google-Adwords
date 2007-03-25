@@ -663,6 +663,8 @@ This documentation refers to Google::Adwords::CampaignService version 0.5
 
     # if you have a MCC
     $campaign_service->clientEmail($client_email);
+    # or 
+    $campaign_service->clientCustomerId($customerid);
 
     # now create the campaign
     my $campaign_response = $campaign_service->addCampaign($campaign);

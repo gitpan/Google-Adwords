@@ -257,6 +257,8 @@ This documentation refers to Google::Adwords::AccountService version 0.3
     $service->email($email)
             ->password($password)
             ->clientEmail($cemail)
+	   or
+	    ->clientCustomerId($ccustomerid)
             ->applicationToken($app_token)
             ->developerToken($dev_token);
 

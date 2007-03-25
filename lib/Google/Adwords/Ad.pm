@@ -107,6 +107,8 @@ This documentation refers to Google::Adwords::Ad version 0.0.1
 
         # if you use a MCC
         #$service->clientEmail('clientemail@domain.com');
+    	# or 
+  	#$service->clientCustomerId($customerid);
 
         # Add the two ads
         my @added_ads = $service->addAds($ad1, $ad2);

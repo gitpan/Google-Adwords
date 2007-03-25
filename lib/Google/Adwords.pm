@@ -1,7 +1,7 @@
 package Google::Adwords;
 use strict; use warnings;
 
-use version; our $VERSION = qv('1.1.3');
+use version; our $VERSION = qv('1.2');
 
 1;
 
@@ -14,7 +14,7 @@ Google::Adwords - an interface which abstracts the Google Adwords SOAP API
  
 =head1 VERSION
  
-This documentation refers to Google::Adwords version 1.1.3
+This documentation refers to Google::Adwords version 1.2
  
 
 =head1 API VERSION
@@ -43,6 +43,8 @@ your *Service objects to 'v7'.
 
     # if you use a MCC
     #$service->clientEmail('clientemail@domain.com');
+    # or (but not both)
+    #$service->clientCustomerId('xxx-xxx-xxxx');
 
     # To use an earlier version of the Adwords API
     #$service->api_version('v7');

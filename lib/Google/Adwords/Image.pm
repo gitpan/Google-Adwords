@@ -56,6 +56,8 @@ This documentation refers to Google::Adwords::Image version 0.0.1
 
     # if you have a MCC
     $creative_service->clientEmail($client_email);
+    # or 
+    $creative_service->clientCustomerId($customerid);
 
     # Lets add an image creative
     my $data_blurb = read_file('image.gif');

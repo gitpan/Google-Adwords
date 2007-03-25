@@ -1,13 +1,13 @@
 package Google::Adwords::Service;
 use strict; use warnings;
 
-use version; our $VERSION = qv('0.6.3');
+use version; our $VERSION = qv('0.7');
 
 use base qw/ Class::Accessor::Chained Google::Adwords /;
 use SOAP::Lite;
 use Readonly;
 
-Readonly my $user_agent => "Google::Adwords v1.1.3";
+Readonly my $user_agent => "Google::Adwords v1.2";
 Readonly my $endpoint => 'https://adwords.google.com/api/adwords';
 Readonly my $endpoint_sandbox => 'https://sandbox.google.com/api/adwords';
 Readonly my $soap_timeout => 35;
@@ -21,6 +21,7 @@ __PACKAGE__->mk_accessors(qw/
     api_version
     use_sandbox
     clientEmail
+    clientCustomerId
     timeout
     debug
     requestId
@@ -90,6 +91,12 @@ sub _get_soap_headers
     if (defined $self->clientEmail) {
         push @headers, 
             SOAP::Header->name("clientEmail")->value($self->clientEmail)->type('');
+    }
+
+    # or the clientCustomerId header
+    if (defined $self->clientCustomerId) {
+        push @headers, 
+            SOAP::Header->name("clientCustomerId")->value($self->clientCustomerId)->type('');
     }
 
     return @headers;
@@ -270,7 +277,7 @@ Google::Adwords::Service - Base class for the Service modules
  
 =head1 VERSION
  
-This documentation refers to Google::Adwords::Service version 0.6.3
+This documentation refers to Google::Adwords::Service version 0.7
  
  
 =head1 DESCRIPTION
@@ -325,6 +332,12 @@ These accessors/methods are available across all the child Service modules
 
     Use this if you have a MCC (My Client Center) account. Set the actual
     client email which will be used for the API calls.
+
+=head2 B<clientCustomerId()>
+
+    Use this if you have a MCC (My Client Center) account. Set the actual
+    client customerid which will be used for the API calls.
+    One of clientEmail and clientCustomerId must be set but NOT both.
 
 =head2 B<useragent()>
 

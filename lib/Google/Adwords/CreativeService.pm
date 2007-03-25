@@ -1,7 +1,7 @@
 package Google::Adwords::CreativeService;
 use strict; use warnings;
 
-use version; our $VERSION = qv('0.3');
+use version; our $VERSION = qv('0.3.1');
 
 use base 'Google::Adwords::Service';
 
@@ -457,7 +457,7 @@ CreativeService API calls
  
 =head1 VERSION
  
-This documentation refers to Google::Adwords::CreativeService version 0.3
+This documentation refers to Google::Adwords::CreativeService version 0.3.1
  
  
 =head1 SYNOPSIS
@@ -479,6 +479,8 @@ This documentation refers to Google::Adwords::CreativeService version 0.3
 
     # if you have a MCC
     $creative_service->clientEmail($client_email);
+    # or 
+    $creative_service->clientCustomerId($customerid);
 
     my $adgroupid	= 123456789;
 
@@ -494,25 +496,6 @@ This documentation refers to Google::Adwords::CreativeService version 0.3
     my $getcreative	= $creative_service->getCreative($adgroupid, $creativeid);
     print "Get creative: " . $getcreative->name . ", Id : " . $getcreative->id . "\n";
 
-    # activate a creative
-    my $ret = $creative_service->activateCreative($adgroupid, $creativeid);
-
-    # activate a list of creative
-    my @activate_list = (
-        {
-            adGroupId => 1234,
-            creativeId => 12,
-        },
-        {
-            adGroupId => 5789,
-            creativeId => 209,
-        },
-    );
-    my $ret = $creative_service->activateCreativeList(@activate_list);
-
-    # delete a creative
-    my $ret	= $creative_service->deleteCreative($adgroupid, $creativeid);
-    
     # add a creative
     my $creative_text = Google::Adwords::Creative->new
             ->adGroupId($adgroupid)
@@ -552,100 +535,6 @@ information about your creatives.
 
   
 =head1 METHODS 
-
-=head2 B<activateCreative()>
-
-=head3 Description
-
-=over 4
-
-Mark a Creative as active. Active Creatives will be served.
-
-Creatives are active by default when they are first created, but it is
-possible to create them in the deleted (inactive) state, or to inactivate them
-by marking them as deleted. A "deleted" creative can be undeleted and made
-active again by the activateCreative operation.
-
-To undo this operation, call deleteCreative.
-
-=back
-
-=head3 Usage
-
-=over 4
-
-    my $ret = $obj->activateCreative($adGroupId, $creativeId);
-
-=back
-
-=head3 Parameters
-
-=over 4
-
-=item 1) $adGroupId : id of the Adgroup
-
-=item 2) $creativeId : id of the Creative
-
-=back
-
-=head3 Returns
- 
-=over 4
-
-1 on success
-
-=back
-
-=head2 B<activateCreativeList()>
-
-=head3 Description
-
-=over 4
-
-Mark a list of Creatives as active. Each pair of (adGroupId, creativeId)
-parameters specifies one Creative to activate. See activateCreative.
-
-To undo this operation, call deleteCreativeList.
-
-=back
-
-=head3 Usage
-
-=over 4
-
-    my @pairs = (
-        {
-            adGroupId => 1244,
-            creativeId => 15,
-        },
-        {
-            adGroupId => 4561,
-            creativeId => 29,
-        },
-    );
-    my $ret = $obj->activateCreativeList(@pairs);
-
-=back
-
-=head3 Parameters
-
-A list of hashrefs with keys (each forming a pair) :
-
-=over 4
-
-=item * adGroupId : id of the Adgroup
-
-=item * creativeId : id of the Creative
-
-=back
-
-=head3 Returns
- 
-=over 4
-
-1 on success
-
-=back
 
 =head2 B<addCreative()>
 
@@ -712,92 +601,6 @@ A list of Google::Adwords::Creative objects
 =over 4
 
 The list of created creatives, each as a Google::Adwords::Creative object
-
-=back
-
-=head2 B<deleteCreative()>
-
-=head3 Description
-
-=over 4
-
-Mark a Creative as deleted. Deleted Creatives will not be served. If the
-Creative is already deleted, this does nothing.
-
-=back
-
-=head3 Usage
-
-=over 4
-
-    my $ret = $obj->deleteCreative($adGroupId, $creativeId);
-
-=back
-
-=head3 Parameters
-
-=over 4
-
-=item * 1) $adGroupId : the id of the adgroup
-=item * 2) $creativeId : the id of the creative
-
-=back
-
-=head3 Returns
- 
-=over 4
-
-1 on success
-
-=back
-
-=head2 B<deleteCreativeList()>
-
-=head3 Description
-
-=over 4
-
-Mark a list of Creatives as deleted. Each pair of (adGroupId, creativeId)
-parameters specifies one Creative to delete. To undo this operation, call
-activateCreativeList.
-
-=back
-
-=head3 Usage
-
-=over 4
-
-    my @pairs = (
-        {
-            adGroupId => 1244,
-            creativeId => 15,
-        },
-        {
-            adGroupId => 4561,
-            creativeId => 29,
-        },
-    );
-    my $ret = $obj->deleteCreativeList(@pairs);
-
-=back
-
-=head3 Parameters
-
-A list of hashrefs (each representing a pair) with keys :
-
-=over 4
-
-=item * adGroupId : id of the Adgroup
-
-=item * creativeId : id of the Creative
-
-=back
-
-=head3 Returns
- 
-=over 4
-
-1 on success
 
 =back
 

@@ -288,6 +288,8 @@ This documentation refers to Google::Adwords::TrafficEstimatorService version
 
     # if you use a MCC
     #$service->clientEmail('clientemail@domain.com');
+    # or 
+    #$service->clientCustomerId($customerid);
 
     # create some KeywordRequest objects
     my $kwreq1 = Google::Adwords::KeywordRequest->new

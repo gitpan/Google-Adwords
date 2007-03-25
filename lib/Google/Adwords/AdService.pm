@@ -489,6 +489,8 @@ This documentation refers to Google::Adwords::AdService version 0.2
 
         # if you use a MCC
         #$service->clientEmail('clientemail@domain.com');
+	# or 
+        #$service->clientCustomerId('xxx-xxx-xxxx');
 
         # Add the two ads
         my @added_ads = $service->addAds($ad1, $ad2);
