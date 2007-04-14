@@ -9,7 +9,7 @@ use SOAP::Lite;
 use Readonly;
 
 Readonly my $default_api_version => 'v8';
-Readonly my $user_agent          => "Google::Adwords v1.2.1";
+Readonly my $user_agent          => "Google::Adwords v1.2.2";
 Readonly my $endpoint            => 'https://adwords.google.com/api/adwords';
 Readonly my $endpoint_sandbox    => 'https://sandbox.google.com/api/adwords';
 Readonly my $default_timeout => 35;    # HTTP timeout in seconds

@@ -1,5 +1,8 @@
 Revision history for Perl module Google::Adwords
 
+v1.2.2  Sat Apr 14 18:38:49 IST 2007
+    - included t/pod.t in distribution
+
 v1.2.1  Sat Apr 14 16:03:45 IST 2007
     - bug fix in AdService::findBusinesses() to encode html entities
     - only encode '<>&' characters in the request XML. Thanks to Steven Sattin for

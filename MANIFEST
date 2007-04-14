@@ -53,6 +53,7 @@ lib/Google/Adwords/SiteKeywordGroups.pm
 lib/Google/Adwords/SiteKeyword.pm
 lib/Google/Adwords/StatsRecord.pm
 lib/Google/Adwords/TrafficEstimatorService.pm
+t/pod.t
 t/run.t
 t/sandbox.t
 t/lib/AccountService.pm
