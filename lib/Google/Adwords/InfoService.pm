@@ -1,5 +1,6 @@
 package Google::Adwords::InfoService;
-use strict; use warnings;
+use strict;
+use warnings;
 
 use version; our $VERSION = qv('0.1.1');
 
@@ -21,13 +22,16 @@ sub getUsageQuotaThisMonth
     my ($self) = @_;
 
     # create the SOAP service
-    my $result = $self->_create_service_and_call({
-        service => 'InfoService',
-        method => 'getUsageQuotaThisMonth',   
-    });
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'InfoService',
+            method  => 'getUsageQuotaThisMonth',
+        }
+    );
 
-    return $result->valueof("//getUsageQuotaThisMonthResponse/getUsageQuotaThisMonthReturn");
-}
+    return $result->valueof(
+        "//getUsageQuotaThisMonthResponse/getUsageQuotaThisMonthReturn");
+} # end sub getUsageQuotaThisMonth
 
 ### INSTANCE METHOD ################################################
 # Usage      : my $quota = $obj->getFreeUsageQuotaThisMonth();
@@ -43,17 +47,20 @@ sub getFreeUsageQuotaThisMonth
     my ($self) = @_;
 
     # create the SOAP service
-    my $result = $self->_create_service_and_call({
-        service => 'InfoService',
-        method => 'getFreeUsageQuotaThisMonth',   
-    });
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'InfoService',
+            method  => 'getFreeUsageQuotaThisMonth',
+        }
+    );
 
-    return $result->valueof("//getFreeUsageQuotaThisMonthResponse/getFreeUsageQuotaThisMonthReturn");
-}
-
+    return $result->valueof(
+"//getFreeUsageQuotaThisMonthResponse/getFreeUsageQuotaThisMonthReturn"
+    );
+} # end sub getFreeUsageQuotaThisMonth
 
 ### INSTANCE METHOD ################################################
-# Usage      : 
+# Usage      :
 #   my $cost = $obj->getMethodCost({
 #       service => $service_name,
 #       method => $method_name,
@@ -68,25 +75,29 @@ sub getFreeUsageQuotaThisMonth
 #######################################################################
 sub getMethodCost
 {
-    my ($self, $args_ref) = @_;
+    my ( $self, $args_ref ) = @_;
 
     my @params;
-    push @params, SOAP::Data->name('service' => $args_ref->{'service'})->type('');
-    push @params, SOAP::Data->name('method' => $args_ref->{'method'})->type('');
-    push @params, SOAP::Data->name('date' => $args_ref->{'date'})->type('');
-    
+    push @params,
+        SOAP::Data->name( 'service' => $args_ref->{'service'} )->type('');
+    push @params,
+        SOAP::Data->name( 'method' => $args_ref->{'method'} )->type('');
+    push @params, SOAP::Data->name( 'date' => $args_ref->{'date'} )->type('');
+
     # call the service
-    my $result = $self->_create_service_and_call({
-        service => 'InfoService',
-        method => 'getMethodCost',   
-        params => \@params,
-    });
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'InfoService',
+            method  => 'getMethodCost',
+            params  => \@params,
+        }
+    );
 
     return $result->valueof("//getMethodCostResponse/getMethodCostReturn");
-}
+} # end sub getMethodCost
 
 ### INSTANCE METHOD ################################################
-# Usage      : 
+# Usage      :
 #   my $cost = $obj->getOperationCount({
 #       startDate => $date,
 #       endDate => $date,
@@ -100,24 +111,29 @@ sub getMethodCost
 #######################################################################
 sub getOperationCount
 {
-    my ($self, $args_ref) = @_;
+    my ( $self, $args_ref ) = @_;
 
     my @params;
-    push @params, SOAP::Data->name('startDate' => $args_ref->{'startDate'})->type('');
-    push @params, SOAP::Data->name('endDate' => $args_ref->{'endDate'})->type('');
-    
-    # call the service
-    my $result = $self->_create_service_and_call({
-        service => 'InfoService',
-        method => 'getOperationCount',   
-        params => \@params,
-    });
+    push @params,
+        SOAP::Data->name( 'startDate' => $args_ref->{'startDate'} )->type('');
+    push @params,
+        SOAP::Data->name( 'endDate' => $args_ref->{'endDate'} )->type('');
 
-    return $result->valueof("//getOperationCountResponse/getOperationCountReturn");
-}
+    # call the service
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'InfoService',
+            method  => 'getOperationCount',
+            params  => \@params,
+        }
+    );
+
+    return $result->valueof(
+        "//getOperationCountResponse/getOperationCountReturn");
+} # end sub getOperationCount
 
 ### INSTANCE METHOD ################################################
-# Usage      : 
+# Usage      :
 #   my $units_count = $obj->getUnitCount({
 #       startDate => $date,
 #       endDate => $date,
@@ -131,26 +147,28 @@ sub getOperationCount
 #######################################################################
 sub getUnitCount
 {
-    my ($self, $args_ref) = @_;
+    my ( $self, $args_ref ) = @_;
 
-        
     my @params;
-    push @params, SOAP::Data->name('startDate' => $args_ref->{'startDate'})->type('');
-    push @params, SOAP::Data->name('endDate' => $args_ref->{'endDate'})->type('');
-    
+    push @params,
+        SOAP::Data->name( 'startDate' => $args_ref->{'startDate'} )->type('');
+    push @params,
+        SOAP::Data->name( 'endDate' => $args_ref->{'endDate'} )->type('');
 
     # create the SOAP service
-    my $result = $self->_create_service_and_call({
-        service => 'InfoService',
-        method => 'getUnitCount',   
-        params => \@params,
-    });
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'InfoService',
+            method  => 'getUnitCount',
+            params  => \@params,
+        }
+    );
 
     return $result->valueof("//getUnitCountResponse/getUnitCountReturn");
-}
+} # end sub getUnitCount
 
 ### INSTANCE METHOD ################################################
-# Usage      : 
+# Usage      :
 #   my $units_count = $obj->getUnitCountForMethod({
 #       service => $service_name,
 #       method => $method_name,
@@ -166,28 +184,34 @@ sub getUnitCount
 #######################################################################
 sub getUnitCountForMethod
 {
-    my ($self, $args_ref) = @_;
+    my ( $self, $args_ref ) = @_;
 
     my @params;
-    push @params, SOAP::Data->name('service' => $args_ref->{'service'})->type('');
-    push @params, SOAP::Data->name('method' => $args_ref->{'method'})->type('');
-    push @params, SOAP::Data->name('startDate' => $args_ref->{'startDate'})->type('');
-    push @params, SOAP::Data->name('endDate' => $args_ref->{'endDate'})->type('');
-    
+    push @params,
+        SOAP::Data->name( 'service' => $args_ref->{'service'} )->type('');
+    push @params,
+        SOAP::Data->name( 'method' => $args_ref->{'method'} )->type('');
+    push @params,
+        SOAP::Data->name( 'startDate' => $args_ref->{'startDate'} )->type('');
+    push @params,
+        SOAP::Data->name( 'endDate' => $args_ref->{'endDate'} )->type('');
 
     # call the service
     # create the SOAP service
-    my $result = $self->_create_service_and_call({
-        service => 'InfoService',
-        method => 'getUnitCountForMethod',   
-        params => \@params,
-    });
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'InfoService',
+            method  => 'getUnitCountForMethod',
+            params  => \@params,
+        }
+    );
 
-    return $result->valueof("//getUnitCountForMethodResponse/getUnitCountForMethodReturn");
-}
+    return $result->valueof(
+        "//getUnitCountForMethodResponse/getUnitCountForMethodReturn");
+} # end sub getUnitCountForMethod
 
 ### INSTANCE METHOD ################################################
-# Usage      : 
+# Usage      :
 #   my @usage_records = $obj->getUnitCountForClients({
 #       clientEmails => [ $emai1, $email2 ],
 #       startDate => $date,
@@ -202,43 +226,50 @@ sub getUnitCountForMethod
 #######################################################################
 sub getUnitCountForClients
 {
-    my ($self, $args_ref) = @_;
+    my ( $self, $args_ref ) = @_;
 
     my @params;
 
-    push @params, SOAP::Data->name('startDate' => $args_ref->{'startDate'})->type('');
-    push @params, SOAP::Data->name('endDate' => $args_ref->{'endDate'})->type('');
-    
+    push @params,
+        SOAP::Data->name( 'startDate' => $args_ref->{'startDate'} )->type('');
+    push @params,
+        SOAP::Data->name( 'endDate' => $args_ref->{'endDate'} )->type('');
+
     # clientEmails
     my @client_emails = ();
-    if ((exists $args_ref->{'clientEmails'}) &&
-        (scalar @{$args_ref->{'clientEmails'}} > 0))
+    if (   ( exists $args_ref->{'clientEmails'} )
+        && ( scalar @{ $args_ref->{'clientEmails'} } > 0 ) )
     {
-        for (@{$args_ref->{'clientEmails'}}) {
+        for ( @{ $args_ref->{'clientEmails'} } ) {
             push @client_emails, $_;
         }
     }
-    push @params, SOAP::Data->name('clientEmails' 
-        => @client_emails)->type('');
-
+    push @params,
+        SOAP::Data->name( 'clientEmails' => @client_emails )->type('');
 
     # call the service
     # create the SOAP service
-    my $result = $self->_create_service_and_call({
-        service => 'InfoService',
-        method => 'getUnitCountForClients',   
-        params => \@params,
-    });
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'InfoService',
+            method  => 'getUnitCountForClients',
+            params  => \@params,
+        }
+    );
 
     my @ret;
-    for ($result->valueof("//getUnitCountForClientsResponse/getUnitCountForClientsReturn"))
+    for (
+        $result->valueof(
+            "//getUnitCountForClientsResponse/getUnitCountForClientsReturn")
+        )
     {
-        push @ret, 
-            $self->_create_object_from_hash($_, 'Google::Adwords::ClientUsageRecord');
+        push @ret,
+            $self->_create_object_from_hash( $_,
+            'Google::Adwords::ClientUsageRecord' );
     }
 
     return @ret;
-}
+} # end sub getUnitCountForClients
 
 1;
 
@@ -603,7 +634,7 @@ Rohan Almeida <rohan@almeida.in>
 
  
  
-=head1 LICENCE AND COPYRIGHT
+=head1 LICENSE AND COPYRIGHT
  
 Copyright (c) 2006 Rohan Almeida <rohan@almeida.in>. All rights
 reserved.

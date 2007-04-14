@@ -1,5 +1,6 @@
 package Google::Adwords::KeywordVariations;
-use strict; use warnings;
+use strict;
+use warnings;
 
 use version; our $VERSION = qv('0.0.1');
 
@@ -8,7 +9,7 @@ use base 'Google::Adwords::Data';
 my @fields = qw/
     additionalToConsider
     moreSpecific
-/;
+    /;
 
 __PACKAGE__->mk_accessors(@fields);
 
@@ -53,7 +54,7 @@ Rohan Almeida <rohan@almeida.in>
 
  
  
-=head1 LICENCE AND COPYRIGHT
+=head1 LICENSE AND COPYRIGHT
  
 Copyright (c) 2006 Rohan Almeida <rohan@almeida.in>. All rights
 reserved.

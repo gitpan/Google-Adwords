@@ -1,5 +1,6 @@
 package Google::Adwords::Campaign;
-use strict; use warnings;
+use strict;
+use warnings;
 
 use version; our $VERSION = qv('0.3');
 
@@ -18,7 +19,7 @@ my @fields = qw/
     geoTargeting
     networkTargeting
     schedule
-/;
+    /;
 
 __PACKAGE__->mk_accessors(@fields);
 
@@ -29,31 +30,32 @@ sub new
     my $class = ref $proto || $proto;
 
     if (@_) {
-        my $obj = $class->SUPER::new();
+        my $obj     = $class->SUPER::new();
         my $hashref = shift;
-        for (keys %{$hashref}) {
-            $obj->$_($hashref->{$_});
+        for ( keys %{$hashref} ) {
+            $obj->$_( $hashref->{$_} );
         }
         return $obj;
     }
     else {
         return $class->SUPER::new();
     }
-}
+} # end sub new
 
 sub languageTargeting
 {
     my $self = shift;
 
-    my $sub_name = (caller 0)[3];
+    my $sub_name = ( caller 0 )[3];
 
     # if its a get
-    if (not @_) {
+    if ( not @_ ) {
         my $lang_ref = $self->get($sub_name);
-        
+
         # check if not array ref
-        for (keys %{$lang_ref}) {
-            if ((ref $lang_ref->{$_}) ne 'ARRAY') {
+        for ( keys %{$lang_ref} ) {
+            if ( ( ref $lang_ref->{$_} ) ne 'ARRAY' ) {
+
                 #my @langs = split /, ?/, $lang_ref->{$_};
                 $lang_ref->{$_} = [ $lang_ref->{$_} ];
             }
@@ -61,24 +63,26 @@ sub languageTargeting
         return $lang_ref;
     }
     else {
+
         # set
-        return $self->set($sub_name, @_);
+        return $self->set( $sub_name, @_ );
     }
-}
+} # end sub languageTargeting
 
 sub geoTargeting
 {
     my $self = shift;
-    
-    my $sub_name = (caller 0)[3];
+
+    my $sub_name = ( caller 0 )[3];
 
     # if its a get
-    if (not @_) {
+    if ( not @_ ) {
         my $lang_ref = $self->get($sub_name);
-        
+
         # check if not array ref
-        for (keys %{$lang_ref}) {
-            if ((ref $lang_ref->{$_}) ne 'ARRAY') {
+        for ( keys %{$lang_ref} ) {
+            if ( ( ref $lang_ref->{$_} ) ne 'ARRAY' ) {
+
                 #my @langs = split /, ?/, $lang_ref->{$_};
                 $lang_ref->{$_} = [ $lang_ref->{$_} ];
             }
@@ -86,24 +90,26 @@ sub geoTargeting
         return $lang_ref;
     }
     else {
+
         # set
-        return $self->set($sub_name, @_);
+        return $self->set( $sub_name, @_ );
     }
-}
+} # end sub geoTargeting
 
 sub networkTargeting
 {
     my $self = shift;
-    
-    my $sub_name = (caller 0)[3];
+
+    my $sub_name = ( caller 0 )[3];
 
     # if its a get
-    if (not @_) {
+    if ( not @_ ) {
         my $lang_ref = $self->get($sub_name);
-        
+
         # check if not array ref
-        for (keys %{$lang_ref}) {
-            if ((ref $lang_ref->{$_}) ne 'ARRAY') {
+        for ( keys %{$lang_ref} ) {
+            if ( ( ref $lang_ref->{$_} ) ne 'ARRAY' ) {
+
                 #my @langs = split /, ?/, $lang_ref->{$_};
                 $lang_ref->{$_} = [ $lang_ref->{$_} ];
             }
@@ -111,10 +117,11 @@ sub networkTargeting
         return $lang_ref;
     }
     else {
+
         # set
-        return $self->set($sub_name, @_);
+        return $self->set( $sub_name, @_ );
     }
-}
+} # end sub networkTargeting
 
 1;
 
@@ -373,7 +380,7 @@ Rohan Almeida <rohan@almeida.in>
 
  
  
-=head1 LICENCE AND COPYRIGHT
+=head1 LICENSE AND COPYRIGHT
  
 Copyright (c) 2006 Rohan Almeida <rohan@almeida.in>. All rights
 reserved.

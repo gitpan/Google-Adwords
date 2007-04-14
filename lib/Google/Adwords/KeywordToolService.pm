@@ -1,5 +1,6 @@
 package Google::Adwords::KeywordToolService;
-use strict; use warnings;
+use strict;
+use warnings;
 
 use version; our $VERSION = qv('0.2');
 
@@ -13,12 +14,12 @@ use Google::Adwords::SiteKeyword;
 use Google::Adwords::SiteKeywordGroups;
 
 ### INSTANCE METHOD ################################################
-# Usage      : 
+# Usage      :
 #
 #   my $sitekeywordgroups = $obj->getKeywordsFromSite({
 #       url     => 'http://url.com',
 #       includeLinkedPages => 1,
-#       languages   => [ 'en', 'fr' ], 
+#       languages   => [ 'en', 'fr' ],
 #       countries   => [ 'IN', 'FR' ]
 #   });
 #
@@ -32,66 +33,72 @@ use Google::Adwords::SiteKeywordGroups;
 #######################################################################
 sub getKeywordsFromSite
 {
-    my ($self, $args_ref) = @_;
+    my ( $self, $args_ref ) = @_;
 
-    $args_ref->{languages}	||= [];
-    $args_ref->{countries}	||= [];
+    $args_ref->{languages} ||= [];
+    $args_ref->{countries} ||= [];
 
     my @params;
-    push @params, SOAP::Data->name(
-        'url' => $args_ref->{url} )->type('');
-    push @params, SOAP::Data->name(
-      'includeLinkedPages' => ( $args_ref->{includeLinkedPages} ) ? 'true' : 'false' )->type('');
-    if ( @{$args_ref->{languages}} ) {
-        push @params, SOAP::Data->name(
-	        'languages' => @{$args_ref->{languages}} )->type('');
+    push @params, SOAP::Data->name( 'url' => $args_ref->{url} )->type('');
+    push @params,
+        SOAP::Data->name(
+          'includeLinkedPages' => ( $args_ref->{includeLinkedPages} )
+        ? 'true'
+        : 'false' )->type('');
+    if ( @{ $args_ref->{languages} } ) {
+        push @params,
+            SOAP::Data->name( 'languages' => @{ $args_ref->{languages} } )
+            ->type('');
     }
-    if ( @{$args_ref->{countries}} ) {
-        push @params, SOAP::Data->name(
-	        'countries' => @{$args_ref->{countries}} )->type('');
+    if ( @{ $args_ref->{countries} } ) {
+        push @params,
+            SOAP::Data->name( 'countries' => @{ $args_ref->{countries} } )
+            ->type('');
     }
 
-
-    my $result	= $self->_create_service_and_call({
-        service	=> 'KeywordToolService',
-        method	=> 'getKeywordsFromSite',
-        params	=> \@params,
-    });
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'KeywordToolService',
+            method  => 'getKeywordsFromSite',
+            params  => \@params,
+        }
+    );
 
     # get response data in a hash
-    my $data = $result->valueof("//getKeywordsFromSiteResponse/getKeywordsFromSiteReturn");
+    my $data = $result->valueof(
+        "//getKeywordsFromSiteResponse/getKeywordsFromSiteReturn");
 
     my $sitekeywordgroups = Google::Adwords::SiteKeywordGroups->new();
-    $sitekeywordgroups->groups($data->{groups});
+    $sitekeywordgroups->groups( $data->{groups} );
 
     my @keywords;
-    if ($data->{keywords}) {
-        for ( @{$data->{keywords}} ) {
-            push @keywords, 
-	            $self->_create_object_from_hash($_, 'Google::Adwords::SiteKeyword');
+    if ( $data->{keywords} ) {
+        for ( @{ $data->{keywords} } ) {
+            push @keywords,
+                $self->_create_object_from_hash( $_,
+                'Google::Adwords::SiteKeyword' );
         }
         $sitekeywordgroups->keywords(@keywords);
     }
 
     return $sitekeywordgroups;
-}
-
+} # end sub getKeywordsFromSite
 
 ### INSTANCE METHOD ################################################
-# Usage      : 
+# Usage      :
 #
 #   my $keyword_variations = $obj->getKeywordVariations({
-#       seedKeywords => \@seedkeyword, 
-#       useSynonyms => 1, 
-#       languages  => \@languages, 
+#       seedKeywords => \@seedkeyword,
+#       useSynonyms => 1,
+#       languages  => \@languages,
 #       countries  => \@countries
 #   });
 #
-# Purpose    : Given a list of SeedKeyword objects, returns their 
+# Purpose    : Given a list of SeedKeyword objects, returns their
 #  variations in multiple lists.
 # Returns    : A Google::Adwords::KeywordVariations object.
 # Parameters : an array ref of Google::Adwords::SeedKeyword objects, a flag
-#  indicating if synonyms are enabled, an array ref of languages, 
+#  indicating if synonyms are enabled, an array ref of languages,
 #  an array ref of countries.
 # Throws     : no exceptions
 # Comments   : none
@@ -99,78 +106,85 @@ sub getKeywordsFromSite
 #######################################################################
 sub getKeywordVariations
 {
-    my ($self, $args_ref) = @_;
+    my ( $self, $args_ref ) = @_;
 
     $args_ref->{seedKeywords} ||= [];
-    $args_ref->{useSynonyms} ||= 0;
-    $args_ref->{languages} ||= [];
-    $args_ref->{countries} ||= [];
+    $args_ref->{useSynonyms}  ||= 0;
+    $args_ref->{languages}    ||= [];
+    $args_ref->{countries}    ||= [];
 
     my @params;
 
-    for (@{$args_ref->{seedKeywords}}) {
+    for ( @{ $args_ref->{seedKeywords} } ) {
         my @seedkeyword;
         if ( defined $_->negative ) {
             push @seedkeyword, SOAP::Data->name(
                 'negative' => ( $_->negative ) ? 'true' : 'false' )->type('');
         }
         if ( defined $_->text ) {
-            push @seedkeyword, SOAP::Data->name(
-                'text' => $_->text )->type('');
+            push @seedkeyword,
+                SOAP::Data->name( 'text' => $_->text )->type('');
         }
         if ( defined $_->type ) {
-            push @seedkeyword, SOAP::Data->name(
-                'type' => $_->type )->type('');
+            push @seedkeyword,
+                SOAP::Data->name( 'type' => $_->type )->type('');
         }
         push @params, SOAP::Data->name(
-	        'seedKeywords' => \SOAP::Data->value(@seedkeyword) )->type('');
+            'seedKeywords' => \SOAP::Data->value(@seedkeyword) )->type('');
     }
 
-    push @params, SOAP::Data->name(
-        'useSynonyms' => ( $args_ref->{useSynonyms} ) ? 'true' : 'false' )->type('');
+    push @params,
+        SOAP::Data->name(
+        'useSynonyms' => ( $args_ref->{useSynonyms} ) ? 'true' : 'false' )
+        ->type('');
 
-    if ( @{$args_ref->{languages}} ) {
-        push @params, SOAP::Data->name(
-	        'languages' => @{$args_ref->{languages}} )->type('');
+    if ( @{ $args_ref->{languages} } ) {
+        push @params,
+            SOAP::Data->name( 'languages' => @{ $args_ref->{languages} } )
+            ->type('');
     }
-    if ( @{$args_ref->{countries}} ) {
-        push @params, SOAP::Data->name(
-	        'countries' => @{$args_ref->{countries}} )->type('');
+    if ( @{ $args_ref->{countries} } ) {
+        push @params,
+            SOAP::Data->name( 'countries' => @{ $args_ref->{countries} } )
+            ->type('');
     }
 
-
-    my $result	= $self->_create_service_and_call({
-        service	=> 'KeywordToolService',
-        method	=> 'getKeywordVariations',
-        params	=> \@params,
-    });
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'KeywordToolService',
+            method  => 'getKeywordVariations',
+            params  => \@params,
+        }
+    );
 
     # get response data in a hash
-    my $data = $result->valueof("//getKeywordVariationsResponse/getKeywordVariationsReturn");
+    my $data = $result->valueof(
+        "//getKeywordVariationsResponse/getKeywordVariationsReturn");
 
     my $keyword_variations = Google::Adwords::KeywordVariations->new();
 
     my @additionalToConsider;
     if ( $data->{additionalToConsider} ) {
-        for ( @{$data->{additionalToConsider}} ) {
-            push @additionalToConsider, 
-	            $self->_create_object_from_hash($_, 'Google::Adwords::KeywordVariation');
+        for ( @{ $data->{additionalToConsider} } ) {
+            push @additionalToConsider,
+                $self->_create_object_from_hash( $_,
+                'Google::Adwords::KeywordVariation' );
         }
         $keyword_variations->additionalToConsider(@additionalToConsider);
     }
-    
+
     my @moreSpecific;
     if ( $data->{moreSpecific} ) {
         for ( @{ $data->{moreSpecific} } ) {
-            push @moreSpecific, 
-	            $self->_create_object_from_hash($_, 'Google::Adwords::KeywordVariation');
+            push @moreSpecific,
+                $self->_create_object_from_hash( $_,
+                'Google::Adwords::KeywordVariation' );
         }
         $keyword_variations->moreSpecific(@moreSpecific);
     }
 
     return $keyword_variations;
-}
-    
+} # end sub getKeywordVariations
 
 1;
 
@@ -365,7 +379,7 @@ Rohan Almeida <rohan@almeida.in>
  
 Mathieu Jondet <mathieu@eulerian.com>
  
-=head1 LICENCE AND COPYRIGHT
+=head1 LICENSE AND COPYRIGHT
  
 Copyright (c) 2006 Rohan Almeida <rohan@almeida.in>. All rights
 reserved.

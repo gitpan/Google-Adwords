@@ -1,4 +1,6 @@
 package Google::Adwords::KeywordEstimate;
+use strict;
+use warnings;
 
 use base 'Google::Adwords::Data';
 
@@ -10,7 +12,7 @@ my @fields = qw/
     upperAvgPosition
     upperClicksPerDay
     upperCpc
-/;
+    /;
 
 __PACKAGE__->mk_accessors(@fields);
 
@@ -65,7 +67,7 @@ Rohan Almeida <rohan@almeida.in>
 
  
  
-=head1 LICENCE AND COPYRIGHT
+=head1 LICENSE AND COPYRIGHT
  
 Copyright (c) 2006 Rohan Almeida <rohan@almeida.in>. All rights
 reserved.

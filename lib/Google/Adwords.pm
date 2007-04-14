@@ -1,7 +1,8 @@
 package Google::Adwords;
-use strict; use warnings;
+use strict;
+use warnings;
 
-use version; our $VERSION = qv('1.2');
+use version; our $VERSION = qv('1.2.1');
 
 1;
 
@@ -14,7 +15,7 @@ Google::Adwords - an interface which abstracts the Google Adwords SOAP API
  
 =head1 VERSION
  
-This documentation refers to Google::Adwords version 1.2
+This documentation refers to Google::Adwords version 1.2.1
  
 
 =head1 API VERSION
@@ -201,7 +202,7 @@ Rohan Almeida <rohan@almeida.in>
 Mathieu Jondet <mathieu@eulerian.com>
  
  
-=head1 LICENCE AND COPYRIGHT
+=head1 LICENSE AND COPYRIGHT
  
 Copyright (c) 2006 Rohan Almeida <rohan@almeida.in>. All rights
 reserved.

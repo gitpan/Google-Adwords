@@ -1,31 +1,34 @@
 package Google::Adwords::Data;
-use strict; use warnings;
+use strict;
+use warnings;
 
-use version; our $VERSION = qv('0.0.1');
+use version; our $VERSION = qv('0.2');
 
 use base qw/ Class::Accessor::Chained Google::Adwords /;
 
 use HTML::Entities;
 
-__PACKAGE__->mk_accessors(qw/
-/);
+__PACKAGE__->mk_accessors(
+    qw/
+        /
+);
 
 sub get
 {
     my $self = shift;
 
-    my $key = shift;
+    my $key   = shift;
     my $value = $self->{$key};
 
     # check if called from within Google::Adwords:: namespace
     my $package = caller 1;
-    if ($package =~ /^Google::Adwords::\w+Service$/) {
-        return encode_entities($value);
+    if ( $package =~ /^Google::Adwords::\w+Service$/ ) {
+        return encode_entities( $value, '<>&' );
     }
     else {
         return $value;
     }
-}
+} # end sub get
 
 1;
 
@@ -38,7 +41,7 @@ Google::Adwords::Data - Base class for the Data modules
  
 =head1 VERSION
  
-This documentation refers to Google::Adwords::Data version 0.0.1
+This documentation refers to Google::Adwords::Data version 0.2
  
  
 =head1 DESCRIPTION
@@ -53,7 +56,7 @@ Rohan Almeida <rohan@almeida.in>
 
  
  
-=head1 LICENCE AND COPYRIGHT
+=head1 LICENSE AND COPYRIGHT
  
 Copyright (c) 2006 Rohan Almeida <rohan@almeida.in>. All rights
 reserved.

@@ -1,5 +1,5 @@
-Google-Adwords version 1.2
-==========================
+Google-Adwords version 1.2.1
+============================
 
 This module provides an interface to the Google Adwords SOAP API.
 
@@ -33,7 +33,7 @@ AUTHORS
     Rohan Almeida <rohan@almeida.in>
     Mathieu Jondet <mathieu@eulerian.com>
 
-COPYRIGHT AND LICENCE
+COPYRIGHT AND LICENSE
 
 Copyright (C) 2006 by Rohan Almeida <rohan@almeida.in>
 

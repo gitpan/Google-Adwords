@@ -1,5 +1,6 @@
 package Google::Adwords::ReportService;
-use strict; use warnings;
+use strict;
+use warnings;
 
 use version; our $VERSION = qv('0.0.1');
 
@@ -9,9 +10,9 @@ use base 'Google::Adwords::Service';
 use Google::Adwords::ReportJob;
 
 ### INSTANCE METHOD ################################################
-# Usage      : 
+# Usage      :
 #   my $ret = $obj->deleteReport($id);
-# Purpose    : Delete a report 
+# Purpose    : Delete a report
 # Returns    : Always return 1
 # Parameters : The id of the report to delete
 # Throws     : no exceptions
@@ -20,29 +21,30 @@ use Google::Adwords::ReportJob;
 #######################################################################
 sub deleteReport
 {
-    my ($self, $id) = @_;
+    my ( $self, $id ) = @_;
 
     # id should be present
-    if (not defined $id) {
+    if ( not defined $id ) {
         die "id must be set.";
     }
 
     my @params;
-    push @params, SOAP::Data->name(
-        'reportJobId' => $id )->type('');
+    push @params, SOAP::Data->name( 'reportJobId' => $id )->type('');
 
     # create the SOAP service
-    my $result = $self->_create_service_and_call({
-        service => 'ReportService',
-        method => 'deleteReport',   
-        params => \@params,
-    });
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'ReportService',
+            method  => 'deleteReport',
+            params  => \@params,
+        }
+    );
 
     return 1;
-}
+} # end sub deleteReport
 
 ### INSTANCE METHOD ################################################
-# Usage      : 
+# Usage      :
 #   my@jobs = $boj->getAllJobs();
 # Purpose    : Get all the report jobs for an account
 # Returns    : A list of ReportJob objects
@@ -55,22 +57,27 @@ sub getAllJobs
 {
     my $self = shift;
 
-    my $result	= $self->_create_service_and_call({
-     service	=> 'ReportService',
-     method	=> 'getAllJobs',
-    });
-    
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'ReportService',
+            method  => 'getAllJobs',
+        }
+    );
+
     my @data;
-    foreach my $c ($result->valueof("//getAllJobsResponse/getAllJobsReturn")) {
-     push @data, 
-	   $self->_create_object_from_hash($c, 'Google::Adwords::ReportJob');
+    foreach
+        my $c ( $result->valueof("//getAllJobsResponse/getAllJobsReturn") )
+    {
+        push @data,
+            $self->_create_object_from_hash( $c,
+            'Google::Adwords::ReportJob' );
     }
 
     return @data;
-}
+} # end sub getAllJobs
 
 ### INSTANCE METHOD ################################################
-# Usage      : 
+# Usage      :
 #   my $url = $obj->getGzipReportDownloadUrl($id);
 # Purpose    : Get the url of the gzipped report
 # Returns    : The url for download
@@ -81,27 +88,27 @@ sub getAllJobs
 #######################################################################
 sub getGzipReportDownloadUrl
 {
-    my ($self, $id) = @_;
-    
-    my @params;
-    push @params,
-     SOAP::Data->name(
-      'reportJobId' => $id )->type('');
+    my ( $self, $id ) = @_;
 
-    my $result	= $self->_create_service_and_call({
-     service	=> 'ReportService',
-     method	=> 'getGzipReportDownloadUrl',
-     params	=> \@params,
-    });
-    
-    my $data 
-        = $result->valueof("//getGzipReportDownloadUrlResponse/getGzipReportDownloadUrlReturn");
+    my @params;
+    push @params, SOAP::Data->name( 'reportJobId' => $id )->type('');
+
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'ReportService',
+            method  => 'getGzipReportDownloadUrl',
+            params  => \@params,
+        }
+    );
+
+    my $data = $result->valueof(
+        "//getGzipReportDownloadUrlResponse/getGzipReportDownloadUrlReturn");
 
     return $data;
-}
+} # end sub getGzipReportDownloadUrl
 
 ### INSTANCE METHOD ################################################
-# Usage      : 
+# Usage      :
 #   my $url = $obj->getReportDownloadUrl($id);
 # Purpose    : Get the url of the report
 # Returns    : The url for download
@@ -112,61 +119,61 @@ sub getGzipReportDownloadUrl
 #######################################################################
 sub getReportDownloadUrl
 {
-    my ($self, $id) = @_;
-    
-    my @params;
-    push @params,
-     SOAP::Data->name(
-      'reportJobId' => $id )->type('');
+    my ( $self, $id ) = @_;
 
-    my $result	= $self->_create_service_and_call({
-     service	=> 'ReportService',
-     method	=> 'getReportDownloadUrl',
-     params	=> \@params,
-    });
-    
-    my $data 
-        = $result->valueof("//getReportDownloadUrlResponse/getReportDownloadUrlReturn");
+    my @params;
+    push @params, SOAP::Data->name( 'reportJobId' => $id )->type('');
+
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'ReportService',
+            method  => 'getReportDownloadUrl',
+            params  => \@params,
+        }
+    );
+
+    my $data = $result->valueof(
+        "//getReportDownloadUrlResponse/getReportDownloadUrlReturn");
 
     return $data;
-}
+} # end sub getReportDownloadUrl
 
 ### INSTANCE METHOD ################################################
 # Usage      :
 #   my $status = $obj->getReportJobStatus($id);
 # Purpose    : Get the current status of a report job
-# Returns    : A job status 
-# Parameters : The id of the report job 
+# Returns    : A job status
+# Parameters : The id of the report job
 # Throws     : no exceptions
 # Comments   : none
 # See Also   : n/a
 #######################################################################
-sub getReportJobStatus 
+sub getReportJobStatus
 {
-    my ($self, $id) = @_;
-    
-    my @params;
-    push @params,
-     SOAP::Data->name(
-      'reportJobId' => $id )->type('');
+    my ( $self, $id ) = @_;
 
-    my $result	= $self->_create_service_and_call({
-     service	=> 'ReportService',
-     method	=> 'getReportJobStatus',
-     params	=> \@params,
-    });
-    
-    my $data 
-     = $result->valueof("//getReportJobStatusResponse/getReportJobStatusReturn");
+    my @params;
+    push @params, SOAP::Data->name( 'reportJobId' => $id )->type('');
+
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'ReportService',
+            method  => 'getReportJobStatus',
+            params  => \@params,
+        }
+    );
+
+    my $data = $result->valueof(
+        "//getReportJobStatusResponse/getReportJobStatusReturn");
 
     return $data;
-}
+} # end sub getReportJobStatus
 
 ### INSTANCE METHOD ################################################
 # Usage      :
 #   my $jobid = $obj->scheduleReportJob($type, $job);
 # Purpose    : Schedule a report
-# Returns    : A job request id 
+# Returns    : A job request id
 # Parameters : The type of the report (see doc) and a ReportJob object
 # Throws     : no exceptions
 # Comments   : none
@@ -174,142 +181,129 @@ sub getReportJobStatus
 #######################################################################
 sub scheduleReportJob
 {
-    my ($self, $type, $job) = @_;
+    my ( $self, $type, $job ) = @_;
 
     if ( not defined $type ) {
-     die "type must be defined.";
+        die "type must be defined.";
     }
 
     if ( not defined $job ) {
-     die "job object must be defined.";
+        die "job object must be defined.";
     }
 
     my @job_params;
 
     if ( defined $job->aggregationType ) {
-     push @job_params,
-      SOAP::Data->name(
-       'aggregationType' => $job->aggregationType )->type('');
+        push @job_params,
+            SOAP::Data->name( 'aggregationType' => $job->aggregationType )
+            ->type('');
     }
     if ( defined $job->clientEmails ) {
-     my @p = ( ref($job->clientEmails) eq 'ARRAY' ) ? 
-      @{ $job->clientEmails } : $job->clientEmails;
-    push @job_params, 
-     SOAP::Data->name(
-      'clientEmails' => @p)->type('');
+        my @p = ( ref( $job->clientEmails ) eq 'ARRAY' )
+            ? @{ $job->clientEmails }
+            : $job->clientEmails;
+        push @job_params, SOAP::Data->name( 'clientEmails' => @p )->type('');
     }
     if ( defined $job->crossClient ) {
-     push @job_params,
-      SOAP::Data->name(
-       'crossClient' => $job->crossClient )->type('');
+        push @job_params,
+            SOAP::Data->name( 'crossClient' => $job->crossClient )->type('');
     }
     if ( defined $job->endDay ) {
-     push @job_params,
-      SOAP::Data->name(
-       'endDay' => $job->endDay )->type('');
+        push @job_params,
+            SOAP::Data->name( 'endDay' => $job->endDay )->type('');
     }
     if ( defined $job->id ) {
-     push @job_params,
-      SOAP::Data->name(
-       'id' => $job->id )->type('');
+        push @job_params, SOAP::Data->name( 'id' => $job->id )->type('');
     }
     if ( defined $job->name ) {
-     push @job_params,
-      SOAP::Data->name(
-       'name' => $job->name )->type('');
+        push @job_params, SOAP::Data->name( 'name' => $job->name )->type('');
     }
     if ( defined $job->startDay ) {
-     push @job_params,
-      SOAP::Data->name(
-       'startDay' => $job->startDay )->type('');
+        push @job_params,
+            SOAP::Data->name( 'startDay' => $job->startDay )->type('');
     }
     if ( defined $job->adWordsType ) {
-     my @p = ( ref($job->adWordsType) eq 'ARRAY' ) ? 
-      @{ $job->adWordsType } : $job->adWordsType;
-     push @job_params,
-      SOAP::Data->name(
-       'adWordsType' => @p )->type('');
+        my @p = ( ref( $job->adWordsType ) eq 'ARRAY' )
+            ? @{ $job->adWordsType }
+            : $job->adWordsType;
+        push @job_params, SOAP::Data->name( 'adWordsType' => @p )->type('');
     }
     if ( defined $job->campaigns ) {
-     my @p = ( ref($job->campaigns) eq 'ARRAY' ) ? 
-      @{ $job->campaigns } : $job->campaigns;
-     push @job_params,
-      SOAP::Data->name(
-       'campaigns' => @p )->type('');
+        my @p = ( ref( $job->campaigns ) eq 'ARRAY' )
+            ? @{ $job->campaigns }
+            : $job->campaigns;
+        push @job_params, SOAP::Data->name( 'campaigns' => @p )->type('');
     }
     if ( defined $job->campaignStatuses ) {
-     my @p = ( ref($job->campaignStatuses) eq 'ARRAY' ) ? 
-      @{ $job->campaignStatuses } : $job->campaignStatuses;
-     push @job_params,
-      SOAP::Data->name(
-       'campaignStatuses' => @p )->type('');
+        my @p = ( ref( $job->campaignStatuses ) eq 'ARRAY' )
+            ? @{ $job->campaignStatuses }
+            : $job->campaignStatuses;
+        push @job_params,
+            SOAP::Data->name( 'campaignStatuses' => @p )->type('');
     }
     if ( defined $job->adGroups ) {
-     my @p = ( ref($job->adGroup) eq 'ARRAY' ) ? 
-      @{ $job->adGroup } : $job->adGroup;
-     push @job_params,
-      SOAP::Data->name(
-       'adGroups' => @p  )->type('');
+        my @p = ( ref( $job->adGroup ) eq 'ARRAY' )
+            ? @{ $job->adGroup }
+            : $job->adGroup;
+        push @job_params, SOAP::Data->name( 'adGroups' => @p )->type('');
     }
     if ( defined $job->adGroupStatuses ) {
-     my @p = ( ref($job->adGroupStatuses) eq 'ARRAY' ) ? 
-      @{ $job->adGroupStatuses } : $job->adGroupStatuses;
-     push @job_params,
-      SOAP::Data->name(
-       'adGroupStatuses' => @p )->type('');
+        my @p = ( ref( $job->adGroupStatuses ) eq 'ARRAY' )
+            ? @{ $job->adGroupStatuses }
+            : $job->adGroupStatuses;
+        push @job_params,
+            SOAP::Data->name( 'adGroupStatuses' => @p )->type('');
     }
     if ( defined $job->keywords ) {
-     my @p = ( ref($job->keywords) eq 'ARRAY' ) ? 
-      @{ $job->keywords } : $job->keywords;
-     push @job_params,
-      SOAP::Data->name(
-       'keywords' => @p )->type('');
+        my @p = ( ref( $job->keywords ) eq 'ARRAY' )
+            ? @{ $job->keywords }
+            : $job->keywords;
+        push @job_params, SOAP::Data->name( 'keywords' => @p )->type('');
     }
     if ( defined $job->keywordStatuses ) {
-     my @p = ( ref($job->keywordStatuses) eq 'ARRAY' ) ? 
-      @{ $job->keywordStatuses } : $job->keywordStatuses;
-     push @job_params,
-      SOAP::Data->name(
-       'keywordStatuses' => @p )->type('');
+        my @p = ( ref( $job->keywordStatuses ) eq 'ARRAY' )
+            ? @{ $job->keywordStatuses }
+            : $job->keywordStatuses;
+        push @job_params,
+            SOAP::Data->name( 'keywordStatuses' => @p )->type('');
     }
     if ( defined $job->keywordType ) {
-     my @p = ( ref($job->keywordType) eq 'ARRAY' ) ? 
-      @{ $job->keywordType } : $job->keywordType;
-     push @job_params,
-      SOAP::Data->name(
-       'keywordType' => @p )->type('');
+        my @p = ( ref( $job->keywordType ) eq 'ARRAY' )
+            ? @{ $job->keywordType }
+            : $job->keywordType;
+        push @job_params, SOAP::Data->name( 'keywordType' => @p )->type('');
     }
     if ( defined $job->customOptions ) {
-     my @p = ( ref($job->customOptions) eq 'ARRAY' ) ? 
-      @{ $job->customOptions } : $job->customOptions;
-     push @job_params,
-      SOAP::Data->name(
-       'customOptions' => @p )->type('');
+        my @p = ( ref( $job->customOptions ) eq 'ARRAY' )
+            ? @{ $job->customOptions }
+            : $job->customOptions;
+        push @job_params, SOAP::Data->name( 'customOptions' => @p )->type('');
     }
     if ( defined $job->includeZeroImpression ) {
-     push @job_params,
-      SOAP::Data->name(
-       'includeZeroImpression' => $job->includeZeroImpression )->type('');
+        push @job_params,
+            SOAP::Data->name(
+            'includeZeroImpression' => $job->includeZeroImpression )
+            ->type('');
     }
 
     my @params;
-    push @params,
-     SOAP::Data->name(
-      'job' => \SOAP::Data->value(@job_params) 
-     )->attr({ 'xsi:type' => $type })->type('');
+    push @params, SOAP::Data->name( 'job' => \SOAP::Data->value(@job_params) )
+        ->attr( { 'xsi:type' => $type } )->type('');
 
-    my $result	= $self->_create_service_and_call({
-     service	=> 'ReportService',
-     method	=> 'scheduleReportJob',
-     with_uri	=> 1,
-     params	=> \@params,
-    });
-    
-    my $data = $result->valueof("//scheduleReportJobResponse/scheduleReportJobReturn");
+    my $result = $self->_create_service_and_call(
+        {
+            service  => 'ReportService',
+            method   => 'scheduleReportJob',
+            with_uri => 1,
+            params   => \@params,
+        }
+    );
+
+    my $data = $result->valueof(
+        "//scheduleReportJobResponse/scheduleReportJobReturn");
 
     return $data;
-}
-
+} # end sub scheduleReportJob
 
 1;
 
@@ -624,7 +618,7 @@ Rohan Almeida <rohan@almeida.in>
  
 Mathieu Jondet <mathieu@eulerian.com>
  
-=head1 LICENCE AND COPYRIGHT
+=head1 LICENSE AND COPYRIGHT
  
 Copyright (c) 2006 Rohan Almeida <rohan@almeida.in>. All rights
 reserved.

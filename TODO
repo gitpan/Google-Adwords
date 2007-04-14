@@ -1,5 +1,4 @@
 
-- Unicode and HTML entities handling
 - *Service objects should be a singleton
 - Lots more good examples
 - CriterionService.checkCriteria()
@@ -7,4 +6,5 @@
 - Error handling - ApiException and ApiError objects
 - Error handling - use croak/carp for errors
 - support for Adwords API v9
+- switch to Module::Build ?
 

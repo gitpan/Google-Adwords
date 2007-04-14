@@ -1,7 +1,8 @@
 package Google::Adwords::AdService;
-use strict; use warnings;
+use strict;
+use warnings;
 
-use version; our $VERSION = qv('0.2');
+use version; our $VERSION = qv('0.3');
 
 use base 'Google::Adwords::Service';
 
@@ -9,6 +10,8 @@ use base 'Google::Adwords::Service';
 use Google::Adwords::Ad;
 use Google::Adwords::Business;
 use Google::Adwords::StatsRecord;
+
+use HTML::Entities;
 
 ### INTERNAL UTILITY ###############################################
 # Usage      : @params = $self->_create_request_params($obj);
@@ -19,72 +22,78 @@ use Google::Adwords::StatsRecord;
 # Comments   : none
 # See Also   : n/a
 #######################################################################
-sub _create_request_params 
+sub _create_request_params
 {
-    my ($self, $ad) = @_;
+    my ( $self, $ad ) = @_;
 
     my @params;
 
     # Get fields of the base Ad object
     my @fields_base_ad = Google::Adwords::Ad->get_fields();
     for (@fields_base_ad) {
-        if (defined $ad->$_) {
+        if ( defined $ad->$_ ) {
 
             # If this is an ImageAd
-            if (($_ eq 'image') # ImageAd
-                or ($_ eq 'businessImage') # LocalBusinessAd
-                or ($_ eq 'customIcon') # LocalBusinessAd
-                or ($_ eq 'productImage') # CommerceAd
-            ) 
+            if (
+                ( $_    eq 'image' )            # ImageAd
+                or ( $_ eq 'businessImage' )    # LocalBusinessAd
+                or ( $_ eq 'customIcon' )       # LocalBusinessAd
+                or ( $_ eq 'productImage' )     # CommerceAd
+                )
             {
                 my $image = $ad->$_;
                 my @image_params;
                 my @image_fields = Google::Adwords::Image->get_fields();
-        
+
                 for (@image_fields) {
-                    if (defined $image->$_) {
-                        # for the data field, we need to set the type explicitly
-                        if ($_ eq 'data') {
-                            push @image_params, SOAP::Data->name(
-                              'data' => SOAP::Data->type( base64 => $image->data ) )->type('');
+                    if ( defined $image->$_ ) {
+
+                      # for the data field, we need to set the type explicitly
+                        if ( $_ eq 'data' ) {
+                            push @image_params,
+                                SOAP::Data->name(
+                                'data' => SOAP::Data->type(
+                                    base64 => $image->data
+                                )
+                                )->type('');
                         }
                         else {
-                            push @image_params, SOAP::Data->name(
-                              $_ => $image->$_)->type('');
+                            push @image_params,
+                                SOAP::Data->name( $_ => $image->$_ )
+                                ->type('');
                         }
                     }
                 }
-                
+
                 push @params, SOAP::Data->name(
                     $_ => \SOAP::Data->value(@image_params) )->type('');
             }
             else {
-                push @params, SOAP::Data->name(
-                    $_ => $ad->$_)->type('');
+                push @params, SOAP::Data->name( $_ => $ad->$_ )->type('');
             }
         }
     }
 
     return @params;
-}
+} # end sub _create_request_params
 
 ### INSTANCE METHOD ################################################
-# Usage      : 
+# Usage      :
 #   my @ads = $obj->addAds($ad1, $ad2);
 # Purpose    : Create a new batch of Ads
 # Returns    : List of created Ad objects
-# Parameters : A Google::Adwords::Creative object 
+# Parameters : A Google::Adwords::Creative object
 # Throws     : no exceptions
 # Comments   : none
 # See Also   : n/a
 #######################################################################
 sub addAds
 {
-    my ($self, @ads) = @_;
+    my ( $self, @ads ) = @_;
 
     # for each ad, adGroupId must be filled in
     for (@ads) {
-        if (not defined $_->adGroupId) {
+        if ( not defined $_->adGroupId ) {
             die "adGroupId must be filled in for the Ad object\n";
         }
     }
@@ -96,26 +105,26 @@ sub addAds
     }
 
     my @params;
-    push @params,
-        SOAP::Data->name(
-            'ads' => \SOAP::Data->value(@ads_params) )->type('');
+    push @params, SOAP::Data->name( 'ads' => \SOAP::Data->value(@ads_params) )
+        ->type('');
 
-    my $result	= $self->_create_service_and_call({
-        service	=> 'AdService',
-        method	=> 'addAds',
-        params	=> \@params,
-    });
-    
+    my $result = $self->_create_service_and_call(
+        {
+            service  => 'AdService',
+            method   => 'addAds',
+            params   => \@params,
+            with_uri => 1,
+        }
+    );
+
     # Parse SOAP response
     my @ret;
-    foreach my $r ($result->valueof("//addAdsResponse/addAdsReturn")) {
+    foreach my $r ( $result->valueof("//addAdsResponse/addAdsReturn") ) {
         push @ret, $self->_parse_ad_response($r);
     }
 
     return @ret;
-}
-
-
+} # end sub addAds
 
 ### INTERNAL UTILITY #####################################################
 # Usage      : $obj = $self->_parse_ad_response($ad_ref);
@@ -126,25 +135,24 @@ sub addAds
 # Comments   : none
 # See Also   : n/a
 #######################################################################
-sub _parse_ad_response 
+sub _parse_ad_response
 {
-    my ($self, $r) = @_;
+    my ( $self, $r ) = @_;
 
-    if ((exists $r->{image})
-        or (exists $r->{businessImage})
-        or (exists $r->{customIcon})
-        or (exists $r->{productImage})
-    )
+    if (   ( exists $r->{image} )
+        or ( exists $r->{businessImage} )
+        or ( exists $r->{customIcon} )
+        or ( exists $r->{productImage} ) )
     {
-        $r->{image} = 
-            $self->_create_object_from_hash($r->{image}, 'Google::Adwords::Image');
+        $r->{image} = $self->_create_object_from_hash( $r->{image},
+            'Google::Adwords::Image' );
     }
 
-    return $self->_create_object_from_hash($r, 'Google::Adwords::Ad');
-}
+    return $self->_create_object_from_hash( $r, 'Google::Adwords::Ad' );
+} # end sub _parse_ad_response
 
 ### INSTANCE METHOD ########################################################
-# Usage      : 
+# Usage      :
 #
 #   my @businesses = $self->findBusinesses({
 #       name    => 'business name',
@@ -161,34 +169,40 @@ sub _parse_ad_response
 #######################################################################
 sub findBusinesses
 {
-    my ($self, $args_ref) = @_;
+    my ( $self, $args_ref ) = @_;
 
     my @params;
 
     for (qw/name address countryCode/) {
-        if (not exists $args_ref->{$_}) {
+        if ( not exists $args_ref->{$_} ) {
             die "$_ must be defined for the Business object\n";
         }
-        push @params, SOAP::Data->name(
-            $_ => $args_ref->{$_} )->type('');
+        push @params,
+            SOAP::Data->name( $_ => encode_entities( $args_ref->{$_} ) )
+            ->type('');
     }
 
-    my $result	= $self->_create_service_and_call({
-        service	=> 'AdService',
-        method	=> 'findBusinesses',
-        params	=> \@params,
-    });
-    
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'AdService',
+            method  => 'findBusinesses',
+            params  => \@params,
+        }
+    );
+
     my @data;
-    foreach my $c ( $result->valueof("//findBusinessesResponse/findBusinessesReturn") ) {
-        push @data, $self->_create_object_from_hash($c, 'Google::Adwords::Business');
+    foreach my $c (
+        $result->valueof("//findBusinessesResponse/findBusinessesReturn") )
+    {
+        push @data, $self->_create_object_from_hash( $c,
+            'Google::Adwords::Business' );
     }
 
     return @data;
-}
+} # end sub findBusinesses
 
 ### INSTANCE METHOD ################################################
-# Usage      : 
+# Usage      :
 #   my @ads = $obj->getActiveAds($adgroupid1, $adgroupid2);
 # Purpose    : Get all the active creatives for the given adgroups
 # Returns    : A list of Google::Adwords::Ad objects
@@ -199,29 +213,32 @@ sub findBusinesses
 #######################################################################
 sub getActiveAds
 {
-    my ($self, @adgroup_ids) = @_;
+    my ( $self, @adgroup_ids ) = @_;
 
     my @params;
-    push @params, SOAP::Data->name(
-        'adGroupIds' => @adgroup_ids )->type('');
+    push @params, SOAP::Data->name( 'adGroupIds' => @adgroup_ids )->type('');
 
-    my $result	= $self->_create_service_and_call({
-        service	=> 'AdService',
-        method	=> 'getActiveAds',
-        params	=> \@params,
-    });
-    
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'AdService',
+            method  => 'getActiveAds',
+            params  => \@params,
+        }
+    );
+
     # Parse SOAP response
     my @ret;
-    foreach my $r ($result->valueof("//getActiveAdsResponse/getActiveAdsReturn")) {
+    foreach my $r (
+        $result->valueof("//getActiveAdsResponse/getActiveAdsReturn") )
+    {
         push @ret, $self->_parse_ad_response($r);
     }
 
     return @ret;
-}
+} # end sub getActiveAds
 
 ### INSTANCE METHOD ################################################
-# Usage      : 
+# Usage      :
 #   my $ad = $obj->getAd($adgroup_id, $ad_id);
 # Purpose    : Get a given Ad in a given adgroup
 # Returns    : The requested Ad as a Google::Adwords::Ad object.
@@ -232,26 +249,26 @@ sub getActiveAds
 #######################################################################
 sub getAd
 {
-    my ($self, $adgroup_id, $ad_id) = @_;
+    my ( $self, $adgroup_id, $ad_id ) = @_;
 
     my @params;
-    push @params, SOAP::Data->name(
-      'adGroupId' => $adgroup_id )->type('');
-    push @params, SOAP::Data->name(
-      'adId' => $ad_id )->type('');
+    push @params, SOAP::Data->name( 'adGroupId' => $adgroup_id )->type('');
+    push @params, SOAP::Data->name( 'adId'      => $ad_id )->type('');
 
-    my $result	= $self->_create_service_and_call({
-        service	=> 'AdService',
-        method	=> 'getAd',
-        params	=> \@params,
-    });
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'AdService',
+            method  => 'getAd',
+            params  => \@params,
+        }
+    );
 
     my $data = $result->valueof("//getAdResponse/getAdReturn");
     return $self->_parse_ad_response($data);
-}
+} # end sub getAd
 
 ### INSTANCE METHOD ################################################
-# Usage      : 
+# Usage      :
 #   my @ad_stats = $obj->getAdStats({
 #       adGroupId	=> 1234
 #	    adIds	=> [ 3982, 2787, 17872 ],
@@ -261,58 +278,60 @@ sub getAd
 #   });
 # Purpose    : Get stats on a set of Ads
 # Returns    :  A list of StatsRecord object for each Ad
-# Parameters : 
+# Parameters :
 #   adGroupId : The ad group that contains the Ads to be queried
 #	creativeIds  : array reference of Ad Ids
 #	startDay : starting day of the stats YYYY-MM-DD
 #	endDay : end day of the stats YYYY-MM-DD
-#	inPST : True = get stats in America/Los_Angeles timezone 
+#	inPST : True = get stats in America/Los_Angeles timezone
 #           (Google headquarters) regardless of the parent account's localtimezone.
 # Throws     : no exceptions
 # Comments   : none
 # See Also   : n/a
 #######################################################################
-sub getAdStats 
+sub getAdStats
 {
-    my ($self, $args_ref) = @_;
+    my ( $self, $args_ref ) = @_;
 
-    if (not defined $args_ref->{adGroupId}) {
+    if ( not defined $args_ref->{adGroupId} ) {
         die "adGroupId param must be provided to getAdStats\n";
     }
 
-    my $ra_id	= $args_ref->{adIds} || [];
-    my $startDay	= $args_ref->{startDay} || '';
-    my $endDay	= $args_ref->{endDay}	|| '';
-    my $inPST	= $args_ref->{inPST}	|| 0;
+    my $ra_id    = $args_ref->{adIds}    || [];
+    my $startDay = $args_ref->{startDay} || '';
+    my $endDay   = $args_ref->{endDay}   || '';
+    my $inPST    = $args_ref->{inPST}    || 0;
 
     my @params;
-    push @params, SOAP::Data->name(
-	    'adGroupId' => $args_ref->{adGroupId} )->type('');
-    push @params, SOAP::Data->name(
-	    'adIds' => @{$ra_id} )->type('');
-    push @params, SOAP::Data->name(
-	    'startDay' => $startDay )->type('');
-    push @params, SOAP::Data->name(
-	    'endDay' => $endDay )->type('');
-    push @params, SOAP::Data->name(
-	    'inPST' => $inPST )->type('');
-    
-    my $result	= $self->_create_service_and_call({
-        service	=> 'AdService',
-        method	=> 'getAdStats',
-        params	=> \@params,
-    });
+    push @params,
+        SOAP::Data->name( 'adGroupId' => $args_ref->{adGroupId} )->type('');
+    push @params, SOAP::Data->name( 'adIds'    => @{$ra_id} )->type('');
+    push @params, SOAP::Data->name( 'startDay' => $startDay )->type('');
+    push @params, SOAP::Data->name( 'endDay'   => $endDay )->type('');
+    push @params, SOAP::Data->name( 'inPST'    => $inPST )->type('');
+
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'AdService',
+            method  => 'getAdStats',
+            params  => \@params,
+        }
+    );
 
     my @data;
-    foreach my $c ( $result->valueof("//getAdStatsResponse/getAdStatsReturn") ) {
-        push @data, $self->_create_object_from_hash($c, 'Google::Adwords::StatsRecord');
+    foreach
+        my $c ( $result->valueof("//getAdStatsResponse/getAdStatsReturn") )
+    {
+        push @data,
+            $self->_create_object_from_hash( $c,
+            'Google::Adwords::StatsRecord' );
     }
 
     return @data;
-}
+} # end sub getAdStats
 
 ### INSTANCE METHOD ################################################
-# Usage      : 
+# Usage      :
 #   my @ads = $obj->getAllAds($adgroup_id1, $adgroup_id2);
 # Purpose    : Get all the Ads for the given adgroup_ids
 # Returns    : A list of Google::Adwords::Ad objects
@@ -323,29 +342,31 @@ sub getAdStats
 #######################################################################
 sub getAllAds
 {
-    my ($self, @adgroup_ids) = @_;
+    my ( $self, @adgroup_ids ) = @_;
 
     my @params;
-    push @params, SOAP::Data->name(
-        'adGroupIds' => @adgroup_ids )->type('');
+    push @params, SOAP::Data->name( 'adGroupIds' => @adgroup_ids )->type('');
 
-    my $result	= $self->_create_service_and_call({
-        service	=> 'AdService',
-        method	=> 'getAllAds',
-        params	=> \@params,
-    });
-    
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'AdService',
+            method  => 'getAllAds',
+            params  => \@params,
+        }
+    );
+
     # Parse SOAP response
     my @ret;
-    foreach my $r ($result->valueof("//getAllAdsResponse/getAllAdsReturn")) {
+    foreach my $r ( $result->valueof("//getAllAdsResponse/getAllAdsReturn") )
+    {
         push @ret, $self->_parse_ad_response($r);
     }
 
     return @ret;
-}
+} # end sub getAllAds
 
 ### INSTANCE METHOD ########################################################
-# Usage      : 
+# Usage      :
 #
 #   my @businesses = $self->getMyBusinesses();
 #
@@ -361,26 +382,30 @@ sub getMyBusinesses
     my ($self) = @_;
 
     my @params;
-    my $result	= $self->_create_service_and_call({
-        service	=> 'AdService',
-        method	=> 'getMyBusinesses',
-        params	=> \@params,
-    });
-    
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'AdService',
+            method  => 'getMyBusinesses',
+            params  => \@params,
+        }
+    );
+
     my @data;
-    foreach my $c ( $result->valueof("//getMyBusinessesResponse/getMyBusinessesReturn") ) {
-        push @data, $self->_create_object_from_hash($c, 'Google::Adwords::Business');
+    foreach my $c (
+        $result->valueof("//getMyBusinessesResponse/getMyBusinessesReturn") )
+    {
+        push @data, $self->_create_object_from_hash( $c,
+            'Google::Adwords::Business' );
     }
 
     return @data;
-}
-
+} # end sub getMyBusinesses
 
 ### INSTANCE METHOD ###################################################
 # Usage      : $ret = $obj->updateAds(@ads);
 # Purpose    : update status of Ads
 # Returns    : 1 on success
-# Parameters : 
+# Parameters :
 #   @ads => List of Ad objects
 # Throws     : no exceptions
 # Comments   : Only the status filed can be updated
@@ -388,45 +413,46 @@ sub getMyBusinesses
 #######################################################################
 sub updateAds
 {
-    my ($self, @ads) = @_;
+    my ( $self, @ads ) = @_;
 
     my @params;
 
-    foreach my $ad ( @ads ) {
-         my @ad_params;
-      
-        if (not defined $ad->id) {
+    foreach my $ad (@ads) {
+        my @ad_params;
+
+        if ( not defined $ad->id ) {
             die "id must be set for the Ad object\n";
         }
-        if (not defined $ad->adGroupId) {
+        if ( not defined $ad->adGroupId ) {
             die "adGroupId must be set for the Ad object\n";
         }
-        if (not defined $ad->status) {
+        if ( not defined $ad->status ) {
             die "status must be set for the Ad object\n";
         }
 
-        push @ad_params, SOAP::Data->name(
-	        'id' => $ad->id )->type('');
-        push @ad_params, SOAP::Data->name(
-	        'adGroupId' => $ad->adGroupId )->type('');
-        push @ad_params, SOAP::Data->name(
-	        'adType' => $ad->adType )->type('');
-        push @ad_params, SOAP::Data->name(
-	        'status' => $ad->status )->type('');
-     
-        push @params, SOAP::Data->name(
-            'ads' => \SOAP::Data->value(@ad_params) )->type('');
+        push @ad_params, SOAP::Data->name( 'id' => $ad->id )->type('');
+        push @ad_params,
+            SOAP::Data->name( 'adGroupId' => $ad->adGroupId )->type('');
+        push @ad_params,
+            SOAP::Data->name( 'adType' => $ad->adType )->type('');
+        push @ad_params,
+            SOAP::Data->name( 'status' => $ad->status )->type('');
+
+        push @params,
+            SOAP::Data->name( 'ads' => \SOAP::Data->value(@ad_params) )
+            ->type('');
     }
 
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'AdService',
+            method  => 'updateAds',
+            params  => \@params,
+        }
+    );
 
-    my $result	= $self->_create_service_and_call({
-        service	=> 'AdService',
-        method	=> 'updateAds',
-        params	=> \@params,
-    });
-    
-    return 1; 
-}
+    return 1;
+} # end sub updateAds
 
 1;
 
@@ -439,7 +465,7 @@ Google::Adwords::AdService - Interact with the Google Adwords AdService API call
  
 =head1 VERSION
  
-This documentation refers to Google::Adwords::AdService version 0.2
+This documentation refers to Google::Adwords::AdService version 0.3
  
  
 =head1 SYNOPSIS
@@ -798,7 +824,7 @@ Rohan Almeida <rohan@almeida.in>
  
 Mathieu Jondet <mathieu@eulerian.com>
  
-=head1 LICENCE AND COPYRIGHT
+=head1 LICENSE AND COPYRIGHT
  
 Copyright (c) 2006 Rohan Almeida <rohan@almeida.in>. All rights
 reserved.

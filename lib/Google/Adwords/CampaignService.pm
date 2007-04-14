@@ -1,5 +1,6 @@
 package Google::Adwords::CampaignService;
-use strict; use warnings;
+use strict;
+use warnings;
 
 use version; our $VERSION = qv('0.5');
 
@@ -28,137 +29,140 @@ sub _create_campaign_params
     my @campaign_params;
 
     # dailyBudget
-    push @campaign_params, SOAP::Data->name(
-        'dailyBudget' => $campaign->dailyBudget )->type('');
+    push @campaign_params,
+        SOAP::Data->name( 'dailyBudget' => $campaign->dailyBudget )->type('');
 
     # campaign name
-    if (defined $campaign->name) {
-        push @campaign_params, SOAP::Data->name(
-            'name' => $campaign->name )->type('');
+    if ( defined $campaign->name ) {
+        push @campaign_params,
+            SOAP::Data->name( 'name' => $campaign->name )->type('');
     }
 
     # status
-    if (defined $campaign->status) {
-        push @campaign_params, SOAP::Data->name(
-            'status' => $campaign->status )->type('');
+    if ( defined $campaign->status ) {
+        push @campaign_params,
+            SOAP::Data->name( 'status' => $campaign->status )->type('');
     }
 
     # start_day
-    if (defined $campaign->startDay) {
-        push @campaign_params, SOAP::Data->name(
-            'startDay' => $campaign->startDay )->type('');
+    if ( defined $campaign->startDay ) {
+        push @campaign_params,
+            SOAP::Data->name( 'startDay' => $campaign->startDay )->type('');
     }
 
     # end_day
-    if (defined $campaign->endDay) {
-        push @campaign_params, SOAP::Data->name(
-            'endDay' => $campaign->endDay )->type('');
+    if ( defined $campaign->endDay ) {
+        push @campaign_params,
+            SOAP::Data->name( 'endDay' => $campaign->endDay )->type('');
     }
 
     # Ad schedule
-    if (defined $campaign->schedule) {
+    if ( defined $campaign->schedule ) {
 
         my @schedule_params;
 
         # status
-        push @schedule_params, SOAP::Data->name(
-            'status' => $campaign->schedule->status)->type('');
+        push @schedule_params,
+            SOAP::Data->name( 'status' => $campaign->schedule->status )
+            ->type('');
 
         # intervals
-        foreach my $interval (@{$campaign->schedule->intervals}) {
+        foreach my $interval ( @{ $campaign->schedule->intervals } ) {
             my @interval_params;
             for (qw/day endHour endMinute multiplier startHour startMinute/) {
-                if (defined $interval->$_) {
-                    push @interval_params, SOAP::Data->name(
-                        $_ => $interval->$_)->type('');
+                if ( defined $interval->$_ ) {
+                    push @interval_params,
+                        SOAP::Data->name( $_ => $interval->$_ )->type('');
                 }
             }
-            push @schedule_params, SOAP::Data->name(
-                'intervals' => \SOAP::Data->value(@interval_params))->type('');
+            push @schedule_params,
+                SOAP::Data->name(
+                'intervals' => \SOAP::Data->value(@interval_params) )
+                ->type('');
         }
 
         push @campaign_params, SOAP::Data->name(
-            'schedule' => \SOAP::Data->value(@schedule_params))->type('');
+            'schedule' => \SOAP::Data->value(@schedule_params) )->type('');
     }
 
     # budget optimizer settings
-    if (defined $campaign->budgetOptimizerSettings) {
-        
+    if ( defined $campaign->budgetOptimizerSettings ) {
+
         my @budget_params;
         my $budget = $campaign->budgetOptimizerSettings;
-        
+
         for (qw/bidCeiling enabled takeOnOptimizedBids/) {
-            if (defined $budget->$_) {
-                push @budget_params, SOAP::Data->name(
-                    $_ => $budget->$_ )->type('');
+            if ( defined $budget->$_ ) {
+                push @budget_params,
+                    SOAP::Data->name( $_ => $budget->$_ )->type('');
             }
         }
 
-        push @campaign_params, SOAP::Data->name(
-            'budgetOptimizerSettings' => \SOAP::Data->value(@budget_params) )->type('');
-
+        push @campaign_params,
+            SOAP::Data->name(
+            'budgetOptimizerSettings' => \SOAP::Data->value(@budget_params) )
+            ->type('');
 
     }
 
-
     # language_targeting
-    if ((defined $campaign->languageTargeting) &&
-        (ref $campaign->languageTargeting eq 'HASH')
-    ) {
+    if (   ( defined $campaign->languageTargeting )
+        && ( ref $campaign->languageTargeting eq 'HASH' ) )
+    {
         my $langs_ref = $campaign->languageTargeting;
-        if ((exists $langs_ref->{'languages'}) &&
-            (scalar @{$langs_ref->{'languages'}} > 0)
-        ) {
-            push @campaign_params, SOAP::Data->name(
-            'languageTargeting' 
-                => \SOAP::Data->name('languages' 
-                    => @{$langs_ref->{'languages'}})->type('')
-            )->type('');
+        if (   ( exists $langs_ref->{'languages'} )
+            && ( scalar @{ $langs_ref->{'languages'} } > 0 ) )
+        {
+            push @campaign_params,
+                SOAP::Data->name(
+                'languageTargeting' => \SOAP::Data->name(
+                    'languages' => @{ $langs_ref->{'languages'} }
+                    )->type('')
+                )->type('');
         }
     }
 
     # geo_targeting
-    if ((defined $campaign->geoTargeting) &&
-        (ref $campaign->geoTargeting eq 'HASH')
-    ) {
+    if (   ( defined $campaign->geoTargeting )
+        && ( ref $campaign->geoTargeting eq 'HASH' ) )
+    {
         my $geo_ref = $campaign->geoTargeting;
         my @geo_data;
 
         for (qw/countries cities metros regions/) {
-            if ((exists $geo_ref->{$_}) and
-                (scalar @{$geo_ref->{$_}} > 0))
+            if (    ( exists $geo_ref->{$_} )
+                and ( scalar @{ $geo_ref->{$_} } > 0 ) )
             {
-                push @geo_data, SOAP::Data->name($_  
-                    => @{$geo_ref->{$_}})->type('');
+                push @geo_data,
+                    SOAP::Data->name( $_ => @{ $geo_ref->{$_} } )->type('');
             }
         }
-        
-        if (scalar @geo_data > 0) {
+
+        if ( scalar @geo_data > 0 ) {
             push @campaign_params, SOAP::Data->name(
-                'geoTargeting' => \SOAP::Data->value(@geo_data),
-            )->type('');
+                'geoTargeting' => \SOAP::Data->value(@geo_data), )->type('');
         }
     }
 
     # network_targeting
-    if ((defined $campaign->networkTargeting) &&
-        (ref $campaign->networkTargeting eq 'HASH')
-    ) {
+    if (   ( defined $campaign->networkTargeting )
+        && ( ref $campaign->networkTargeting eq 'HASH' ) )
+    {
         my $network_ref = $campaign->networkTargeting;
-        if ((exists $network_ref->{networkTypes}) &&
-            (scalar @{$network_ref->{'networkTypes'}} > 0) 
-        ) {
-            push @campaign_params, SOAP::Data->name(
-            'networkTargeting' 
-                => \SOAP::Data->name('networkTypes' 
-                    => @{$network_ref->{'networkTypes'}})->type('')
-            )->type('');
+        if (   ( exists $network_ref->{networkTypes} )
+            && ( scalar @{ $network_ref->{'networkTypes'} } > 0 ) )
+        {
+            push @campaign_params,
+                SOAP::Data->name(
+                'networkTargeting' => \SOAP::Data->name(
+                    'networkTypes' => @{ $network_ref->{'networkTypes'} }
+                    )->type('')
+                )->type('');
         }
     }
-    
-    return @campaign_params;
-}
 
+    return @campaign_params;
+} # end sub _create_campaign_params
 
 ### INTERNAL UTILITY ##################################################
 # Usage      : $campaign = $self->_create_campaign_object($data_ref);
@@ -171,61 +175,58 @@ sub _create_campaign_params
 #######################################################################
 sub _create_campaign_object
 {
-    my ($self, $data) = @_;
+    my ( $self, $data ) = @_;
 
     # format dates
-    $data->{'startDay'} 
-        = UnixDate(ParseDate($data->{'startDay'}), "%Y-%m-%d %H:%M:%S");
-    $data->{'endDay'} 
-        = UnixDate(ParseDate($data->{'endDay'}), "%Y-%m-%d %H:%M:%S");
+    $data->{'startDay'}
+        = UnixDate( ParseDate( $data->{'startDay'} ), "%Y-%m-%d %H:%M:%S" );
+    $data->{'endDay'}
+        = UnixDate( ParseDate( $data->{'endDay'} ), "%Y-%m-%d %H:%M:%S" );
 
     # budgetOptimizerSettings
-    if (exists $data->{budgetOptimizerSettings}) {
-        $data->{budgetOptimizerSettings} 
-            = $self->_create_object_from_hash(
-                $data->{budgetOptimizerSettings},
-                'Google::Adwords::BudgetOptimizerSettings'
-                );
+    if ( exists $data->{budgetOptimizerSettings} ) {
+        $data->{budgetOptimizerSettings} = $self->_create_object_from_hash(
+            $data->{budgetOptimizerSettings},
+            'Google::Adwords::BudgetOptimizerSettings' );
     }
 
     # ad schedule
     my @intervals;
-    if (exists $data->{schedule}{intervals}) {
-        
+    if ( exists $data->{schedule}{intervals} ) {
+
         # check if we have multiple intervals
-        if (ref $data->{schedule}{intervals} eq 'ARRAY') {
-            for (@{$data->{schedule}{intervals}}) {
-                push @intervals, 
-                    $self->_create_object_from_hash($_,
-                        "Google::Adwords::SchedulingInterval");
+        if ( ref $data->{schedule}{intervals} eq 'ARRAY' ) {
+            for ( @{ $data->{schedule}{intervals} } ) {
+                push @intervals,
+                    $self->_create_object_from_hash( $_,
+                    "Google::Adwords::SchedulingInterval" );
             }
         }
         else {
+
             # just a single interval
-            push @intervals, 
-                $self->_create_object_from_hash($data->{schedule}{intervals}, 
-                    "Google::Adwords::SchedulingInterval");
+            push @intervals,
+                $self->_create_object_from_hash( $data->{schedule}{intervals},
+                "Google::Adwords::SchedulingInterval" );
         }
     }
-    if (scalar @intervals > 0) {
+    if ( scalar @intervals > 0 ) {
         $data->{schedule}{intervals} = \@intervals;
     }
-    my $ad_schedule 
-        = $self->_create_object_from_hash($data->{schedule},
-        "Google::Adwords::AdSchedule");
+    my $ad_schedule = $self->_create_object_from_hash( $data->{schedule},
+        "Google::Adwords::AdSchedule" );
 
     $data->{schedule} = $ad_schedule;
 
-
     # get campaign object
-    my $campaign_response 
-        = $self->_create_object_from_hash($data, 'Google::Adwords::Campaign');
-    
+    my $campaign_response = $self->_create_object_from_hash( $data,
+        'Google::Adwords::Campaign' );
+
     return $campaign_response;
-}
+} # end sub _create_campaign_object
 
 ### INSTANCE METHOD ################################################
-# Usage      : 
+# Usage      :
 #   my $campaign = $obj->addCampaign($campaign);
 # Purpose    : Add a new campaign
 # Returns    : ????
@@ -236,34 +237,37 @@ sub _create_campaign_object
 #######################################################################
 sub addCampaign
 {
-    my ($self, $campaign) = @_;
+    my ( $self, $campaign ) = @_;
 
     # daily_budget should be present
-    if (not defined $campaign->dailyBudget) {
+    if ( not defined $campaign->dailyBudget ) {
         die "dailyBudget should be set for the campaign object";
     }
 
     my @campaign_params = _create_campaign_params($campaign);
 
     my @params;
-    push @params, SOAP::Data->name(
-        'campaign' => \SOAP::Data->value(@campaign_params) )->type('');
+    push @params,
+        SOAP::Data->name( 'campaign' => \SOAP::Data->value(@campaign_params) )
+        ->type('');
 
     # create the SOAP service
-    my $result = $self->_create_service_and_call({
-        service => 'CampaignService',
-        method => 'addCampaign',   
-        params => \@params,
-    });
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'CampaignService',
+            method  => 'addCampaign',
+            params  => \@params,
+        }
+    );
 
     # get response data in a hash
     my $data = $result->valueof("//addCampaignResponse/addCampaignReturn");
 
     return $self->_create_campaign_object($data);
-}
+} # end sub addCampaign
 
 ### INSTANCE METHOD ################################################
-# Usage      : 
+# Usage      :
 #   my @campaigns = $obj->addCampaignList(@campaigns_to_add);
 # Purpose    : Add a list of new campaign
 # Returns    : @campaigns => List of newly added campaign objects
@@ -274,11 +278,11 @@ sub addCampaign
 #######################################################################
 sub addCampaignList
 {
-    my ($self, @campaigns) = @_;
+    my ( $self, @campaigns ) = @_;
 
     # daily_budget should be present
     for (@campaigns) {
-        if (not defined $_->dailyBudget) {
+        if ( not defined $_->dailyBudget ) {
             die "dailyBudget should be set for the campaign object";
         }
     }
@@ -297,23 +301,26 @@ sub addCampaignList
     }
 
     # create the SOAP service
-    my $result = $self->_create_service_and_call({
-        service => 'CampaignService',
-        method => 'addCampaignList',   
-        params => \@params,
-    });
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'CampaignService',
+            method  => 'addCampaignList',
+            params  => \@params,
+        }
+    );
 
     my @data;
-    foreach my $c ($result->valueof("//addCampaignListResponse/addCampaignListReturn") ) 
+    foreach my $c (
+        $result->valueof("//addCampaignListResponse/addCampaignListReturn") )
     {
         push @data, $self->_create_campaign_object($c);
     }
 
     return @data;
-}
+} # end sub addCampaignList
 
 ### INSTANCE METHOD ################################################
-# Usage      : 
+# Usage      :
 #   my @campaigns = $obj->getAllAdWordsCampaigns();
 # Purpose    : Get all the AdWords campaign for an account
 # Returns    : A list of Campaign objects
@@ -322,31 +329,35 @@ sub addCampaignList
 # Comments   : none
 # See Also   : n/a
 #######################################################################
-sub getAllAdWordsCampaigns 
+sub getAllAdWordsCampaigns
 {
     my ($self) = @_;
 
     my @params;
-    push @params,
-     SOAP::Data->name(
-      'dummy' => 1 )->type('');
+    push @params, SOAP::Data->name( 'dummy' => 1 )->type('');
 
-    my $result	= $self->_create_service_and_call({
-     service	=> 'CampaignService',
-     method	=> 'getAllAdWordsCampaigns',
-     params	=> \@params,
-    });
-    
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'CampaignService',
+            method  => 'getAllAdWordsCampaigns',
+            params  => \@params,
+        }
+    );
+
     my @data;
-    foreach my $c ( $result->valueof("//getAllAdWordsCampaignsResponse/getAllAdWordsCampaignsReturn") ) {
+    foreach my $c (
+        $result->valueof(
+            "//getAllAdWordsCampaignsResponse/getAllAdWordsCampaignsReturn")
+        )
+    {
         push @data, $self->_create_campaign_object($c);
     }
 
-    return	@data;
-}
+    return @data;
+} # end sub getAllAdWordsCampaigns
 
 ### INSTANCE METHOD ################################################
-# Usage      : 
+# Usage      :
 #   my $campaign = $obj->getCampaign($id);
 # Purpose    : Get details for specified AdWords campaign
 # Returns    : the campaign object
@@ -357,61 +368,61 @@ sub getAllAdWordsCampaigns
 #######################################################################
 sub getCampaign
 {
-    my ($self, $id) = @_;
-    
-    my @params;
-    push @params,
-     SOAP::Data->name(
-      'id' => $id )->type('');
+    my ( $self, $id ) = @_;
 
-    my $result	= $self->_create_service_and_call({
-     service	=> 'CampaignService',
-     method	=> 'getCampaign',
-     params	=> \@params,
-    });
-    
+    my @params;
+    push @params, SOAP::Data->name( 'id' => $id )->type('');
+
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'CampaignService',
+            method  => 'getCampaign',
+            params  => \@params,
+        }
+    );
+
     my $data = $result->valueof("//getCampaignResponse/getCampaignReturn");
 
     return $self->_create_campaign_object($data);
-}
+} # end sub getCampaign
 
 ### INSTANCE METHOD ################################################
-# Usage      : 
+# Usage      :
 #   my @campaigns = $obj->getCampaignList(@campaign_ids);
 # Purpose    : Get details on a specific list of campaigns
 # Returns    : A list of campaign objects
-# Parameters : An list of campaign ids to be fetched 
+# Parameters : An list of campaign ids to be fetched
 # Throws     : no exceptions
 # Comments   : none
 # See Also   : n/a
 #######################################################################
 sub getCampaignList
 {
-    my ($self, @campaign_ids) = @_;
-    
-    my @params;
-    push @params,
-     SOAP::Data->name(
-      'ids' => @campaign_ids )->type('');
+    my ( $self, @campaign_ids ) = @_;
 
-    my $result	= $self->_create_service_and_call({
-     service	=> 'CampaignService',
-     method	=> 'getCampaignList',
-     params	=> \@params,
-    });
+    my @params;
+    push @params, SOAP::Data->name( 'ids' => @campaign_ids )->type('');
+
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'CampaignService',
+            method  => 'getCampaignList',
+            params  => \@params,
+        }
+    );
 
     my @data;
-    foreach my $c ($result->valueof("//getCampaignListResponse/getCampaignListReturn")) 
+    foreach my $c (
+        $result->valueof("//getCampaignListResponse/getCampaignListReturn") )
     {
         push @data, $self->_create_campaign_object($c);
     }
 
     return @data;
-}
-
+} # end sub getCampaignList
 
 ### INSTANCE METHOD ################################################
-# Usage      : 
+# Usage      :
 #   my @campaign_stats = $obj->getCampaignStats({
 #	    campaignids	=> [ 3982, 2787, 17872 ],
 #	    startDay => $startDay,
@@ -420,7 +431,7 @@ sub getCampaignList
 #   });
 # Purpose    : Get stats on a set of campaign
 # Returns    :  A list of StatsRecord object for each campaign
-# Parameters : 
+# Parameters :
 #	ids  : array reference of campaign ids
 #	startDay : starting day of the stats YYYY-MM-DD
 #	endDay : end day of the stats YYYY-MM-DD
@@ -429,44 +440,43 @@ sub getCampaignList
 # Comments   : none
 # See Also   : n/a
 #######################################################################
-sub getCampaignStats 
+sub getCampaignStats
 {
- my ($self, $args_ref) = @_;
- my $ra_id	= $args_ref->{campaignids} || [];
- my $startDay	= $args_ref->{startDay} || '';
- my $endDay	= $args_ref->{endDay}	|| '';
- my $inPST	= $args_ref->{inPST}	|| 0;
+    my ( $self, $args_ref ) = @_;
+    my $ra_id    = $args_ref->{campaignids} || [];
+    my $startDay = $args_ref->{startDay}    || '';
+    my $endDay   = $args_ref->{endDay}      || '';
+    my $inPST    = $args_ref->{inPST}       || 0;
 
- my @params;
- push @params,
-      SOAP::Data->name(
-	'campaignids' => @{ $ra_id } )->type('');
- push @params,
-      SOAP::Data->name(
-	'startDay' => $startDay )->type('');
- push @params,
-      SOAP::Data->name(
-	'endDay' => $endDay )->type('');
- push @params,
-      SOAP::Data->name(
-	'inPST' => $inPST )->type('');
-    
- my $result	= $self->_create_service_and_call({
-   service	=> 'CampaignService',
-   method	=> 'getCampaignStats',
-   params	=> \@params,
-   });
+    my @params;
+    push @params, SOAP::Data->name( 'campaignids' => @{$ra_id} )->type('');
+    push @params, SOAP::Data->name( 'startDay'    => $startDay )->type('');
+    push @params, SOAP::Data->name( 'endDay'      => $endDay )->type('');
+    push @params, SOAP::Data->name( 'inPST'       => $inPST )->type('');
 
- my @data;
- foreach my $c ( $result->valueof("//getCampaignStatsResponse/getCampaignStatsReturn") ) {
-  push @data, $self->_create_object_from_hash($c, 'Google::Adwords::StatsRecord');
- }
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'CampaignService',
+            method  => 'getCampaignStats',
+            params  => \@params,
+        }
+    );
 
- return	@data;
-}
+    my @data;
+    foreach my $c (
+        $result->valueof("//getCampaignStatsResponse/getCampaignStatsReturn")
+        )
+    {
+        push @data,
+            $self->_create_object_from_hash( $c,
+            'Google::Adwords::StatsRecord' );
+    }
+
+    return @data;
+} # end sub getCampaignStats
 
 ### INSTANCE METHOD ################################################
-# Usage      : 
+# Usage      :
 #   my $is_optimized = $obj->getOptimizeAdServing($id);
 # Purpose    : Get the optimize AdServing status flag.
 # Returns    : 1 if true, 0 otherwise
@@ -475,70 +485,68 @@ sub getCampaignStats
 # Comments   : none
 # See Also   : n/a
 #######################################################################
-sub getOptimizeAdServing 
+sub getOptimizeAdServing
 {
-    my ($self, $id) = @_;
-    
+    my ( $self, $id ) = @_;
+
     my @params;
-    push @params,
-     SOAP::Data->name(
-      'id' => $id )->type('');
+    push @params, SOAP::Data->name( 'id' => $id )->type('');
 
-    my $result	= $self->_create_service_and_call({
-     service	=> 'CampaignService',
-     method	=> 'getOptimizeAdServing',
-     params	=> \@params,
-    });
-    
-    my $data = $result->valueof("//getOptimizeAdServingResponse/getOptimizeAdServingReturn");
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'CampaignService',
+            method  => 'getOptimizeAdServing',
+            params  => \@params,
+        }
+    );
 
-    return	( $data eq 'true' ) ? 1 : 0;
-}
+    my $data = $result->valueof(
+        "//getOptimizeAdServingResponse/getOptimizeAdServingReturn");
 
+    return ( $data eq 'true' ) ? 1 : 0;
+} # end sub getOptimizeAdServing
 
 ### INSTANCE METHOD ################################################
-# Usage      : 
+# Usage      :
 #   my $ret = $obj->setOptimizeAdServing($id, $enable);
 # Purpose    : Set the optimize AdServing status flag.
 # Returns    : returns 1 if success
-# Parameters : 
+# Parameters :
 #	- the campaign id
 #	- the enable flag, set to 1 for 'true', 0 for for 'false'
 # Throws     : no exceptions
 # Comments   : none
 # See Also   : n/a
 #######################################################################
-sub setOptimizeAdServing 
+sub setOptimizeAdServing
 {
-    my ($self, $id, $enable) = @_;
+    my ( $self, $id, $enable ) = @_;
 
     if ( not defined $id ) {
-     die "setOptimizeAdServing : need to provide campaign id.\n";
+        die "setOptimizeAdServing : need to provide campaign id.\n";
     }
     if ( not defined $enable ) {
-     die "setOptimizeAdServing : need to provide enable flag.\n";
+        die "setOptimizeAdServing : need to provide enable flag.\n";
     }
-    
+
     my @params;
-    push @params,
-     SOAP::Data->name(
-      'campaignid' => $id )->type('');
-    push @params,
-     SOAP::Data->name(
-      'enable' => ( $enable ) ? 'true' : 'false' )->type('');
+    push @params, SOAP::Data->name( 'campaignid' => $id )->type('');
+    push @params, SOAP::Data->name( 'enable' => ($enable) ? 'true' : 'false' )
+        ->type('');
 
-    my $result	= $self->_create_service_and_call({
-     service	=> 'CampaignService',
-     method	=> 'setOptimizeAdServing',
-     params	=> \@params,
-    });
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'CampaignService',
+            method  => 'setOptimizeAdServing',
+            params  => \@params,
+        }
+    );
 
-    return	1;
-}
-
+    return 1;
+} # end sub setOptimizeAdServing
 
 ### INSTANCE METHOD ################################################
-# Usage      : 
+# Usage      :
 #   my $campaign = $obj->updateCampaign($campaign_obj);
 # Purpose    : Update an existing campaign
 # Returns    : returns 1 on success
@@ -549,33 +557,36 @@ sub setOptimizeAdServing
 #######################################################################
 sub updateCampaign
 {
-    my ($self, $campaign) = @_;
+    my ( $self, $campaign ) = @_;
 
     # id should be present
-    if (not defined $campaign->id) {
+    if ( not defined $campaign->id ) {
         die "id should be set for the campaign object";
     }
 
     my @campaign_params = _create_campaign_params($campaign);
-    push @campaign_params, SOAP::Data->name(
-        'id' => $campaign->id )->type('');
+    push @campaign_params,
+        SOAP::Data->name( 'id' => $campaign->id )->type('');
 
     my @params;
-    push @params, SOAP::Data->name(
-        'campaign' => \SOAP::Data->value(@campaign_params) )->type('');
+    push @params,
+        SOAP::Data->name( 'campaign' => \SOAP::Data->value(@campaign_params) )
+        ->type('');
 
     # create the SOAP service
-    my $result = $self->_create_service_and_call({
-        service => 'CampaignService',
-        method => 'updateCampaign',   
-        params => \@params,
-    });
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'CampaignService',
+            method  => 'updateCampaign',
+            params  => \@params,
+        }
+    );
 
     return 1;
-}
+} # end sub updateCampaign
 
 ### INSTANCE METHOD ################################################
-# Usage      : 
+# Usage      :
 #   my $ret = $obj->updateCampaignList(@campaigns);
 # Purpose    : Update a list of campaigns
 # Returns    : 1 on success
@@ -586,11 +597,11 @@ sub updateCampaign
 #######################################################################
 sub updateCampaignList
 {
-    my ($self, @campaigns) = @_;
+    my ( $self, @campaigns ) = @_;
 
     # id should be present
     for (@campaigns) {
-        if (not defined $_->id) {
+        if ( not defined $_->id ) {
             die "id should be set for the campaign object";
         }
     }
@@ -601,26 +612,26 @@ sub updateCampaignList
     for my $campaign (@campaigns) {
 
         my @campaign_params = _create_campaign_params($campaign);
-        push @campaign_params, SOAP::Data->name(
-            'id' => $campaign->id )->type('');
-    
+        push @campaign_params,
+            SOAP::Data->name( 'id' => $campaign->id )->type('');
+
         push @params, SOAP::Data->name(
             'campaign' => \SOAP::Data->value(@campaign_params) )->type('');
-    
 
     }
 
     # create the SOAP service
-    my $result = $self->_create_service_and_call({
-        service => 'CampaignService',
-        method => 'updateCampaignList',   
-        params => \@params,
-    });
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'CampaignService',
+            method  => 'updateCampaignList',
+            params  => \@params,
+        }
+    );
 
     return 1;
-}
+} # end sub updateCampaignList
 
- 
 1;
 
 =pod
@@ -1033,7 +1044,7 @@ Rohan Almeida <rohan@almeida.in>
  
 Mathieu Jondet <mathieu@eulerian.com>
  
-=head1 LICENCE AND COPYRIGHT
+=head1 LICENSE AND COPYRIGHT
  
 Copyright (c) 2006 Rohan Almeida <rohan@almeida.in>. All rights
 reserved.

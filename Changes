@@ -1,5 +1,15 @@
 Revision history for Perl module Google::Adwords
 
+v1.2.1  Sat Apr 14 16:03:45 IST 2007
+    - bug fix in AdService::findBusinesses() to encode html entities
+    - only encode '<>&' characters in the request XML. Thanks to Steven Sattin for
+      suggesting this.
+    - Kwalitee related changes (http://cpants.perl.org/kwalitee.html)
+        * LICENCE renamed to LICENSE (hope this works)
+        * Added t/pod.t to test for POD correctness using Test::Pod 
+        * All modules now have 'use strict'
+    - All code formatted through perltidy
+
 v1.2    Sun Mar 25 18:36:07 IST 2007
     - Added method clientCustomerId() to the base Service class, so you can use
       either clientEmail() or clientCustomerId() if you have a MCC, but not both. 

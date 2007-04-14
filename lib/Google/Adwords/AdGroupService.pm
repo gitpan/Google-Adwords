@@ -1,5 +1,6 @@
 package Google::Adwords::AdGroupService;
-use strict; use warnings;
+use strict;
+use warnings;
 
 use version; our $VERSION = qv('0.0.2');
 
@@ -10,174 +11,187 @@ use Google::Adwords::AdGroup;
 use Google::Adwords::StatsRecord;
 
 ### INSTANCE METHOD ################################################
-# Usage      : 
+# Usage      :
 #   my $adgroup = $obj->addAdGroup($campaign_id, $adgroup);
-# Purpose    : Add a new AdGroup to a campaign 
+# Purpose    : Add a new AdGroup to a campaign
 # Returns    : The newly created AdGroup
-# Parameters : 
+# Parameters :
 #   1) $campaign_id => Campaign ID
-#   2) $adgroup => A Google::Adwords::AdGroup object 
+#   2) $adgroup => A Google::Adwords::AdGroup object
 # Throws     : no exceptions
 # Comments   : none
 # See Also   : n/a
 #######################################################################
 sub addAdGroup
 {
-    my ($self, $campaignId, $adgroup) = @_;
+    my ( $self, $campaignId, $adgroup ) = @_;
 
     # campaignId should be present
-    if (not defined $campaignId ) {
+    if ( not defined $campaignId ) {
         die "campaignId should be set.";
     }
-    if (not defined $adgroup) {
-     die "adgroup object must be specified.";
+    if ( not defined $adgroup ) {
+        die "adgroup object must be specified.";
     }
-    if ((not defined $adgroup->maxCpc) and (not defined $adgroup->maxCpm)) {
-     die "adgroup must have either maxCpm or maxCpc set.";
+    if (    ( not defined $adgroup->maxCpc )
+        and ( not defined $adgroup->maxCpm ) )
+    {
+        die "adgroup must have either maxCpm or maxCpc set.";
     }
 
     my @adgroup_params;
 
     # adgroup name
-    if (defined $adgroup->name) {
-        push @adgroup_params, SOAP::Data->name(
-            'name' => $adgroup->name )->type('');
+    if ( defined $adgroup->name ) {
+        push @adgroup_params,
+            SOAP::Data->name( 'name' => $adgroup->name )->type('');
     }
 
     # status
-    if (defined $adgroup->status) {
-        push @adgroup_params, SOAP::Data->name(
-            'status' => $adgroup->status )->type('');
+    if ( defined $adgroup->status ) {
+        push @adgroup_params,
+            SOAP::Data->name( 'status' => $adgroup->status )->type('');
     }
-    
+
     # maxContentCpc
-    if (defined $adgroup->maxContentCpc) {
-        push @adgroup_params, SOAP::Data->name(
-            'maxContentCpc' => $adgroup->maxContentCpc )->type('');
+    if ( defined $adgroup->maxContentCpc ) {
+        push @adgroup_params,
+            SOAP::Data->name( 'maxContentCpc' => $adgroup->maxContentCpc )
+            ->type('');
     }
-    
+
     # maxCpc
-    if (defined $adgroup->maxCpc) {
-        push @adgroup_params, SOAP::Data->name(
-            'maxCpc' => $adgroup->maxCpc )->type('');
+    if ( defined $adgroup->maxCpc ) {
+        push @adgroup_params,
+            SOAP::Data->name( 'maxCpc' => $adgroup->maxCpc )->type('');
     }
-    
+
     # maxCpm
-    if (defined $adgroup->maxCpm) {
-        push @adgroup_params, SOAP::Data->name(
-            'maxCpm' => $adgroup->maxCpm )->type('');
+    if ( defined $adgroup->maxCpm ) {
+        push @adgroup_params,
+            SOAP::Data->name( 'maxCpm' => $adgroup->maxCpm )->type('');
     }
 
     my @params;
-    push @params, SOAP::Data->name('campaignID')->value($campaignId)->type('');
-    push @params, SOAP::Data->name(
-        'newData' 	=> \SOAP::Data->value(@adgroup_params) )->type('');
+    push @params,
+        SOAP::Data->name('campaignID')->value($campaignId)->type('');
+    push @params,
+        SOAP::Data->name( 'newData' => \SOAP::Data->value(@adgroup_params) )
+        ->type('');
 
     # create the SOAP service
-    my $result = $self->_create_service_and_call({
-        service => 'AdGroupService',
-        method => 'addAdGroup',   
-        params => \@params,
-    });
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'AdGroupService',
+            method  => 'addAdGroup',
+            params  => \@params,
+        }
+    );
 
     # get response data in a hash
     my $data = $result->valueof("//addAdGroupResponse/addAdGroupReturn");
 
     # get adgroup object
-    my $adgroup_response 
-        = $self->_create_object_from_hash($data, 'Google::Adwords::AdGroup');
-    
+    my $adgroup_response = $self->_create_object_from_hash( $data,
+        'Google::Adwords::AdGroup' );
+
     return $adgroup_response;
-}
+} # end sub addAdGroup
 
 ### INSTANCE METHOD ################################################
-# Usage      : 
+# Usage      :
 #   my @adgroups = $obj->addAdGroupList($campaign_id, \@adgroups_to_add);
-# Purpose    : Add a new AdGroup to a campaign 
+# Purpose    : Add a new AdGroup to a campaign
 # Returns    : The newly created AdGroup
-# Parameters : 
+# Parameters :
 #   1) $campaign_id => Campaign ID
-#   2) $adgroup => A Google::Adwords::AdGroup object 
+#   2) $adgroup => A Google::Adwords::AdGroup object
 # Throws     : no exceptions
 # Comments   : none
 # See Also   : n/a
 #######################################################################
 sub addAdGroupList
 {
-    my ($self, $campaignId, $adgroups_to_add_ref) = @_;
+    my ( $self, $campaignId, $adgroups_to_add_ref ) = @_;
 
     # campaignId should be present
-    if (not defined $campaignId ) {
+    if ( not defined $campaignId ) {
         die "campaignId should be set.";
     }
 
-    for (@{$adgroups_to_add_ref}) {
-        if ((not defined $_->maxCpc) and (not defined $_->maxCpm)) {
+    for ( @{$adgroups_to_add_ref} ) {
+        if ( ( not defined $_->maxCpc ) and ( not defined $_->maxCpm ) ) {
             die "adgroup must have either maxCpm or maxCpc set.";
         }
     }
 
     my @params;
-    push @params, SOAP::Data->name('campaignID')->value($campaignId)->type('');
+    push @params,
+        SOAP::Data->name('campaignID')->value($campaignId)->type('');
 
-    for my $adgroup (@{$adgroups_to_add_ref}) {
+    for my $adgroup ( @{$adgroups_to_add_ref} ) {
         my @adgroup_params;
-    
+
         # adgroup name
-        if (defined $adgroup->name) {
-            push @adgroup_params, SOAP::Data->name(
-                'name' => $adgroup->name )->type('');
-        }
-    
-        # status
-        if (defined $adgroup->status) {
-            push @adgroup_params, SOAP::Data->name(
-                'status' => $adgroup->status )->type('');
-        }
-        
-        # maxContentCpc
-        if (defined $adgroup->maxContentCpc) {
-            push @adgroup_params, SOAP::Data->name(
-                'maxContentCpc' => $adgroup->maxContentCpc )->type('');
-        }
-        
-        # maxCpc
-        if (defined $adgroup->maxCpc) {
-            push @adgroup_params, SOAP::Data->name(
-                'maxCpc' => $adgroup->maxCpc )->type('');
-        }
-        
-        # maxCpm
-        if (defined $adgroup->maxCpm) {
-            push @adgroup_params, SOAP::Data->name(
-                'maxCpm' => $adgroup->maxCpm )->type('');
+        if ( defined $adgroup->name ) {
+            push @adgroup_params,
+                SOAP::Data->name( 'name' => $adgroup->name )->type('');
         }
 
-        push @params, SOAP::Data->name(
-            newData => \SOAP::Data->value(@adgroup_params) )->type(''); 
+        # status
+        if ( defined $adgroup->status ) {
+            push @adgroup_params,
+                SOAP::Data->name( 'status' => $adgroup->status )->type('');
+        }
+
+        # maxContentCpc
+        if ( defined $adgroup->maxContentCpc ) {
+            push @adgroup_params,
+                SOAP::Data->name( 'maxContentCpc' => $adgroup->maxContentCpc )
+                ->type('');
+        }
+
+        # maxCpc
+        if ( defined $adgroup->maxCpc ) {
+            push @adgroup_params,
+                SOAP::Data->name( 'maxCpc' => $adgroup->maxCpc )->type('');
+        }
+
+        # maxCpm
+        if ( defined $adgroup->maxCpm ) {
+            push @adgroup_params,
+                SOAP::Data->name( 'maxCpm' => $adgroup->maxCpm )->type('');
+        }
+
+        push @params,
+            SOAP::Data->name( newData => \SOAP::Data->value(@adgroup_params) )
+            ->type('');
     }
 
     # create the SOAP service
-    my $result = $self->_create_service_and_call({
-        service => 'AdGroupService',
-        method => 'addAdGroupList',   
-        params => \@params,
-    });
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'AdGroupService',
+            method  => 'addAdGroupList',
+            params  => \@params,
+        }
+    );
 
     my @data;
-    for my $a
-        ($result->valueof("//addAdGroupListResponse/addAdGroupListReturn"))
+    for my $a (
+        $result->valueof("//addAdGroupListResponse/addAdGroupListReturn") )
     {
+
         # get adgroup object
-        push @data,  
-            $self->_create_object_from_hash($a, 'Google::Adwords::AdGroup');
+        push @data,
+            $self->_create_object_from_hash( $a, 'Google::Adwords::AdGroup' );
     }
 
     return @data;
-}
+} # end sub addAdGroupList
 
 ### INSTANCE METHOD ################################################
-# Usage      : 
+# Usage      :
 #   my $adgroup = $obj->getAdGroup($id);
 # Purpose    : Get the specified AdGroup
 # Returns    : the adgroup object
@@ -188,62 +202,65 @@ sub addAdGroupList
 #######################################################################
 sub getAdGroup
 {
-    my ($self, $id) = @_;
-    
-    my @params;
-    push @params,
-     SOAP::Data->name(
-      'adGroupId' => $id )->type('');
+    my ( $self, $id ) = @_;
 
-    my $result	= $self->_create_service_and_call({
-     service	=> 'AdGroupService',
-     method	=> 'getAdGroup',
-     params	=> \@params,
-    });
-    
+    my @params;
+    push @params, SOAP::Data->name( 'adGroupId' => $id )->type('');
+
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'AdGroupService',
+            method  => 'getAdGroup',
+            params  => \@params,
+        }
+    );
+
     my $data = $result->valueof("//getAdGroupResponse/getAdGroupReturn");
 
-    my $adgroup_response 
-     = $self->_create_object_from_hash($data, 'Google::Adwords::AdGroup');
+    my $adgroup_response = $self->_create_object_from_hash( $data,
+        'Google::Adwords::AdGroup' );
 
-    return	$adgroup_response;
-}
+    return $adgroup_response;
+} # end sub getAdGroup
 
 ### INSTANCE METHOD ################################################
-# Usage      : 
+# Usage      :
 #   my @adgroups = $obj->getAdGroupList(@adgroup_ids);
-# Purpose    : Get details on a specific list of adgroups 
+# Purpose    : Get details on a specific list of adgroups
 # Returns    : An list of adgroup objects
-# Parameters : An list of adgroup ids to be fetched 
+# Parameters : An list of adgroup ids to be fetched
 # Throws     : no exceptions
 # Comments   : none
 # See Also   : n/a
 #######################################################################
 sub getAdGroupList
 {
-    my ($self, @ids) = @_;
-    
-    my @params;
-    push @params,
-     SOAP::Data->name(
-      'adgroupIDs' => @ids )->type('');
+    my ( $self, @ids ) = @_;
 
-    my $result	= $self->_create_service_and_call({
-     service	=> 'AdGroupService',
-     method	=> 'getAdGroupList',
-     params	=> \@params,
-    });
+    my @params;
+    push @params, SOAP::Data->name( 'adgroupIDs' => @ids )->type('');
+
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'AdGroupService',
+            method  => 'getAdGroupList',
+            params  => \@params,
+        }
+    );
 
     my @data;
-    foreach my $c ( $result->valueof("//getAdGroupListResponse/getAdGroupListReturn") ) {
-     push @data, $self->_create_object_from_hash($c,'Google::Adwords::AdGroup');
+    foreach my $c (
+        $result->valueof("//getAdGroupListResponse/getAdGroupListReturn") )
+    {
+        push @data,
+            $self->_create_object_from_hash( $c, 'Google::Adwords::AdGroup' );
     }
 
     return @data;
-}
+} # end sub getAdGroupList
 
 ### INSTANCE METHOD ################################################
-# Usage      : 
+# Usage      :
 #   my @adgroups = $obj->getAllAdGroups($campaignID);
 # Purpose    : Get all the campaign's adgroups
 # Returns    : An array of AdGroups objects
@@ -252,36 +269,38 @@ sub getAdGroupList
 # Comments   : none
 # See Also   : n/a
 #######################################################################
-sub getAllAdGroups 
+sub getAllAdGroups
 {
-    my ($self, $id) = @_;
+    my ( $self, $id ) = @_;
 
     if ( not defined $id ) {
-     die "must give a campaignId.";
+        die "must give a campaignId.";
     }
 
     my @params;
-    push @params,
-     SOAP::Data->name(
-      'campaignID' => $id )->type('');
+    push @params, SOAP::Data->name( 'campaignID' => $id )->type('');
 
-    my $result	= $self->_create_service_and_call({
-     service	=> 'AdGroupService',
-     method	=> 'getAllAdGroups',
-     params	=> \@params,
-    });
-    
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'AdGroupService',
+            method  => 'getAllAdGroups',
+            params  => \@params,
+        }
+    );
+
     my @data;
-    foreach my $c ( $result->valueof("//getAllAdGroupsResponse/getAllAdGroupsReturn") ) {
-     push @data, $self->_create_object_from_hash($c,'Google::Adwords::AdGroup');
+    foreach my $c (
+        $result->valueof("//getAllAdGroupsResponse/getAllAdGroupsReturn") )
+    {
+        push @data,
+            $self->_create_object_from_hash( $c, 'Google::Adwords::AdGroup' );
     }
 
     return @data;
-}
-
+} # end sub getAllAdGroups
 
 ### INSTANCE METHOD ################################################
-# Usage      : 
+# Usage      :
 #   my @adgroup_stats = $obj->getAdGroupStats({
 #       campaignId	=> $campaignId
 #	    adGroupIds	=> [ arrayref of adgroup ids ],
@@ -291,7 +310,7 @@ sub getAllAdGroups
 #   });
 # Purpose    : Get stats on a set of adgroups
 # Returns    : StatsRecord object for each adgroup
-# Parameters : 
+# Parameters :
 #	campaignId : the campaign in which to find the ad group
 #	adGroupIds  : array reference of adgroup ids
 #	startDay : starting day of the stats YYYY-MM-DD
@@ -301,114 +320,110 @@ sub getAllAdGroups
 # Comments   : none
 # See Also   : n/a
 #######################################################################
-sub getAdGroupStats 
+sub getAdGroupStats
 {
- my ($self, $args_ref) = @_;
- my $campaignId	= $args_ref->{campaignId} || 0;
- my $ra_id	= $args_ref->{adGroupIds} || [];
- my $startDay	= $args_ref->{startDay} || '';
- my $endDay	= $args_ref->{endDay}	|| '';
- my $inPST	= $args_ref->{inPST}	|| 0;
+    my ( $self, $args_ref ) = @_;
+    my $campaignId = $args_ref->{campaignId} || 0;
+    my $ra_id      = $args_ref->{adGroupIds} || [];
+    my $startDay   = $args_ref->{startDay}   || '';
+    my $endDay     = $args_ref->{endDay}     || '';
+    my $inPST      = $args_ref->{inPST}      || 0;
 
- my @params;
- push @params,
-      SOAP::Data->name(
-	'campaignId' => $campaignId )->type('');
- push @params,
-      SOAP::Data->name(
-	'adGroupIds' => @{ $ra_id } )->type('');
- push @params,
-      SOAP::Data->name(
-	'startDay' => $startDay )->type('');
- push @params,
-      SOAP::Data->name(
-	'endDay' => $endDay )->type('');
- push @params,
-      SOAP::Data->name(
-	'inPST' => $inPST )->type('');
-    
- my $result	= $self->_create_service_and_call({
-   service	=> 'AdGroupService',
-   method	=> 'getAdGroupStats',
-   params	=> \@params,
-   });
+    my @params;
+    push @params, SOAP::Data->name( 'campaignId' => $campaignId )->type('');
+    push @params, SOAP::Data->name( 'adGroupIds' => @{$ra_id} )->type('');
+    push @params, SOAP::Data->name( 'startDay'   => $startDay )->type('');
+    push @params, SOAP::Data->name( 'endDay'     => $endDay )->type('');
+    push @params, SOAP::Data->name( 'inPST'      => $inPST )->type('');
 
- my @data;
- foreach my $c ( $result->valueof("//getAdGroupStatsResponse/getAdGroupStatsReturn") ) {
-  push @data, $self->_create_object_from_hash($c, 'Google::Adwords::StatsRecord');
- }
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'AdGroupService',
+            method  => 'getAdGroupStats',
+            params  => \@params,
+        }
+    );
 
- return	@data;
-}
+    my @data;
+    foreach my $c (
+        $result->valueof("//getAdGroupStatsResponse/getAdGroupStatsReturn") )
+    {
+        push @data,
+            $self->_create_object_from_hash( $c,
+            'Google::Adwords::StatsRecord' );
+    }
 
+    return @data;
+} # end sub getAdGroupStats
 
 ### INSTANCE METHOD ################################################
-# Usage      : 
+# Usage      :
 #   my $ret = $obj->updateAdGroup($adgroup);
 # Purpose    : Update an existing AdGroup
 # Returns    : none
-# Parameters : AdGroup object 
+# Parameters : AdGroup object
 # Throws     : no exceptions
 # Comments   : none
 # See Also   : n/a
 #######################################################################
 sub updateAdGroup
 {
-    my ($self, $adgroup) = @_;
+    my ( $self, $adgroup ) = @_;
 
-    if (not defined $adgroup) {
-     die "adgroup object must be specified.";
+    if ( not defined $adgroup ) {
+        die "adgroup object must be specified.";
     }
-    if (not defined $adgroup->id) {
-     die "adgroup id must be specified.";
+    if ( not defined $adgroup->id ) {
+        die "adgroup id must be specified.";
     }
 
     my @adgroup_params;
-    
-    # adgroup id 
-    push @adgroup_params, SOAP::Data->name(
-      'id' => $adgroup->id )->type('');
+
+    # adgroup id
+    push @adgroup_params, SOAP::Data->name( 'id' => $adgroup->id )->type('');
 
     # adgroup name
-    if (defined $adgroup->name) {
-        push @adgroup_params, SOAP::Data->name(
-            'name' => $adgroup->name )->type('');
+    if ( defined $adgroup->name ) {
+        push @adgroup_params,
+            SOAP::Data->name( 'name' => $adgroup->name )->type('');
     }
 
     # status
-    if (defined $adgroup->status) {
-        push @adgroup_params, SOAP::Data->name(
-            'status' => $adgroup->status )->type('');
+    if ( defined $adgroup->status ) {
+        push @adgroup_params,
+            SOAP::Data->name( 'status' => $adgroup->status )->type('');
     }
-    
+
     # maxCpc
-    if (defined $adgroup->maxCpc) {
-        push @adgroup_params, SOAP::Data->name(
-            'maxCpc' => $adgroup->maxCpc )->type('');
+    if ( defined $adgroup->maxCpc ) {
+        push @adgroup_params,
+            SOAP::Data->name( 'maxCpc' => $adgroup->maxCpc )->type('');
     }
-    
+
     # maxCpm
-    if (defined $adgroup->maxCpm) {
-        push @adgroup_params, SOAP::Data->name(
-            'maxCpm' => $adgroup->maxCpm )->type('');
+    if ( defined $adgroup->maxCpm ) {
+        push @adgroup_params,
+            SOAP::Data->name( 'maxCpm' => $adgroup->maxCpm )->type('');
     }
 
     my @params;
     push @params, SOAP::Data->name(
-        'changedData' 	=> \SOAP::Data->value(@adgroup_params) )->type('');
+        'changedData' => \SOAP::Data->value(@adgroup_params) )->type('');
 
     # create the SOAP service
-    my $result = $self->_create_service_and_call({
-        service => 'AdGroupService',
-        method => 'updateAdGroup',   
-        params => \@params,
-    });
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'AdGroupService',
+            method  => 'updateAdGroup',
+            params  => \@params,
+        }
+    );
 
     return 1;
-}
+} # end sub updateAdGroup
 
 ### INSTANCE METHOD ################################################
-# Usage      : 
+# Usage      :
 #   my $ret = $obj->updateAdGroupList(@adgroups);
 # Purpose    : Update a list of existing AdGroups
 # Returns    : 1 on success
@@ -419,11 +434,11 @@ sub updateAdGroup
 #######################################################################
 sub updateAdGroupList
 {
-    my ($self, @adgroups) = @_;
+    my ( $self, @adgroups ) = @_;
 
     # check that ids are specified
     for (@adgroups) {
-        if (not defined $_->id) {
+        if ( not defined $_->id ) {
             die "adgroup id must be specified.";
         }
     }
@@ -433,51 +448,50 @@ sub updateAdGroupList
     for my $adgroup (@adgroups) {
 
         my @adgroup_params;
-        
-        # adgroup id 
-        push @adgroup_params, SOAP::Data->name(
-          'id' => $adgroup->id )->type('');
-    
+
+        # adgroup id
+        push @adgroup_params,
+            SOAP::Data->name( 'id' => $adgroup->id )->type('');
+
         # adgroup name
-        if (defined $adgroup->name) {
-            push @adgroup_params, SOAP::Data->name(
-                'name' => $adgroup->name )->type('');
+        if ( defined $adgroup->name ) {
+            push @adgroup_params,
+                SOAP::Data->name( 'name' => $adgroup->name )->type('');
         }
-    
+
         # status
-        if (defined $adgroup->status) {
-            push @adgroup_params, SOAP::Data->name(
-                'status' => $adgroup->status )->type('');
+        if ( defined $adgroup->status ) {
+            push @adgroup_params,
+                SOAP::Data->name( 'status' => $adgroup->status )->type('');
         }
-        
+
         # maxCpc
-        if (defined $adgroup->maxCpc) {
-            push @adgroup_params, SOAP::Data->name(
-                'maxCpc' => $adgroup->maxCpc )->type('');
+        if ( defined $adgroup->maxCpc ) {
+            push @adgroup_params,
+                SOAP::Data->name( 'maxCpc' => $adgroup->maxCpc )->type('');
         }
-        
+
         # maxCpm
-        if (defined $adgroup->maxCpm) {
-            push @adgroup_params, SOAP::Data->name(
-                'maxCpm' => $adgroup->maxCpm )->type('');
+        if ( defined $adgroup->maxCpm ) {
+            push @adgroup_params,
+                SOAP::Data->name( 'maxCpm' => $adgroup->maxCpm )->type('');
         }
-    
+
         push @params, SOAP::Data->name(
-            'changedData' 	=> \SOAP::Data->value(@adgroup_params) )->type('');
+            'changedData' => \SOAP::Data->value(@adgroup_params) )->type('');
     }
 
-
     # create the SOAP service
-    my $result = $self->_create_service_and_call({
-        service => 'AdGroupService',
-        method => 'updateAdGroupList',   
-        params => \@params,
-    });
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'AdGroupService',
+            method  => 'updateAdGroupList',
+            params  => \@params,
+        }
+    );
 
     return 1;
-}
-
-
+} # end sub updateAdGroupList
 
 1;
 
@@ -840,7 +854,7 @@ Rohan Almeida <rohan@almeida.in>
  
 Mathieu Jondet <mathieu@eulerian.com>
  
-=head1 LICENCE AND COPYRIGHT
+=head1 LICENSE AND COPYRIGHT
  
 Copyright (c) 2006 Rohan Almeida <rohan@almeida.in>. All rights
 reserved.

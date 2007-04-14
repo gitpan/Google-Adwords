@@ -1,5 +1,6 @@
 package Google::Adwords::Service;
-use strict; use warnings;
+use strict;
+use warnings;
 
 use version; our $VERSION = qv('0.7');
 
@@ -7,29 +8,31 @@ use base qw/ Class::Accessor::Chained Google::Adwords /;
 use SOAP::Lite;
 use Readonly;
 
-Readonly my $user_agent => "Google::Adwords v1.2";
-Readonly my $endpoint => 'https://adwords.google.com/api/adwords';
-Readonly my $endpoint_sandbox => 'https://sandbox.google.com/api/adwords';
-Readonly my $soap_timeout => 35;
+Readonly my $default_api_version => 'v8';
+Readonly my $user_agent          => "Google::Adwords v1.2.1";
+Readonly my $endpoint            => 'https://adwords.google.com/api/adwords';
+Readonly my $endpoint_sandbox    => 'https://sandbox.google.com/api/adwords';
+Readonly my $default_timeout => 35;    # HTTP timeout in seconds
 
-__PACKAGE__->mk_accessors(qw/
-    email
-    password
-    developerToken
-    applicationToken
-    useragent
-    api_version
-    use_sandbox
-    clientEmail
-    clientCustomerId
-    timeout
-    debug
-    requestId
-    operations
-    units
-    responseTime
-/);
-
+__PACKAGE__->mk_accessors(
+    qw/
+        email
+        password
+        developerToken
+        applicationToken
+        useragent
+        api_version
+        use_sandbox
+        clientEmail
+        clientCustomerId
+        timeout
+        debug
+        requestId
+        operations
+        units
+        responseTime
+        /
+);
 
 ### CLASS METHOD ##################################################
 # Usage      : Google::Adwords::Service->new();
@@ -49,22 +52,21 @@ sub new
     # don't use sandbox by default
     $self->{'use_sandbox'} = 0;
 
-    # no debug by default
+    # no debugging by default
     $self->{'debug'} = 0;
 
     # set default timeout
-    $self->{'timeout'} = $soap_timeout;
+    $self->{'timeout'} = $default_timeout;
 
     # default useragent
     $self->{'useragent'} = $user_agent;
 
     # Adwords API version
-    $self->{api_version} = 'v8';
+    $self->{api_version} = $default_api_version;
 
     bless $self, $class;
     return $self;
-}
-
+} # end sub new
 
 ### INTERNAL UTILITY #################################################
 # Usage      : ????
@@ -75,33 +77,35 @@ sub new
 # Comments   : none
 # See Also   : n/a
 #######################################################################
-sub _get_soap_headers 
+sub _get_soap_headers
 {
     my ($self) = @_;
 
     my @headers = (
-        SOAP::Header->name("email")->value($self->email)->type(''),
-        SOAP::Header->name("password")->value($self->password)->type(''),
-        SOAP::Header->name("useragent")->value($self->useragent)->type(''),
-        SOAP::Header->name("developerToken")->value($self->developerToken)->type(''),
-        SOAP::Header->name("applicationToken")->value($self->applicationToken)->type(''),
+        SOAP::Header->name("email")->value( $self->email )->type(''),
+        SOAP::Header->name("password")->value( $self->password )->type(''),
+        SOAP::Header->name("useragent")->value( $self->useragent )->type(''),
+        SOAP::Header->name("developerToken")->value( $self->developerToken )
+            ->type(''),
+        SOAP::Header->name("applicationToken")
+            ->value( $self->applicationToken )->type(''),
     );
 
     # check for clientEmail header
-    if (defined $self->clientEmail) {
-        push @headers, 
-            SOAP::Header->name("clientEmail")->value($self->clientEmail)->type('');
+    if ( defined $self->clientEmail ) {
+        push @headers,
+            SOAP::Header->name("clientEmail")->value( $self->clientEmail )
+            ->type('');
     }
 
     # or the clientCustomerId header
-    if (defined $self->clientCustomerId) {
-        push @headers, 
-            SOAP::Header->name("clientCustomerId")->value($self->clientCustomerId)->type('');
+    if ( defined $self->clientCustomerId ) {
+        push @headers, SOAP::Header->name("clientCustomerId")
+            ->value( $self->clientCustomerId )->type('');
     }
 
     return @headers;
-}
-
+} # end sub _get_soap_headers
 
 ### INTERNAL UTILITY ##############################################
 # Usage      : $self->_endpoint();
@@ -116,17 +120,16 @@ sub _endpoint
 {
     my ($self) = @_;
 
-    if ($self->use_sandbox) {
+    if ( $self->use_sandbox ) {
         return $endpoint_sandbox . '/' . $self->api_version;
     }
     else {
         return $endpoint . '/' . $self->api_version;
     }
-}
-
+} # end sub _endpoint
 
 ### INTERNAL UTILITY ##################################################
-# Usage      : 
+# Usage      :
 #   $service = $obj->_create_soap_service({
 #       service => $service_name,
 #   });
@@ -137,23 +140,22 @@ sub _endpoint
 # Comments   : none
 # See Also   : n/a
 #######################################################################
-sub _create_soap_service 
+sub _create_soap_service
 {
-    my ($self, $args_ref) = @_;
+    my ( $self, $args_ref ) = @_;
 
     my $endpoint = $self->_endpoint . '/' . $args_ref->{'service'};
-    my $service = SOAP::Lite->proxy($endpoint, timeout => $self->timeout);
+    my $service = SOAP::Lite->proxy( $endpoint, timeout => $self->timeout );
 
-    if ($self->debug) {
-        SOAP::Lite->import(+trace => 'debug');
+    if ( $self->debug ) {
+        SOAP::Lite->import( +trace => 'debug' );
     }
 
-    return $service; 
-}
-
+    return $service;
+} # end sub _create_soap_service
 
 ### INTERNAL UTILITY ####################################################
-# Usage      : 
+# Usage      :
 #   $result = $self->_call({
 #       service => $service,
 #       method => $method_name,
@@ -166,16 +168,16 @@ sub _create_soap_service
 # Comments   : none
 # See Also   : n/a
 #######################################################################
-sub _call 
+sub _call
 {
-    my ($self, $args_ref) = @_;
+    my ( $self, $args_ref ) = @_;
 
     # get the headers
     my @headers = $self->_get_soap_headers();
 
     # create the method
-    my $method = SOAP::Data->name($args_ref->{'method'});
-        
+    my $method = SOAP::Data->name( $args_ref->{'method'} );
+
     # Blank out the earlier response header values
     $self->requestId('');
     $self->responseTime('');
@@ -183,39 +185,43 @@ sub _call
     $self->units('');
 
     # set uri endpoint if requested
-    if ( (defined $args_ref->{'with_uri'}) && ($args_ref->{'with_uri'}) ) {
-        $method->uri($endpoint . '/' . $self->api_version)->prefix('');
+    if ( ( defined $args_ref->{'with_uri'} ) && ( $args_ref->{'with_uri'} ) )
+    {
+        $method->uri( $endpoint . '/' . $self->api_version )->prefix('');
     }
 
     # call the SOAP service
     my $result;
     eval {
         $result = $args_ref->{'service'}->call(
-            $method => @headers, @{$args_ref->{'params'}},
+            $method => @headers,
+            @{ $args_ref->{'params'} },
         );
     };
     if ($@) {
+
         # TODO: return an error object
         die "Error: $@\n";
     }
-    
+
     # check for SOAP faults
-    if ($result->fault) {
-        die "Fault Code: " . $result->faultcode . "\n" 
-            . "Fault Description: " . $result->faultstring . "\n";
+    if ( $result->fault ) {
+        die "Fault Code: "
+            . $result->faultcode . "\n"
+            . "Fault Description: "
+            . $result->faultstring . "\n";
     }
 
     # get the SOAP response headers
     for (qw/requestId responseTime operations units/) {
-        $self->$_($result->headerof("//$_")->value);
+        $self->$_( $result->headerof("//$_")->value );
     }
 
-    return $result; 
-}
-
+    return $result;
+} # end sub _call
 
 ### INTERNAL UTILITY ###################################################
-# Usage      : 
+# Usage      :
 #   $result = $self->_create_service_and_call({
 #       service => $service_name,
 #       method => $method_name,
@@ -228,26 +234,26 @@ sub _call
 # Comments   : none
 # See Also   : n/a
 #######################################################################
-sub _create_service_and_call 
+sub _create_service_and_call
 {
-    my ($self, $args_ref) = @_;
+    my ( $self, $args_ref ) = @_;
 
     # create the SOAP service
-    my $service = $self->_create_soap_service({
-        service => $args_ref->{'service'},
-    });
-        
+    my $service = $self->_create_soap_service(
+        { service => $args_ref->{'service'}, } );
+
     # call the service
-    my $result = $self->_call({
-        service => $service,
-        method => $args_ref->{'method'},   
-        params => $args_ref->{'params'},
-        with_uri => $args_ref->{'with_uri'},
-    });
+    my $result = $self->_call(
+        {
+            service  => $service,
+            method   => $args_ref->{'method'},
+            params   => $args_ref->{'params'},
+            with_uri => $args_ref->{'with_uri'},
+        }
+    );
 
     return $result;
-}
-
+} # end sub _create_service_and_call
 
 ### INTERNAL UTILITY ####################################################
 # Usage      : $obj = $self->_create_object_from_hash($hashref, $class_name);
@@ -258,13 +264,13 @@ sub _create_service_and_call
 # Comments   : none
 # See Also   : n/a
 #######################################################################
-sub _create_object_from_hash 
+sub _create_object_from_hash
 {
-    my ($self, $hashref, $class_name) = @_;
+    my ( $self, $hashref, $class_name ) = @_;
 
     my $obj = $class_name->new($hashref);
     return $obj;
-}
+} # end sub _create_object_from_hash
 
 1;
 
@@ -420,7 +426,7 @@ response
 Rohan Almeida <rohan@almeida.in>
  
  
-=head1 LICENCE AND COPYRIGHT
+=head1 LICENSE AND COPYRIGHT
  
 Copyright (c) 2006 Rohan Almeida <rohan@almeida.in>. All rights
 reserved.

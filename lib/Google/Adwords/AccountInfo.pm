@@ -1,5 +1,6 @@
 package Google::Adwords::AccountInfo;
-use strict; use warnings;
+use strict;
+use warnings;
 
 use version; our $VERSION = qv('0.0.1');
 
@@ -18,7 +19,7 @@ my @fields = qw/
     termsAndConditions
     timeZoneEffectiveDate
     timeZoneId
-/;
+    /;
 
 __PACKAGE__->mk_accessors(@fields);
 
@@ -103,7 +104,7 @@ B<Accessors (read only)>
 Rohan Almeida <rohan@almeida.in>
 
  
-=head1 LICENCE AND COPYRIGHT
+=head1 LICENSE AND COPYRIGHT
  
 Copyright (c) 2006 Rohan Almeida <rohan@almeida.in>. All rights
 reserved.

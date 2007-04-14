@@ -15,7 +15,7 @@ use TrafficEstimatorService;
 use CriterionService;
 use KeywordToolService;
 
-# which tests to actually run
+# which test modules should we run
 my @modules = (
     { InfoService               => 1, },
     { CampaignService           => 1, },
@@ -29,7 +29,7 @@ my @modules = (
 );
 
 # check if user wants to run sandbox tests
-my $answer = prompt "Do you want to run sandbox tests? (y/n): ";
+my $answer = prompt "Do you want to run the sandbox tests? (y/n): ";
 
 if ($answer ne 'y') {
     ok (1 == 1);

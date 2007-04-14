@@ -1,5 +1,6 @@
 package Google::Adwords::AdGroup;
-use strict; use warnings;
+use strict;
+use warnings;
 
 use version; our $VERSION = qv('0.2');
 
@@ -14,7 +15,7 @@ my @fields = qw/
     name
     proxyMaxCpc
     status
-/;
+    /;
 
 __PACKAGE__->mk_accessors(@fields);
 
@@ -110,7 +111,7 @@ Rohan Almeida <rohan@almeida.in>
 
 Mathieu Jondet <mathieu@eulerian.com>
  
-=head1 LICENCE AND COPYRIGHT
+=head1 LICENSE AND COPYRIGHT
  
 Copyright (c) 2006 Rohan Almeida <rohan@almeida.in>. All rights
 reserved.

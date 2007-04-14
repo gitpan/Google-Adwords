@@ -530,13 +530,6 @@ sub updateAds: Test(no_plan)
         my $ret = $self->{obj}->updateAds($ad1);
         ok ($ret == 1, 'updateAds');
 
-        # reset
-        #$creative1->adGroupId($adgroup_id);
-        #$creative1->id($self->{_creative_id});
-        #$creative1->status('Enabled');
-        #$ret = $self->{obj}->updateCreatives($creative1);
-        #ok ($ret == 1, 'updateCreatives');
-
     }
     else {
         my $soap = Test::MockModule->new('SOAP::Lite');

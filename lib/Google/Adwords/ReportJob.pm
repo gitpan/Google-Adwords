@@ -1,4 +1,6 @@
 package Google::Adwords::ReportJob;
+use strict;
+use warnings;
 
 use base 'Google::Adwords::Data';
 
@@ -21,7 +23,7 @@ my @fields = qw/
     name
     startDay
     status
-/;
+    /;
 
 __PACKAGE__->mk_accessors(@fields);
 
@@ -89,7 +91,7 @@ B<Mutators (read/write)>
 Rohan Almeida <rohan@almeida.in>
  
  
-=head1 LICENCE AND COPYRIGHT
+=head1 LICENSE AND COPYRIGHT
  
 Copyright (c) 2006 Rohan Almeida <rohan@almeida.in>. All rights
 reserved.

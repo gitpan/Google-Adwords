@@ -1,5 +1,6 @@
 package Google::Adwords::AccountService;
-use strict; use warnings;
+use strict;
+use warnings;
 
 use version; our $VERSION = qv('0.3');
 
@@ -13,7 +14,7 @@ use Google::Adwords::CoverageType;
 use Google::Adwords::CreditCard;
 
 ### INSTANCE METHOD ################################################
-# Usage      : 
+# Usage      :
 #   my $accountinfo = $obj->getAccountInfo();
 # Purpose    : Return the AdWords account specified by the client account header
 # Returns    : A Google::Adwords::AccountInfo object.
@@ -26,61 +27,69 @@ sub getAccountInfo
 {
     my ($self) = @_;
 
-    my $result	= $self->_create_service_and_call({
-     service	=> 'AccountService',
-     method	=> 'getAccountInfo',
-    });
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'AccountService',
+            method  => 'getAccountInfo',
+        }
+    );
 
     # get response data in a hash
-    my $data = $result->valueof("//getAccountInfoResponse/getAccountInfoReturn");
+    my $data
+        = $result->valueof("//getAccountInfoResponse/getAccountInfoReturn");
 
-    my $account_info = 
-     $self->_create_object_from_hash($data, 'Google::Adwords::AccountInfo');
+    my $account_info = $self->_create_object_from_hash( $data,
+        'Google::Adwords::AccountInfo' );
 
-    # primaryAddress 
-    if (defined $account_info->primaryAddress) {
-        $account_info->primaryAddress( 
-            $self->_create_object_from_hash($data->{primaryAddress},
-                'Google::Adwords::Address')
+    # primaryAddress
+    if ( defined $account_info->primaryAddress ) {
+        $account_info->primaryAddress(
+            $self->_create_object_from_hash(
+                $data->{primaryAddress},
+                'Google::Adwords::Address'
+            )
         );
     }
 
     # billingAddress
-    if (defined $account_info->billingAddress) {
+    if ( defined $account_info->billingAddress ) {
         $account_info->billingAddress(
-            $self->_create_object_from_hash($data->{billingAddress},
-                'Google::Adwords::Address')
+            $self->_create_object_from_hash(
+                $data->{billingAddress},
+                'Google::Adwords::Address'
+            )
         );
     }
-
 
     # defaultAdsCoverage
-    if (defined $account_info->defaultAdsCoverage) {
+    if ( defined $account_info->defaultAdsCoverage ) {
         $account_info->defaultAdsCoverage(
-            $self->_create_object_from_hash($data->{defaultAdsCoverage},
-                'Google::Adwords::CoverageType')
+            $self->_create_object_from_hash(
+                $data->{defaultAdsCoverage},
+                'Google::Adwords::CoverageType'
+            )
         );
     }
 
-    
     # emailPromotionsPreferences
-    if (defined $account_info->emailPromotionsPreferences) {
+    if ( defined $account_info->emailPromotionsPreferences ) {
         $account_info->emailPromotionsPreferences(
-            $self->_create_object_from_hash($data->{emailPromotionsPreferences},
-                'Google::Adwords::EmailPromotionsPreferences')
+            $self->_create_object_from_hash(
+                $data->{emailPromotionsPreferences},
+                'Google::Adwords::EmailPromotionsPreferences'
+            )
         );
     }
-
 
     return $account_info;
-}
+} # end sub getAccountInfo
 
 ### INSTANCE METHOD ################################################
-# Usage      : 
+# Usage      :
 #   my @emails = $obj->getClientAccounts();
-# Purpose    : 
-#   Gets the primary email address for each account managed 
-#   by the effective user. If the effective user user has no 
+# Purpose    :
+#   Gets the primary email address for each account managed
+#   by the effective user. If the effective user user has no
 #   client accounts, an empty array is returned.
 # Returns    : A list of account login emails.
 # Parameters : none
@@ -90,23 +99,24 @@ sub getAccountInfo
 #######################################################################
 sub getClientAccounts
 {
-    my $self	= shift;
-    
-    my $result	= $self->_create_service_and_call({
-     service	=> 'AccountService',
-     method	=> 'getClientAccounts',
-    });
+    my $self = shift;
+
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'AccountService',
+            method  => 'getClientAccounts',
+        }
+    );
 
     # get response data in a array
-    my @data = $result->valueof("//getClientAccountsResponse/getClientAccountsReturn");
+    my @data = $result->valueof(
+        "//getClientAccountsResponse/getClientAccountsReturn");
 
-    return	@data;
-}
-
-
+    return @data;
+} # end sub getClientAccounts
 
 ### INSTANCE METHOD ################################################
-# Usage      : 
+# Usage      :
 #   my $ret = $obj->updateAccountInfo($account);
 # Purpose    : Updates the database to reflect the changes in the account object
 # Returns    : Always return 1.
@@ -117,10 +127,10 @@ sub getClientAccounts
 #######################################################################
 sub updateAccountInfo
 {
-    my ($self, $account) = @_;
+    my ( $self, $account ) = @_;
 
     if ( not defined $account ) {
-     die "Must provide a account info object.";
+        die "Must provide a account info object.";
     }
 
     my @params;
@@ -128,104 +138,129 @@ sub updateAccountInfo
 
     # billingAddress
     if ( defined $account->billingAddress ) {
-     my @billing_address;
-     my $billing_address = $account->billingAddress;
-     for ( qw/ addressLine1 addressLine2 city companyName countryCode
-       emailAddress faxNumber name phoneNumber postalCode state / ) {
-        if (defined $billing_address->$_) {
-            push @billing_address, SOAP::Data->name(
-                $_ => $billing_address->$_ )->type('');
+        my @billing_address;
+        my $billing_address = $account->billingAddress;
+        for (
+            qw/ addressLine1 addressLine2 city companyName countryCode
+            emailAddress faxNumber name phoneNumber postalCode state /
+            )
+        {
+            if ( defined $billing_address->$_ ) {
+                push @billing_address,
+                    SOAP::Data->name( $_ => $billing_address->$_ )->type('');
+            }
         }
-     }
-     push @account_params, SOAP::Data->name(
-      'billingAddress' => \SOAP::Data->value(@billing_address) )->type('');
+        push @account_params,
+            SOAP::Data->name(
+            'billingAddress' => \SOAP::Data->value(@billing_address) )
+            ->type('');
     }
 
     # currencyCode
     if ( defined $account->currencyCode ) {
-     push @account_params, SOAP::Data->name(
-      'currencyCode' => $account->currencyCode )->type('');
+        push @account_params,
+            SOAP::Data->name( 'currencyCode' => $account->currencyCode )
+            ->type('');
     }
-    
+
     # customerId
     if ( defined $account->customerId ) {
-     push @account_params, SOAP::Data->name(
-      'customerId' => $account->customerId )->type('');
+        push @account_params,
+            SOAP::Data->name( 'customerId' => $account->customerId )
+            ->type('');
     }
 
     # defaultAdsCoverage
     if ( defined $account->defaultAdsCoverage ) {
-     my @coveragetype_params;
-     my $coveragetype = $account->defaultAdsCoverage;
-     for ( qw/ optInContentNetwork optInSearchNetwork / ) {
-        if (defined $coveragetype->$_) {
-            push @coveragetype_params, SOAP::Data->name(
-                $_ => ( $coveragetype->$_ ) ? 'true' : 'false' )->type('');
+        my @coveragetype_params;
+        my $coveragetype = $account->defaultAdsCoverage;
+        for (qw/ optInContentNetwork optInSearchNetwork /) {
+            if ( defined $coveragetype->$_ ) {
+                push @coveragetype_params,
+                    SOAP::Data->name(
+                    $_ => ( $coveragetype->$_ ) ? 'true' : 'false' )
+                    ->type('');
+            }
         }
-     }
-     push @account_params, SOAP::Data->name(
-      'defaultAdsCoverage' => \SOAP::Data->value(@coveragetype_params) )->type('');
+        push @account_params,
+            SOAP::Data->name(
+            'defaultAdsCoverage' => \SOAP::Data->value(@coveragetype_params) )
+            ->type('');
     }
 
     # descriptiveName
     if ( defined $account->descriptiveName ) {
-     push @account_params, SOAP::Data->name(
-      'descriptiveName' => $account->descriptiveName )->type('');
+        push @account_params,
+            SOAP::Data->name( 'descriptiveName' => $account->descriptiveName )
+            ->type('');
     }
 
     # emailPromotionsPreferences
     if ( defined $account->emailPromotionsPreferences ) {
-     my @emailpromprefs_params;
-     my $emailpromprefs = $account->emailPromotionsPreferences;
-     for ( qw/ marketResearchEnabled newsletterEnabled promotionsEnabled / ) {
-        if (defined $emailpromprefs->$_) {
-            push @emailpromprefs_params, SOAP::Data->name(
-                $_ => ( $emailpromprefs->$_ ) ? 'true' : 'false' )->type('');
+        my @emailpromprefs_params;
+        my $emailpromprefs = $account->emailPromotionsPreferences;
+        for (qw/ marketResearchEnabled newsletterEnabled promotionsEnabled /)
+        {
+            if ( defined $emailpromprefs->$_ ) {
+                push @emailpromprefs_params,
+                    SOAP::Data->name(
+                    $_ => ( $emailpromprefs->$_ ) ? 'true' : 'false' )
+                    ->type('');
+            }
         }
-     }
-     push @account_params, SOAP::Data->name(
-      'emailPromotionsPreferences' => \SOAP::Data->value(@emailpromprefs_params) )->type('');
+        push @account_params,
+            SOAP::Data->name( 'emailPromotionsPreferences' =>
+                \SOAP::Data->value(@emailpromprefs_params) )->type('');
     }
 
     # languagePreference
     if ( defined $account->languagePreference ) {
-     push @account_params, SOAP::Data->name(
-      'languagePreference' => $account->languagePreference )->type('');
+        push @account_params, SOAP::Data->name(
+            'languagePreference' => $account->languagePreference )->type('');
     }
 
     # primaryAddress
     if ( defined $account->primaryAddress ) {
-     my @primary_address;
-     my $primary_address = $account->primaryAddress;
-     for ( qw/ addressLine1 addressLine2 city companyName countryCode
-       emailAddress faxNumber name phoneNumber postalCode state / ) {
-        if (defined $primary_address->$_) {
-            push @primary_address, SOAP::Data->name(
-                $_ => $primary_address->$_ )->type('');
+        my @primary_address;
+        my $primary_address = $account->primaryAddress;
+        for (
+            qw/ addressLine1 addressLine2 city companyName countryCode
+            emailAddress faxNumber name phoneNumber postalCode state /
+            )
+        {
+            if ( defined $primary_address->$_ ) {
+                push @primary_address,
+                    SOAP::Data->name( $_ => $primary_address->$_ )->type('');
+            }
         }
-     }
-     push @account_params, SOAP::Data->name(
-      'primaryAddress' => \SOAP::Data->value(@primary_address) )->type('');
+        push @account_params,
+            SOAP::Data->name(
+            'primaryAddress' => \SOAP::Data->value(@primary_address) )
+            ->type('');
     }
 
     # primaryBusinessCategory
     if ( defined $account->primaryBusinessCategory ) {
-     push @account_params, SOAP::Data->name(
-      'primaryBusinessCategory' => $account->primaryBusinessCategory)->type('');
+        push @account_params,
+            SOAP::Data->name(
+            'primaryBusinessCategory' => $account->primaryBusinessCategory )
+            ->type('');
     }
 
-    push @params, SOAP::Data->name(
-     'account' => \SOAP::Data->value( @account_params ) )->type('');
+    push @params,
+        SOAP::Data->name( 'account' => \SOAP::Data->value(@account_params) )
+        ->type('');
 
-    my $result	= $self->_create_service_and_call({
-     service	=> 'AccountService',
-     method	=> 'updateAccountInfo',
-     params	=> \@params,
-    });
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'AccountService',
+            method  => 'updateAccountInfo',
+            params  => \@params,
+        }
+    );
 
-    return	1;
-}
-
+    return 1;
+} # end sub updateAccountInfo
 
 1;
 
@@ -408,7 +443,7 @@ Rohan Almeida <rohan@almeida.in>
  
 Mathieu Jondet <mathieu@eulerian.com>
  
-=head1 LICENCE AND COPYRIGHT
+=head1 LICENSE AND COPYRIGHT
  
 Copyright (c) 2006 Rohan Almeida <rohan@almeida.in>. All rights
 reserved.

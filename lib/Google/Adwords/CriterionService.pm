@@ -1,5 +1,6 @@
 package Google::Adwords::CriterionService;
-use strict; use warnings;
+use strict;
+use warnings;
 
 use version; our $VERSION = qv('0.3');
 
@@ -7,7 +8,6 @@ use base 'Google::Adwords::Service';
 
 use Google::Adwords::Criterion;
 use Google::Adwords::StatsRecord;
-
 
 ### INSTANCE METHOD ##################################################
 # Usage      : @criterions = $obj->addCriteria(@list_of_criterions);
@@ -20,31 +20,35 @@ use Google::Adwords::StatsRecord;
 #######################################################################
 sub addCriteria
 {
-    my ($self, @criteria) = @_;
+    my ( $self, @criteria ) = @_;
 
-    my @params=();
+    my @params = ();
 
-    for my $criterion (@criteria){
+    for my $criterion (@criteria) {
 
-     if ( !UNIVERSAL::isa($criterion, 'Google::Adwords::Criterion') ) {
-      #next;
-      die "Object is a not a Google::Adwords::Criterion object.";
-     }
-     if (not defined $criterion->adGroupId) {
-        die "adGroupId must be set for the criterion\n";
-     }
-     if (not defined $criterion->criterionType) {
-        die "criterionType must be set for the criterion\n";
-     }
-     my @criterion_params;
-     
-     push @criterion_params, SOAP::Data->name(
-       'adGroupId' => $criterion->adGroupId )->type('');
+        if ( !UNIVERSAL::isa( $criterion, 'Google::Adwords::Criterion' ) ) {
 
-      push @criterion_params, SOAP::Data->name(
-       'criterionType' => $criterion->criterionType )->type('');
+            #next;
+            die "Object is a not a Google::Adwords::Criterion object.";
+        }
+        if ( not defined $criterion->adGroupId ) {
+            die "adGroupId must be set for the criterion\n";
+        }
+        if ( not defined $criterion->criterionType ) {
+            die "criterionType must be set for the criterion\n";
+        }
+        my @criterion_params;
 
-        for (qw/
+        push @criterion_params,
+            SOAP::Data->name( 'adGroupId' => $criterion->adGroupId )
+            ->type('');
+
+        push @criterion_params,
+            SOAP::Data->name( 'criterionType' => $criterion->criterionType )
+            ->type('');
+
+        for (
+            qw/
             destinationUrl
             exemptionRequest
             language
@@ -57,44 +61,50 @@ sub addCriteria
             type
             maxCpm
             url
-        /)
+            /
+            )
         {
+
             if ( defined $criterion->$_ ) {
-                push @criterion_params, SOAP::Data->name(
-                  $_ => $criterion->$_ )->type('');
+                push @criterion_params,
+                    SOAP::Data->name( $_ => $criterion->$_ )->type('');
             }
         }
 
-        push @params,
-        SOAP::Data->name(
+        push @params, SOAP::Data->name(
             'criterion' => \SOAP::Data->value(@criterion_params) )->type('');
 
     }
 
-    my $result	= $self->_create_service_and_call({
-     service	=> 'CriterionService',
-     method	=> 'addCriteria',
-     params	=> \@params,
-    });
-    
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'CriterionService',
+            method  => 'addCriteria',
+            params  => \@params,
+        }
+    );
+
     my @data;
-    foreach my $c ( $result->valueof("//addCriteriaResponse/addCriteriaReturn") ) {
-     push @data, $self->_create_object_from_hash($c, 'Google::Adwords::Criterion');
+    foreach
+        my $c ( $result->valueof("//addCriteriaResponse/addCriteriaReturn") )
+    {
+        push @data,
+            $self->_create_object_from_hash( $c,
+            'Google::Adwords::Criterion' );
     }
 
-    return	@data;
-}
-
+    return @data;
+} # end sub addCriteria
 
 ### INSTANCE METHOD ##################################################
-# Usage      : 
+# Usage      :
 #   $ret = $obj->setCampaignNegativeCriteria(
 #       $campaign_id,
 #       \@criterions,
 #   );
 # Purpose    : set new negative criteria
 # Returns    : $ret => 1 on success
-# Parameters : 
+# Parameters :
 #   1) $campaign_id => Campaign ID
 #   2) \@criterions => arrayref of Criterion objects
 # Throws     : no exceptions
@@ -103,31 +113,35 @@ sub addCriteria
 #######################################################################
 sub setCampaignNegativeCriteria
 {
-    my ($self, $campaign_id, $criterions_ref) = @_;
+    my ( $self, $campaign_id, $criterions_ref ) = @_;
 
     my @criterion_params;
 
-    for my $criterion (@{$criterions_ref}){
+    for my $criterion ( @{$criterions_ref} ) {
 
-     if ( !UNIVERSAL::isa($criterion, 'Google::Adwords::Criterion') ) {
-      #next;
-      die "Object is a not a Google::Adwords::Criterion object.";
-     }
-     if (not defined $criterion->adGroupId) {
-        die "adGroupId must be set for the criterion\n";
-     }
-     if (not defined $criterion->criterionType) {
-        die "criterionType must be set for the criterion\n";
-     }
-     my @criterion_params_inner;
-     
-     push @criterion_params_inner, SOAP::Data->name(
-       'adGroupId' => $criterion->adGroupId )->type('');
+        if ( !UNIVERSAL::isa( $criterion, 'Google::Adwords::Criterion' ) ) {
 
-      push @criterion_params_inner, SOAP::Data->name(
-       'criterionType' => $criterion->criterionType )->type('');
+            #next;
+            die "Object is a not a Google::Adwords::Criterion object.";
+        }
+        if ( not defined $criterion->adGroupId ) {
+            die "adGroupId must be set for the criterion\n";
+        }
+        if ( not defined $criterion->criterionType ) {
+            die "criterionType must be set for the criterion\n";
+        }
+        my @criterion_params_inner;
 
-        for (qw/
+        push @criterion_params_inner,
+            SOAP::Data->name( 'adGroupId' => $criterion->adGroupId )
+            ->type('');
+
+        push @criterion_params_inner,
+            SOAP::Data->name( 'criterionType' => $criterion->criterionType )
+            ->type('');
+
+        for (
+            qw/
             destinationUrl
             exemptionRequest
             language
@@ -140,39 +154,38 @@ sub setCampaignNegativeCriteria
             type
             maxCpm
             url
-        /)
+            /
+            )
         {
+
             if ( defined $criterion->$_ ) {
-                push @criterion_params_inner, SOAP::Data->name(
-                  $_ => $criterion->$_ )->type('');
+                push @criterion_params_inner,
+                    SOAP::Data->name( $_ => $criterion->$_ )->type('');
             }
         }
 
         push @criterion_params,
             SOAP::Data->name(
-                'criterion' => \SOAP::Data->value(@criterion_params_inner) )->type('');
+            'criterion' => \SOAP::Data->value(@criterion_params_inner) )
+            ->type('');
 
     }
 
     my @params;
+    push @params, SOAP::Data->name( 'campaignId' => $campaign_id )->type('');
     push @params,
-     SOAP::Data->name(
-      'campaignId' => $campaign_id )->type('');
-    push @params,
-     SOAP::Data->name(
-      'criteria' => @criterion_params )->type('');
+        SOAP::Data->name( 'criteria' => @criterion_params )->type('');
 
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'CriterionService',
+            method  => 'setCampaignNegativeCriteria',
+            params  => \@params,
+        }
+    );
 
-    my $result	= $self->_create_service_and_call({
-     service	=> 'CriterionService',
-     method	=> 'setCampaignNegativeCriteria',
-     params	=> \@params,
-    });
-    
     return 1;
-}
-
-
+} # end sub setCampaignNegativeCriteria
 
 ### INSTANCE METHOD #################################################
 # Usage      : $ret = $obj->updateCriteria(@criteria);
@@ -185,34 +198,38 @@ sub setCampaignNegativeCriteria
 #######################################################################
 sub updateCriteria
 {
-    my ($self, @criteria) = @_;
+    my ( $self, @criteria ) = @_;
 
     my @params;
 
-    for my $criterion (@criteria){
-     if ( !UNIVERSAL::isa($criterion, 'Google::Adwords::Criterion') ) {
-      #next;
-      die "Object is a not a Google::Adwords::Criterion object.";
-     }
-     if (not defined $criterion->id) {
-        die "id must be set for the criterion\n";
-     }
-     if (not defined $criterion->adGroupId) {
-        die "adGroupId must be set for the criterion\n";
-     }
-     if (not defined $criterion->criterionType) {
-        die "criterionType must be set for the criterion\n";
-     }
-     my @criterion_params_inner;
-     
-     push @criterion_params_inner, SOAP::Data->name(
-       'id' => $criterion->id )->type('');
-     push @criterion_params_inner, SOAP::Data->name(
-       'adGroupId' => $criterion->adGroupId )->type('');
-      push @criterion_params_inner, SOAP::Data->name(
-       'criterionType' => $criterion->criterionType )->type('');
+    for my $criterion (@criteria) {
+        if ( !UNIVERSAL::isa( $criterion, 'Google::Adwords::Criterion' ) ) {
 
-        for (qw/
+            #next;
+            die "Object is a not a Google::Adwords::Criterion object.";
+        }
+        if ( not defined $criterion->id ) {
+            die "id must be set for the criterion\n";
+        }
+        if ( not defined $criterion->adGroupId ) {
+            die "adGroupId must be set for the criterion\n";
+        }
+        if ( not defined $criterion->criterionType ) {
+            die "criterionType must be set for the criterion\n";
+        }
+        my @criterion_params_inner;
+
+        push @criterion_params_inner,
+            SOAP::Data->name( 'id' => $criterion->id )->type('');
+        push @criterion_params_inner,
+            SOAP::Data->name( 'adGroupId' => $criterion->adGroupId )
+            ->type('');
+        push @criterion_params_inner,
+            SOAP::Data->name( 'criterionType' => $criterion->criterionType )
+            ->type('');
+
+        for (
+            qw/
             destinationUrl
             exemptionRequest
             language
@@ -225,37 +242,39 @@ sub updateCriteria
             type
             maxCpm
             url
-        /)
+            /
+            )
         {
+
             if ( defined $criterion->$_ ) {
-                push @criterion_params_inner, SOAP::Data->name(
-                  $_ => $criterion->$_ )->type('');
+                push @criterion_params_inner,
+                    SOAP::Data->name( $_ => $criterion->$_ )->type('');
             }
         }
 
         push @params,
-        SOAP::Data->name(
-            'criterion' => \SOAP::Data->value(@criterion_params_inner) )->type('');
+            SOAP::Data->name(
+            'criterion' => \SOAP::Data->value(@criterion_params_inner) )
+            ->type('');
     }
 
-    my $result  = $self->_create_service_and_call({
-     service    => 'CriterionService',
-     method     => 'updateCriteria',
-     params     => \@params,
-    });
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'CriterionService',
+            method  => 'updateCriteria',
+            params  => \@params,
+        }
+    );
 
     return 1;
-}
-
-
-
+} # end sub updateCriteria
 
 ### INSTANCE METHOD ################################################
-# Usage      : 
+# Usage      :
 #   $ret = $obj->removeCriteria($adgroup_id, \@criterion_ids);
 # Purpose    : Remove a list of criteria
 # Returns    : $ret => 1 on success
-# Parameters : 
+# Parameters :
 #   1) $adgroup_id => AdGroup ID
 #   2) \@criterion_ids => arrayref of criterion ids
 # Throws     : no exceptions
@@ -264,27 +283,26 @@ sub updateCriteria
 #######################################################################
 sub removeCriteria
 {
-    my ($self, $adgroup_id, $criterion_ids_ref) = @_;
+    my ( $self, $adgroup_id, $criterion_ids_ref ) = @_;
 
     my @params;
+    push @params, SOAP::Data->name( 'adGroupId' => $adgroup_id )->type('');
     push @params,
-     SOAP::Data->name(
-      'adGroupId' => $adgroup_id )->type('');
-    push @params,
-     SOAP::Data->name(
-      'criterionIds' => @{$criterion_ids_ref} )->type('');
+        SOAP::Data->name( 'criterionIds' => @{$criterion_ids_ref} )->type('');
 
-    my $result	= $self->_create_service_and_call({
-     service	=> 'CriterionService',
-     method	=> 'removeCriteria',
-     params	=> \@params,
-    });
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'CriterionService',
+            method  => 'removeCriteria',
+            params  => \@params,
+        }
+    );
 
-    return	1;
-}
+    return 1;
+} # end sub removeCriteria
 
 ### INSTANCE METHOD ####################################################
-# Usage      : 
+# Usage      :
 #   my @criterions = $obj->getCampaignNegativeCriteria($campaign_id);
 # Purpose    : Get list of negative criteria
 # Returns    : @criterions => List of Criterion objects
@@ -295,29 +313,33 @@ sub removeCriteria
 #######################################################################
 sub getCampaignNegativeCriteria
 {
-    my ($self, $campaign_id) = @_;
+    my ( $self, $campaign_id ) = @_;
 
     my @params;
-    push @params,
-     SOAP::Data->name(
-      'campaignId' => $campaign_id )->type('');
+    push @params, SOAP::Data->name( 'campaignId' => $campaign_id )->type('');
 
-    my $result	= $self->_create_service_and_call({
-     service	=> 'CriterionService',
-     method	=> 'getCampaignNegativeCriteria',
-     params	=> \@params,
-    });
-    
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'CriterionService',
+            method  => 'getCampaignNegativeCriteria',
+            params  => \@params,
+        }
+    );
+
     my @data;
     foreach my $c (
-    $result->valueof("//getCampaignNegativeCriteriaResponse/getCampaignNegativeCriteriaReturn") ) {
-        push @data, $self->_create_object_from_hash($c, 'Google::Adwords::Criterion');
+        $result->valueof(
+"//getCampaignNegativeCriteriaResponse/getCampaignNegativeCriteriaReturn"
+        )
+        )
+    {
+        push @data,
+            $self->_create_object_from_hash( $c,
+            'Google::Adwords::Criterion' );
     }
 
-    return	@data;
-}
-
-
+    return @data;
+} # end sub getCampaignNegativeCriteria
 
 ### INSTANCE METHOD ####################################################
 # Usage      : my @criterions = $obj->getAllCriteria($adgroup_id);
@@ -330,35 +352,37 @@ sub getCampaignNegativeCriteria
 #######################################################################
 sub getAllCriteria
 {
-    my ($self, $adgroupid) = @_;
+    my ( $self, $adgroupid ) = @_;
 
     my @params;
-    push @params,
-     SOAP::Data->name(
-      'adGroupId' => $adgroupid )->type('');
+    push @params, SOAP::Data->name( 'adGroupId' => $adgroupid )->type('');
 
-    my $result	= $self->_create_service_and_call({
-     service	=> 'CriterionService',
-     method	=> 'getAllCriteria',
-     params	=> \@params,
-    });
-    
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'CriterionService',
+            method  => 'getAllCriteria',
+            params  => \@params,
+        }
+    );
+
     my @data;
-    foreach my $c ( $result->valueof("//getAllCriteriaResponse/getAllCriteriaReturn") ) {
-     push @data, $self->_create_object_from_hash($c, 'Google::Adwords::Criterion');
+    foreach my $c (
+        $result->valueof("//getAllCriteriaResponse/getAllCriteriaReturn") )
+    {
+        push @data,
+            $self->_create_object_from_hash( $c,
+            'Google::Adwords::Criterion' );
     }
 
-    return	@data;
-}
-
-
+    return @data;
+} # end sub getAllCriteria
 
 ### INSTANCE METHOD ####################################################
-# Usage      : 
+# Usage      :
 #   my @criterions = $obj->getCriteria($adgroup_id, \@criterion_ids);
 # Purpose    : Get list of criteria
 # Returns    : @criterions => List of Criterion objects
-# Parameters : 
+# Parameters :
 #   1) $adgroup_id => AdGroup ID
 #   2) \@criterion_ids => arrayref of Criterion ids
 # Throws     : no exceptions
@@ -367,32 +391,35 @@ sub getAllCriteria
 #######################################################################
 sub getCriteria
 {
-    my ($self, $adgroup_id, $criterion_ids_ref) = @_;
+    my ( $self, $adgroup_id, $criterion_ids_ref ) = @_;
 
     my @params;
+    push @params, SOAP::Data->name( 'adGroupId' => $adgroup_id )->type('');
     push @params,
-     SOAP::Data->name(
-      'adGroupId' => $adgroup_id )->type('');
-    push @params,
-     SOAP::Data->name(
-      'criterionIds' => @{$criterion_ids_ref} )->type('');
+        SOAP::Data->name( 'criterionIds' => @{$criterion_ids_ref} )->type('');
 
-    my $result	= $self->_create_service_and_call({
-     service	=> 'CriterionService',
-     method	=> 'getCriteria',
-     params	=> \@params,
-    });
-    
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'CriterionService',
+            method  => 'getCriteria',
+            params  => \@params,
+        }
+    );
+
     my @data;
-    foreach my $c ( $result->valueof("//getCriteriaResponse/getCriteriaReturn") ) {
-     push @data, $self->_create_object_from_hash($c, 'Google::Adwords::Criterion');
+    foreach
+        my $c ( $result->valueof("//getCriteriaResponse/getCriteriaReturn") )
+    {
+        push @data,
+            $self->_create_object_from_hash( $c,
+            'Google::Adwords::Criterion' );
     }
 
-    return	@data;
-}
+    return @data;
+} # end sub getCriteria
 
 ### INSTANCE METHOD ################################################
-# Usage      : 
+# Usage      :
 #   my @criterion_stats = $obj->getCriterionStats({
 #       adGroupId	=> 1234
 #	    criterionIds => [ 3982, 2787, 17872 ],
@@ -402,7 +429,7 @@ sub getCriteria
 #   });
 # Purpose    : Get stats on a set of criteria
 # Returns    :  A list of StatsRecord object for each criterion
-# Parameters : 
+# Parameters :
 #   adGroupId : The ad group that contains the criteria to be queried
 #	creativeIds  : array reference of criteria ids
 #	startDay : starting day of the stats YYYY-MM-DD
@@ -414,46 +441,41 @@ sub getCriteria
 #######################################################################
 sub getCriterionStats
 {
- my ($self, $args_ref) = @_;
- my $adgroupid	= $args_ref->{adGroupId} || 0;
- my $ra_id	= $args_ref->{criterionIds} || [];
- my $startDay	= $args_ref->{startDay} || '';
- my $endDay	= $args_ref->{endDay}	|| '';
- my $inPST	= $args_ref->{inPST}	|| 0;
+    my ( $self, $args_ref ) = @_;
+    my $adgroupid = $args_ref->{adGroupId}    || 0;
+    my $ra_id     = $args_ref->{criterionIds} || [];
+    my $startDay  = $args_ref->{startDay}     || '';
+    my $endDay    = $args_ref->{endDay}       || '';
+    my $inPST     = $args_ref->{inPST}        || 0;
 
- my @params;
- push @params,
-      SOAP::Data->name(
-	'adGroupId' => $adgroupid )->type('');
- push @params,
-      SOAP::Data->name(
-	'criterionIds' => @{ $ra_id } )->type('');
- push @params,
-      SOAP::Data->name(
-	'startDay' => $startDay )->type('');
- push @params,
-      SOAP::Data->name(
-	'endDay' => $endDay )->type('');
- push @params,
-      SOAP::Data->name(
-	'inPST' => $inPST )->type('');
-    
- my $result	= $self->_create_service_and_call({
-   service	=> 'CriterionService',
-   method	=> 'getCriterionStats',
-   params	=> \@params,
-   });
+    my @params;
+    push @params, SOAP::Data->name( 'adGroupId'    => $adgroupid )->type('');
+    push @params, SOAP::Data->name( 'criterionIds' => @{$ra_id} )->type('');
+    push @params, SOAP::Data->name( 'startDay'     => $startDay )->type('');
+    push @params, SOAP::Data->name( 'endDay'       => $endDay )->type('');
+    push @params, SOAP::Data->name( 'inPST'        => $inPST )->type('');
 
- my @data;
- foreach my $c (
- $result->valueof("//getCriterionStatsResponse/getCriterionStatsReturn") ) {
-  push @data, $self->_create_object_from_hash($c, 'Google::Adwords::StatsRecord');
- }
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'CriterionService',
+            method  => 'getCriterionStats',
+            params  => \@params,
+        }
+    );
 
- return	@data;
-}
+    my @data;
+    foreach my $c (
+        $result->valueof(
+            "//getCriterionStatsResponse/getCriterionStatsReturn")
+        )
+    {
+        push @data,
+            $self->_create_object_from_hash( $c,
+            'Google::Adwords::StatsRecord' );
+    }
 
-
+    return @data;
+} # end sub getCriterionStats
 
 1;
 
@@ -833,7 +855,7 @@ Rohan Almeida <rohan@almeida.in>
  
 Mathieu Jondet <mathieu@eulerian.com>
  
-=head1 LICENCE AND COPYRIGHT
+=head1 LICENSE AND COPYRIGHT
  
 Copyright (c) 2006 Rohan Almeida <rohan@almeida.in>. All rights
 reserved.
