@@ -69,12 +69,12 @@ sub addCriteria
                 push @criterion_params,
                     SOAP::Data->name( $_ => $criterion->$_ )->type('');
             }
-        }
+        } # end for ( qw/ destinationUrl...
 
         push @params, SOAP::Data->name(
             'criterion' => \SOAP::Data->value(@criterion_params) )->type('');
 
-    }
+    } # end for my $criterion (@criteria)
 
     my $result = $self->_create_service_and_call(
         {
@@ -162,14 +162,14 @@ sub setCampaignNegativeCriteria
                 push @criterion_params_inner,
                     SOAP::Data->name( $_ => $criterion->$_ )->type('');
             }
-        }
+        } # end for ( qw/ destinationUrl...
 
         push @criterion_params,
             SOAP::Data->name(
             'criterion' => \SOAP::Data->value(@criterion_params_inner) )
             ->type('');
 
-    }
+    } # end for my $criterion ( @{$criterions_ref...
 
     my @params;
     push @params, SOAP::Data->name( 'campaignId' => $campaign_id )->type('');
@@ -250,13 +250,13 @@ sub updateCriteria
                 push @criterion_params_inner,
                     SOAP::Data->name( $_ => $criterion->$_ )->type('');
             }
-        }
+        } # end for ( qw/ destinationUrl...
 
         push @params,
             SOAP::Data->name(
             'criterion' => \SOAP::Data->value(@criterion_params_inner) )
             ->type('');
-    }
+    } # end for my $criterion (@criteria)
 
     my $result = $self->_create_service_and_call(
         {
@@ -329,7 +329,7 @@ sub getCampaignNegativeCriteria
     my @data;
     foreach my $c (
         $result->valueof(
-"//getCampaignNegativeCriteriaResponse/getCampaignNegativeCriteriaReturn"
+            "//getCampaignNegativeCriteriaResponse/getCampaignNegativeCriteriaReturn"
         )
         )
     {
@@ -421,20 +421,20 @@ sub getCriteria
 ### INSTANCE METHOD ################################################
 # Usage      :
 #   my @criterion_stats = $obj->getCriterionStats({
-#       adGroupId	=> 1234
-#	    criterionIds => [ 3982, 2787, 17872 ],
-#	    startDay 	=> $startDay,
-#	    endDay	=> $endDay,
-#	    inPST	=> 1,
+#       adGroupId       => 1234
+#           criterionIds => [ 3982, 2787, 17872 ],
+#           startDay    => $startDay,
+#           endDay      => $endDay,
+#           inPST       => 1,
 #   });
 # Purpose    : Get stats on a set of criteria
 # Returns    :  A list of StatsRecord object for each criterion
 # Parameters :
 #   adGroupId : The ad group that contains the criteria to be queried
-#	creativeIds  : array reference of criteria ids
-#	startDay : starting day of the stats YYYY-MM-DD
-#	endDay : end day of the stats YYYY-MM-DD
-#	inPST : True = get stats in America/Los_Angeles timezone (Google headquarters) regardless of the parent account's localtimezone.
+#       creativeIds  : array reference of criteria ids
+#       startDay : starting day of the stats YYYY-MM-DD
+#       endDay : end day of the stats YYYY-MM-DD
+#       inPST : True = get stats in America/Los_Angeles timezone (Google headquarters) regardless of the parent account's localtimezone.
 # Throws     : no exceptions
 # Comments   : none
 # See Also   : n/a
@@ -511,22 +511,22 @@ This documentation refers to Google::Adwords::CriterionService version 0.3
     # or 
     $criterion_service->clientCustomerId($customerid);
 
-    my $adgroupid	= 123456789;
+    my $adgroupid       = 123456789;
 
     # get all the criteria for an adgroup
-    my @getallcriteria	= $criterion_service->getAllCriteria($adgroupid);
+    my @getallcriteria  = $criterion_service->getAllCriteria($adgroupid);
     for ( @getallcriteria ) {
         print "Criterion name : " . $_->name . " , Id : " . $_->id . "\n";
     }
 
     # get a specific criterion from an AdGroup
-    my $criterionid	= 987654321;
+    my $criterionid     = 987654321;
 
     my $getcriterion = $criterion_service->getCriteria($adgroupid, [ $criterionid ]);
     print "Get criterion: " . $getcriterion->name . ", Id : " . $getcriterion->id . "\n";
 
     # remove a criterion
-    my $ret	= $criterion_service->removeCriteria($adgroupid, [ $criterionid ]);
+    my $ret     = $criterion_service->removeCriteria($adgroupid, [ $criterionid ]);
     
     # add a criterion
     my $criterion_keyword = Google::Adwords::Criterion->new
@@ -535,7 +535,7 @@ This documentation refers to Google::Adwords::CriterionService version 0.3
             ->type('Broad')
             ->text('Aarohan & Technologies');
 
-    my $addcriterion	= $criterion_service->addCriteria($criterion_keyword);
+    my $addcriterion    = $criterion_service->addCriteria($criterion_keyword);
     print "Added Criterion ID: " . $addcriterion->id . "\n";
 
   

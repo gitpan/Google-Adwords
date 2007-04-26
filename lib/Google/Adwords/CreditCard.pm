@@ -38,7 +38,7 @@ This documentation refers to Google::Adwords::CreditCard version 0.0.1
  
     use Google::Adwords::CreditCard;
 
-    my $creditcard	= Google::Adwords::CreditCard->new
+    my $creditcard      = Google::Adwords::CreditCard->new
                 ->cardNumber(123456789)
                 ->cardType('VISA')
                 ->cardVerificationNumber(123)

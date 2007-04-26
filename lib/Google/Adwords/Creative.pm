@@ -56,7 +56,7 @@ This documentation refers to Google::Adwords::Creative version 0.0.1
 
     # get a specific creative from an AdGroup
     my $adgroupid = 1123
-    my $creativeid	= 7819;
+    my $creativeid      = 7819;
 
     my $creative = $creative_service->getCreative($adgroupid, $creativeid);
     print "Creative Info: \n" 

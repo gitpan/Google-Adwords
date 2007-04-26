@@ -83,7 +83,7 @@ sub _create_campaign_params
 
         push @campaign_params, SOAP::Data->name(
             'schedule' => \SOAP::Data->value(@schedule_params) )->type('');
-    }
+    } # end if ( defined $campaign...
 
     # budget optimizer settings
     if ( defined $campaign->budgetOptimizerSettings ) {
@@ -103,7 +103,7 @@ sub _create_campaign_params
             'budgetOptimizerSettings' => \SOAP::Data->value(@budget_params) )
             ->type('');
 
-    }
+    } # end if ( defined $campaign...
 
     # language_targeting
     if (   ( defined $campaign->languageTargeting )
@@ -120,7 +120,7 @@ sub _create_campaign_params
                     )->type('')
                 )->type('');
         }
-    }
+    } # end if ( ( defined $campaign...
 
     # geo_targeting
     if (   ( defined $campaign->geoTargeting )
@@ -142,7 +142,7 @@ sub _create_campaign_params
             push @campaign_params, SOAP::Data->name(
                 'geoTargeting' => \SOAP::Data->value(@geo_data), )->type('');
         }
-    }
+    } # end if ( ( defined $campaign...
 
     # network_targeting
     if (   ( defined $campaign->networkTargeting )
@@ -159,7 +159,7 @@ sub _create_campaign_params
                     )->type('')
                 )->type('');
         }
-    }
+    } # end if ( ( defined $campaign...
 
     return @campaign_params;
 } # end sub _create_campaign_params
@@ -209,7 +209,7 @@ sub _create_campaign_object
                 $self->_create_object_from_hash( $data->{schedule}{intervals},
                 "Google::Adwords::SchedulingInterval" );
         }
-    }
+    } # end if ( exists $data->{schedule...
     if ( scalar @intervals > 0 ) {
         $data->{schedule}{intervals} = \@intervals;
     }
@@ -424,18 +424,18 @@ sub getCampaignList
 ### INSTANCE METHOD ################################################
 # Usage      :
 #   my @campaign_stats = $obj->getCampaignStats({
-#	    campaignids	=> [ 3982, 2787, 17872 ],
-#	    startDay => $startDay,
-#	    endDay	=> $endDay,
-#	    inPST	=> 1,
+#           campaignids => [ 3982, 2787, 17872 ],
+#           startDay => $startDay,
+#           endDay      => $endDay,
+#           inPST       => 1,
 #   });
 # Purpose    : Get stats on a set of campaign
 # Returns    :  A list of StatsRecord object for each campaign
 # Parameters :
-#	ids  : array reference of campaign ids
-#	startDay : starting day of the stats YYYY-MM-DD
-#	endDay : end day of the stats YYYY-MM-DD
-#	inPST : True = get stats in America/Los_Angeles timezone (Google headquarters) regardless of the parent account's localtimezone.
+#       ids  : array reference of campaign ids
+#       startDay : starting day of the stats YYYY-MM-DD
+#       endDay : end day of the stats YYYY-MM-DD
+#       inPST : True = get stats in America/Los_Angeles timezone (Google headquarters) regardless of the parent account's localtimezone.
 # Throws     : no exceptions
 # Comments   : none
 # See Also   : n/a
@@ -512,8 +512,8 @@ sub getOptimizeAdServing
 # Purpose    : Set the optimize AdServing status flag.
 # Returns    : returns 1 if success
 # Parameters :
-#	- the campaign id
-#	- the enable flag, set to 1 for 'true', 0 for for 'false'
+#       - the campaign id
+#       - the enable flag, set to 1 for 'true', 0 for for 'false'
 # Throws     : no exceptions
 # Comments   : none
 # See Also   : n/a
@@ -772,7 +772,7 @@ returned campaigns.
 
 =head3 Usage
 
-	my @campaigns = $obj->getAllAdWordsCampaigns();
+        my @campaigns = $obj->getAllAdWordsCampaigns();
 
 =head3 Parameters
 
@@ -856,10 +856,10 @@ L<http://www.google.com/apis/adwords/developer/StatsRecord.html>
 =head3 Usage
 
     my @campaign_stats = $obj->getCampaignStats({
-        campaignids	=> [ 3567, 4567, 8819 ],
+        campaignids     => [ 3567, 4567, 8819 ],
         startDay => '2006-08-01',
-        endDay	=> '2006-08-31',
-        inPST	=> 1;
+        endDay  => '2006-08-31',
+        inPST   => 1;
     });
 
 =head3 Parameters

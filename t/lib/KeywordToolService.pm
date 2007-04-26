@@ -12,8 +12,8 @@ sub test_class { return "Google::Adwords::KeywordToolService"; }
 
 # tests to run
 my %tests = (
-    getKeywordsFromSite     => 1,
-    getKeywordVariations    => 1,
+    getKeywordsFromSite  => 1,
+    getKeywordVariations => 1,
 );
 
 sub start_of_each_test : Test(setup)
@@ -21,45 +21,46 @@ sub start_of_each_test : Test(setup)
     my $self = shift;
 
     # set debug to whatever was passed in as param
-    $self->{obj}->debug($self->{debug});
+    $self->{obj}->debug( $self->{debug} );
 }
 
 sub getKeywordsFromSite : Test(no_plan)
 {
     my $self = shift;
 
-    $sub_name = (caller 0)[3];
+    $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if (not $tests{$sub_name}) {
+    if ( not $tests{$sub_name} ) {
         return;
     }
 
+    if ( $self->{sandbox} ) {
 
-    if ($self->{sandbox}) {
-
-        my $url = 'http://aarohan.biz';
+        my $url                  = 'http://aarohan.biz';
         my $include_linked_pages = 0;
-        my $languages_ref = [ 'en', ];
-        my $countries_ref = [ 'IN', ];
-        
+        my $languages_ref        = [ 'en', ];
+        my $countries_ref        = [ 'IN', ];
 
-        my $site_keyword_groups = $self->{obj}->getKeywordsFromSite({
-            url     => $url,
-            includeLinkedPages  => $include_linked_pages,
-            languages   => $languages_ref,
-            countries   => $countries_ref,
-        });
+        my $site_keyword_groups = $self->{obj}->getKeywordsFromSite(
+            {
+                url                => $url,
+                includeLinkedPages => $include_linked_pages,
+                languages          => $languages_ref,
+                countries          => $countries_ref,
+            }
+        );
 
         my $groups_ref = $site_keyword_groups->groups;
-        ok (scalar @{$groups_ref} > 0, 'getKeywordsFromSite (groups)');
+        ok( scalar @{$groups_ref} > 0, 'getKeywordsFromSite (groups)' );
         my $keywords_ref = $site_keyword_groups->keywords;
-        ok (ref $keywords_ref->[0] eq 'Google::Adwords::SiteKeyword', 
-            'getKeywordsFromSite (keywords)');
-    }
+        ok( ref $keywords_ref->[0] eq 'Google::Adwords::SiteKeyword',
+            'getKeywordsFromSite (keywords)' );
+    } # end if ( $self->{sandbox} )
     else {
         my $soap = Test::MockModule->new('SOAP::Lite');
-        $soap->mock( call => sub {
-            my $xml .= <<'EOF';
+        $soap->mock(
+            call => sub {
+                my $xml .= <<'EOF';
 <getKeywordsFromSiteResponse xmlns="">
    <ns1:getKeywordsFromSiteReturn xmlns:ns1="https://adwords.google.com/api/adwords/v8">
     <ns1:groups>DDDDD</ns1:groups>
@@ -496,67 +497,71 @@ sub getKeywordsFromSite : Test(no_plan)
   </getKeywordsFromSiteResponse>
 EOF
 
-            $xml = $self->gen_full_response($xml);
-            my $env = SOAP::Deserializer->deserialize($xml);
-            return $env;
-        });
+                $xml = $self->gen_full_response($xml);
+                my $env = SOAP::Deserializer->deserialize($xml);
+                return $env;
+            }
+        );
 
-        my $url = 'http://aarohan.biz';
+        my $url                  = 'http://aarohan.biz';
         my $include_linked_pages = 0;
-        my $languages_ref = [ 'en', ];
-        my $countries_ref = [ 'IN', ];
-        
-        my $site_keyword_groups = $self->{obj}->getKeywordsFromSite({
-            url     => $url,
-            includeLinkedPages  => $include_linked_pages,
-            languages   => $languages_ref,
-            countries   => $countries_ref,
-        });
+        my $languages_ref        = [ 'en', ];
+        my $countries_ref        = [ 'IN', ];
+
+        my $site_keyword_groups = $self->{obj}->getKeywordsFromSite(
+            {
+                url                => $url,
+                includeLinkedPages => $include_linked_pages,
+                languages          => $languages_ref,
+                countries          => $countries_ref,
+            }
+        );
 
         my $groups_ref = $site_keyword_groups->groups;
-        ok (scalar @{$groups_ref} > 0, 'getKeywordsFromSite (groups)');
+        ok( scalar @{$groups_ref} > 0, 'getKeywordsFromSite (groups)' );
         my $keywords_ref = $site_keyword_groups->keywords;
-        ok (ref $keywords_ref->[0] eq 'Google::Adwords::SiteKeyword', 
-            'getKeywordsFromSite (keywords)');
-
+        ok( ref $keywords_ref->[0] eq 'Google::Adwords::SiteKeyword',
+            'getKeywordsFromSite (keywords)' );
 
     }
 
-}
+} # end sub getKeywordsFromSite :
 
 sub getKeywordVariations : Test(no_plan)
 {
     my $self = shift;
 
-    $sub_name = (caller 0)[3];
+    $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if (not $tests{$sub_name}) {
+    if ( not $tests{$sub_name} ) {
         return;
     }
 
-
-    if ($self->{sandbox}) {
+    if ( $self->{sandbox} ) {
 
         my $seed_keyword1 = Google::Adwords::SeedKeyword->new;
         $seed_keyword1->negative(0);
         $seed_keyword1->text('Linux Perl');
         $seed_keyword1->type('Broad');
 
-        my $keyword_variations = $self->{obj}->getKeywordVariations({
-            seedKeywords    => [ $seed_keyword1, ],
-            useSynonyms     => 1,
-            languages       => [ 'en', ],
-            countries       => [ 'US', ],
-        });
+        my $keyword_variations = $self->{obj}->getKeywordVariations(
+            {
+                seedKeywords => [ $seed_keyword1, ],
+                useSynonyms  => 1,
+                languages    => [ 'en', ],
+                countries    => [ 'US', ],
+            }
+        );
 
-        ok (scalar @{$keyword_variations->moreSpecific} > 0,
-            'getKeywordVariations');
-        
-    }
+        ok( scalar @{ $keyword_variations->moreSpecific } > 0,
+            'getKeywordVariations' );
+
+    } # end if ( $self->{sandbox} )
     else {
         my $soap = Test::MockModule->new('SOAP::Lite');
-        $soap->mock( call => sub {
-            my $xml .= <<'EOF';
+        $soap->mock(
+            call => sub {
+                my $xml .= <<'EOF';
 <getKeywordVariationsResponse xmlns="">
    <ns1:getKeywordVariationsReturn xmlns:ns1="https://adwords.google.com/api/adwords/v8">
     <ns1:moreSpecific>
@@ -575,32 +580,33 @@ sub getKeywordVariations : Test(no_plan)
   </getKeywordVariationsResponse>
 EOF
 
-            $xml = $self->gen_full_response($xml);
-            my $env = SOAP::Deserializer->deserialize($xml);
-            return $env;
-        });
+                $xml = $self->gen_full_response($xml);
+                my $env = SOAP::Deserializer->deserialize($xml);
+                return $env;
+            }
+        );
 
         my $seed_keyword1 = Google::Adwords::SeedKeyword->new;
         $seed_keyword1->negative(0);
         $seed_keyword1->text('Linux Perl');
         $seed_keyword1->type('Broad');
 
-        my $keyword_variations = $self->{obj}->getKeywordVariations({
-            seedKeywords    => [ $seed_keyword1, ],
-            useSynonyms     => 1,
-            languages       => [ 'en', ],
-            countries       => [ 'US', ],
-        });
-
+        my $keyword_variations = $self->{obj}->getKeywordVariations(
+            {
+                seedKeywords => [ $seed_keyword1, ],
+                useSynonyms  => 1,
+                languages    => [ 'en', ],
+                countries    => [ 'US', ],
+            }
+        );
 
         my $more_specific_ref = $keyword_variations->moreSpecific;
-        ok ($more_specific_ref->[0]->text eq 'suggestion Perl Linux',
-            'getKeywordVariations');
+        ok( $more_specific_ref->[0]->text eq 'suggestion Perl Linux',
+            'getKeywordVariations' );
 
     }
 
-}
+} # end sub getKeywordVariations :
 
 1;
-
 

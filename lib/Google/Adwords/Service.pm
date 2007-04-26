@@ -2,14 +2,14 @@ package Google::Adwords::Service;
 use strict;
 use warnings;
 
-use version; our $VERSION = qv('0.7');
+use version; our $VERSION = qv('0.7.1');
 
 use base qw/ Class::Accessor::Chained Google::Adwords /;
 use SOAP::Lite;
 use Readonly;
 
 Readonly my $default_api_version => 'v8';
-Readonly my $user_agent          => "Google::Adwords v1.2.2";
+Readonly my $user_agent          => "Google::Adwords v1.2.3";
 Readonly my $endpoint            => 'https://adwords.google.com/api/adwords';
 Readonly my $endpoint_sandbox    => 'https://sandbox.google.com/api/adwords';
 Readonly my $default_timeout => 35;    # HTTP timeout in seconds
@@ -126,7 +126,7 @@ sub _endpoint
     else {
         return $endpoint . '/' . $self->api_version;
     }
-} # end sub _endpoint
+}
 
 ### INTERNAL UTILITY ##################################################
 # Usage      :
@@ -152,7 +152,7 @@ sub _create_soap_service
     }
 
     return $service;
-} # end sub _create_soap_service
+}
 
 ### INTERNAL UTILITY ####################################################
 # Usage      :
@@ -270,7 +270,7 @@ sub _create_object_from_hash
 
     my $obj = $class_name->new($hashref);
     return $obj;
-} # end sub _create_object_from_hash
+}
 
 1;
 
@@ -283,7 +283,7 @@ Google::Adwords::Service - Base class for the Service modules
  
 =head1 VERSION
  
-This documentation refers to Google::Adwords::Service version 0.7
+This documentation refers to Google::Adwords::Service version 0.7.1
  
  
 =head1 DESCRIPTION

@@ -1,0 +1,47 @@
+
+[-Subroutines::ProhibitSubroutinePrototypes]
+[-InputOutput::ProhibitTwoArgOpen]
+[-Modules::RequireBarewordIncludes]
+[-BuiltinFunctions::ProhibitStringyEval]
+[-Subroutines::ProhibitExplicitReturnUndef]
+[-BuiltinFunctions::RequireGlobFunction]
+[-Modules::ProhibitEvilModules]
+[-ValuesAndExpressions::ProhibitLeadingZeros]
+[-BuiltinFunctions::ProhibitSleepViaSelect]
+[-ClassHierarchies::ProhibitOneArgBless]
+
+
+[TestingAndDebugging::ProhibitNoStrict]
+severity = 5
+
+[TestingAndDebugging::RequireUseStrict]
+severity = 5
+
+[TestingAndDebugging::RequireUseWarnings]
+severity = 5
+
+[CodeLayout::ProhibitParensWithBuiltins]
+severity = 5
+
+[CodeLayout::RequireTrailingCommas]
+severity = 5
+
+[CodeLayout::ProhibitHardTabs]
+severity = 5
+allow_leading_tabs = 0
+
+#[NamingConventions::ProhibitMixedCaseVars]
+#severity = 5
+
+#[NamingConventions::ProhibitMixedCaseSubs]
+#severity = 5
+
+#[ValuesAndExpressions::ProhibitEmptyQuotes]
+#severity = 5
+
+[Subroutines::ProhibitAmpersandSigils]
+severity = 5
+
+[InputOutput::ProhibitBarewordFileHandles]
+severity = 5
+

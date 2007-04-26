@@ -166,7 +166,7 @@ sub addAdGroupList
         push @params,
             SOAP::Data->name( newData => \SOAP::Data->value(@adgroup_params) )
             ->type('');
-    }
+    } # end for my $adgroup ( @{$adgroups_to_add_ref...
 
     # create the SOAP service
     my $result = $self->_create_service_and_call(
@@ -302,20 +302,20 @@ sub getAllAdGroups
 ### INSTANCE METHOD ################################################
 # Usage      :
 #   my @adgroup_stats = $obj->getAdGroupStats({
-#       campaignId	=> $campaignId
-#	    adGroupIds	=> [ arrayref of adgroup ids ],
-#	    startDay => $startDay,
-#	    endDay	=> $endDay,
-#	    inPST	=> $inPST;
+#       campaignId      => $campaignId
+#           adGroupIds  => [ arrayref of adgroup ids ],
+#           startDay => $startDay,
+#           endDay      => $endDay,
+#           inPST       => $inPST;
 #   });
 # Purpose    : Get stats on a set of adgroups
 # Returns    : StatsRecord object for each adgroup
 # Parameters :
-#	campaignId : the campaign in which to find the ad group
-#	adGroupIds  : array reference of adgroup ids
-#	startDay : starting day of the stats YYYY-MM-DD
-#	endDay : end day of the stats YYYY-MM-DD
-#	inPST : True = get stats in America/Los_Angeles timezone (Google headquarters) regardless of the parent account's localtimezone.
+#       campaignId : the campaign in which to find the ad group
+#       adGroupIds  : array reference of adgroup ids
+#       startDay : starting day of the stats YYYY-MM-DD
+#       endDay : end day of the stats YYYY-MM-DD
+#       inPST : True = get stats in America/Los_Angeles timezone (Google headquarters) regardless of the parent account's localtimezone.
 # Throws     : no exceptions
 # Comments   : none
 # See Also   : n/a
@@ -479,7 +479,7 @@ sub updateAdGroupList
 
         push @params, SOAP::Data->name(
             'changedData' => \SOAP::Data->value(@adgroup_params) )->type('');
-    }
+    } # end for my $adgroup (@adgroups)
 
     # create the SOAP service
     my $result = $self->_create_service_and_call(
@@ -692,10 +692,10 @@ is one day.
 
     my @stats = $obj->getAdGroupStats({
         campaignId => $campaignId,
-        adGroupIds	=> [ $id1, $id2, $id3 ],
+        adGroupIds      => [ $id1, $id2, $id3 ],
         startDay => '2006-08-01'
-        endDay	=> '2006-08-31',
-        inPST	=> 1,
+        endDay  => '2006-08-31',
+        inPST   => 1,
     });
 
 =back
@@ -748,7 +748,7 @@ Get all information about the adgroups associated with a campaign.
 
 =over 4
 
-	my @adgroups = $obj->getAllAdGroups($campaignId);
+        my @adgroups = $obj->getAllAdGroups($campaignId);
 
 =back
 

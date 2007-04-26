@@ -44,7 +44,8 @@ sub getKeywordsFromSite
         SOAP::Data->name(
           'includeLinkedPages' => ( $args_ref->{includeLinkedPages} )
         ? 'true'
-        : 'false' )->type('');
+        : 'false'
+        )->type('');
     if ( @{ $args_ref->{languages} } ) {
         push @params,
             SOAP::Data->name( 'languages' => @{ $args_ref->{languages} } )
@@ -131,7 +132,7 @@ sub getKeywordVariations
         }
         push @params, SOAP::Data->name(
             'seedKeywords' => \SOAP::Data->value(@seedkeyword) )->type('');
-    }
+    } # end for ( @{ $args_ref->{seedKeywords...
 
     push @params,
         SOAP::Data->name(
@@ -235,11 +236,11 @@ This documentation refers to Google::Adwords::KeywordToolService version 0.2
 
     # getKeywordVariations
     my $seed1 = Google::Adwords::SeedKeyword->new
-    			    ->text('world news')
-			        ->type('Broad');
+                            ->text('world news')
+                                ->type('Broad');
     my $seed2 = Google::Adwords::SeedKeyword->new
-    			    ->text('independant news')
-			        ->type('Broad');
+                            ->text('independant news')
+                                ->type('Broad');
 
     my $keyword_variations = $kwtool_service->getKeywordVariations({
            seedKeywords => [ $seed1, $seed2, ],

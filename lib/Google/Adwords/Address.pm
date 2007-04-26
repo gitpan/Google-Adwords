@@ -39,7 +39,7 @@ This documentation refers to Google::Adwords::Address version 0.0.1
  
     use Google::Adwords::Address;
 
-    my $address	= Google::Adwords::Address->new
+    my $address = Google::Adwords::Address->new
             ->addressLine1('first street')
             ->city('Paris')
             ->companyName('My company')

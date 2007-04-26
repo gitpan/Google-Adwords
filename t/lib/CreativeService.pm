@@ -11,14 +11,14 @@ sub test_class { return "Google::Adwords::CreativeService"; }
 
 # tests to run
 my %tests = (
-    addCreative             => 0,
-    addCreative_Image       => 0,
-    addCreativeList         => 0,
-    getActiveCreatives      => 0,
-    getAllCreatives         => 0,
-    getCreative             => 0,
-    getCreativeStats        => 0,
-    updateCreatives         => 0,
+    addCreative        => 0,
+    addCreative_Image  => 0,
+    addCreativeList    => 0,
+    getActiveCreatives => 0,
+    getAllCreatives    => 0,
+    getCreative        => 0,
+    getCreativeStats   => 0,
+    updateCreatives    => 0,
 );
 
 sub start_of_each_test : Test(setup)
@@ -26,23 +26,20 @@ sub start_of_each_test : Test(setup)
     my $self = shift;
 
     # set debug to whatever was passed in as param
-    $self->{obj}->debug($self->{debug});
+    $self->{obj}->debug( $self->{debug} );
 }
-
 
 sub addCreative : Test(no_plan)
 {
     my $self = shift;
 
-    $sub_name = (caller 0)[3];
+    $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if (not $tests{$sub_name}) {
+    if ( not $tests{$sub_name} ) {
         return;
     }
 
-
-    if ($self->{sandbox}) {
-
+    if ( $self->{sandbox} ) {
 
         #my $adgroup_id = $self->_get_adgroup_id();
         my $adgroup_id = 20048;
@@ -57,18 +54,19 @@ sub addCreative : Test(no_plan)
         $creative->displayUrl('http://aarohan.biz');
 
         my $creative_response = $self->{obj}->addCreative($creative);
-        ok ($creative_response->adGroupId eq $adgroup_id, 'addCreative');
-        ok ($creative_response->id =~ /\d+/, 
-            'addCreative id: ' . $creative_response->id);
+        ok( $creative_response->adGroupId eq $adgroup_id, 'addCreative' );
+        ok( $creative_response->id =~ /\d+/,
+            'addCreative id: ' . $creative_response->id );
 
         # save for further use
         $self->{_creative_id} = $creative_response->id;
 
-    }
+    } # end if ( $self->{sandbox} )
     else {
         my $soap = Test::MockModule->new('SOAP::Lite');
-        $soap->mock( call => sub {
-            my $xml .= <<'EOF';
+        $soap->mock(
+            call => sub {
+                my $xml .= <<'EOF';
 <addCreativeResponse xmlns="">
    <ns1:addCreativeReturn
 xmlns:ns1="https://adwords.google.com/api/adwords/v7">
@@ -85,10 +83,11 @@ xmlns:ns1="https://adwords.google.com/api/adwords/v7">
   </addCreativeResponse>
 EOF
 
-            $xml = $self->gen_full_response($xml);
-            my $env = SOAP::Deserializer->deserialize($xml);
-            return $env;
-        });
+                $xml = $self->gen_full_response($xml);
+                my $env = SOAP::Deserializer->deserialize($xml);
+                return $env;
+            }
+        );
 
         my $creative = Google::Adwords::Creative->new;
 
@@ -100,27 +99,25 @@ EOF
         $creative->displayUrl('aarohan.biz');
 
         my $creative_response = $self->{obj}->addCreative($creative);
-        ok ($creative_response->adGroupId == 1001, 'addCreative');
-        ok ($creative_response->description1 eq '<b>kakakakaka</b>', 'addCreative');
-
-
+        ok( $creative_response->adGroupId == 1001, 'addCreative' );
+        ok( $creative_response->description1 eq '<b>kakakakaka</b>',
+            'addCreative' );
 
     }
 
-}
+} # end sub addCreative :
 
 sub addCreative_Image : Test(no_plan)
 {
     my $self = shift;
 
-    $sub_name = (caller 0)[3];
+    $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if (not $tests{$sub_name}) {
+    if ( not $tests{$sub_name} ) {
         return;
     }
 
-
-    if ($self->{sandbox}) {
+    if ( $self->{sandbox} ) {
 
         my $adgroup_id = $self->_get_adgroup_id();
 
@@ -136,17 +133,16 @@ sub addCreative_Image : Test(no_plan)
         $creative->image($image);
 
         my $creative_response = $self->{obj}->addCreative($creative);
-        ok ($creative_response->adGroupId eq $adgroup_id, 'addCreative');
-        ok ($creative_response->id =~ /\d+/, 
-            'addCreative id: ' . $creative_response->id);
+        ok( $creative_response->adGroupId eq $adgroup_id, 'addCreative' );
+        ok( $creative_response->id =~ /\d+/,
+            'addCreative id: ' . $creative_response->id );
 
-
-
-    }
+    } # end if ( $self->{sandbox} )
     else {
         my $soap = Test::MockModule->new('SOAP::Lite');
-        $soap->mock( call => sub {
-            my $xml .= <<'EOF';
+        $soap->mock(
+            call => sub {
+                my $xml .= <<'EOF';
   <addCreativeResponse xmlns="">
     <ns1:addCreativeReturn xmlns:ns1="https://adwords.google.com/api/adwords/v7">
     <ns1:adGroupId>1001</ns1:adGroupId>
@@ -171,10 +167,11 @@ sub addCreative_Image : Test(no_plan)
   </addCreativeResponse>
 EOF
 
-            $xml = $self->gen_full_response($xml);
-            my $env = SOAP::Deserializer->deserialize($xml);
-            return $env;
-        });
+                $xml = $self->gen_full_response($xml);
+                my $env = SOAP::Deserializer->deserialize($xml);
+                return $env;
+            }
+        );
 
         my $creative = Google::Adwords::Creative->new;
 
@@ -189,25 +186,23 @@ EOF
         $creative->image($image);
 
         my $creative_response = $self->{obj}->addCreative($creative);
-        ok ($creative_response->image->height == 60, 'addCreative (Image)');
-
+        ok( $creative_response->image->height == 60, 'addCreative (Image)' );
 
     }
 
-}
+} # end sub addCreative_Image :
 
-sub addCreativeList: Test(no_plan)
+sub addCreativeList : Test(no_plan)
 {
     my $self = shift;
 
-    $sub_name = (caller 0)[3];
+    $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if (not $tests{$sub_name}) {
+    if ( not $tests{$sub_name} ) {
         return;
     }
 
-
-    if ($self->{sandbox}) {
+    if ( $self->{sandbox} ) {
 
         my $adgroup_id = $self->_get_adgroup_id();
 
@@ -228,21 +223,20 @@ sub addCreativeList: Test(no_plan)
         $image->data('asjajkjasdkjasd');
         $creative2->image($image);
 
-        my @creatives 
-            = $self->{obj}->addCreativeList($creative1, $creative2);
+        my @creatives
+            = $self->{obj}->addCreativeList( $creative1, $creative2 );
 
-        ok ($creatives[0]->id =~ /\d+/, 
-            'addCreativeList id: ' . $creatives[0]->id);
-        ok ($creatives[1]->id =~ /\d+/, 
-            'addCreativeList id: ' . $creatives[1]->id);
+        ok( $creatives[0]->id =~ /\d+/,
+            'addCreativeList id: ' . $creatives[0]->id );
+        ok( $creatives[1]->id =~ /\d+/,
+            'addCreativeList id: ' . $creatives[1]->id );
 
-
-
-    }
+    } # end if ( $self->{sandbox} )
     else {
         my $soap = Test::MockModule->new('SOAP::Lite');
-        $soap->mock( call => sub {
-            my $xml .= <<'EOF';
+        $soap->mock(
+            call => sub {
+                my $xml .= <<'EOF';
   <addCreativeListResponse xmlns="">
    <ns1:addCreativeListReturn
 xmlns:ns1="https://adwords.google.com/api/adwords/v6">
@@ -280,10 +274,11 @@ xmlns:ns2="https://adwords.google.com/api/adwords/v6">
   </addCreativeListResponse>
 EOF
 
-            $xml = $self->gen_full_response($xml);
-            my $env = SOAP::Deserializer->deserialize($xml);
-            return $env;
-        });
+                $xml = $self->gen_full_response($xml);
+                my $env = SOAP::Deserializer->deserialize($xml);
+                return $env;
+            }
+        );
 
         my $creative1 = Google::Adwords::Creative->new;
         $creative1->adGroupId(1001);
@@ -302,46 +297,45 @@ EOF
         $image->data('asjajkjasdkjasd');
         $creative2->image($image);
 
-        my @creatives 
-            = $self->{obj}->addCreativeList($creative1, $creative2);
+        my @creatives
+            = $self->{obj}->addCreativeList( $creative1, $creative2 );
 
-        ok ($creatives[0]->adGroupId == 1001, 'addCreativeList');
-        ok ($creatives[1]->image->height == 60, 'addCreativeList');
-
+        ok( $creatives[0]->adGroupId == 1001, 'addCreativeList' );
+        ok( $creatives[1]->image->height == 60, 'addCreativeList' );
 
     }
 
-}
+} # end sub addCreativeList :
 
 sub getActiveCreatives : Test(no_plan)
 {
     my $self = shift;
 
-
-    $sub_name = (caller 0)[3];
+    $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if (not $tests{$sub_name}) {
+    if ( not $tests{$sub_name} ) {
         return;
     }
 
-    if ($self->{sandbox}) {
+    if ( $self->{sandbox} ) {
 
         my $adgroup_id = $self->_get_adgroup_id();
 
         my @creatives = $self->{obj}->getActiveCreatives($adgroup_id);
 
         # should get three or more
-        ok (scalar @creatives >= 3, 'getActiveCreatives');
+        ok( scalar @creatives >= 3, 'getActiveCreatives' );
 
         for (@creatives) {
-            ok ($_->id =~ /\d+/, 'getActiveCreatives id: ' . $_->id);
+            ok( $_->id =~ /\d+/, 'getActiveCreatives id: ' . $_->id );
         }
 
     }
     else {
         my $soap = Test::MockModule->new('SOAP::Lite');
-        $soap->mock( call => sub {
-            my $xml .= <<'EOF';
+        $soap->mock(
+            call => sub {
+                my $xml .= <<'EOF';
   <getActiveCreativesResponse>
     <ns10:getActiveCreativesReturn
 xmlns:ns10="https://adwords.google.com/api/adwords/v6">
@@ -379,55 +373,51 @@ xmlns:ns11="https://adwords.google.com/api/adwords/v6">
   </getActiveCreativesResponse>
 EOF
 
-            $xml = $self->gen_full_response($xml);
-            my $env = SOAP::Deserializer->deserialize($xml);
-            return $env;
-        });
+                $xml = $self->gen_full_response($xml);
+                my $env = SOAP::Deserializer->deserialize($xml);
+                return $env;
+            }
+        );
 
         my @creatives = $self->{obj}->getActiveCreatives(1001);
 
-        ok ($creatives[0]->adGroupId == 1001, 'getActiveCreatives');
-        ok ($creatives[1]->adGroupId == 1001, 'getActiveCreatives');
-        ok ($creatives[1]->image->height == 60, 'getActiveCreatives');
-
-
+        ok( $creatives[0]->adGroupId == 1001,   'getActiveCreatives' );
+        ok( $creatives[1]->adGroupId == 1001,   'getActiveCreatives' );
+        ok( $creatives[1]->image->height == 60, 'getActiveCreatives' );
 
     }
 
-
-}
+} # end sub getActiveCreatives :
 
 sub getAllCreatives : Test(no_plan)
 {
     my $self = shift;
 
-
-    $sub_name = (caller 0)[3];
+    $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if (not $tests{$sub_name}) {
+    if ( not $tests{$sub_name} ) {
         return;
     }
 
-    if ($self->{sandbox}) {
+    if ( $self->{sandbox} ) {
 
         my $adgroup_id = $self->_get_adgroup_id();
 
         my @creatives = $self->{obj}->getAllCreatives($adgroup_id);
 
         # should get three or more
-        ok (scalar @creatives >= 3, 'getAllCreatives');
+        ok( scalar @creatives >= 3, 'getAllCreatives' );
 
         for (@creatives) {
-            ok ($_->id =~ /\d+/, 'getAllCreatives id: ' . $_->id);
+            ok( $_->id =~ /\d+/, 'getAllCreatives id: ' . $_->id );
         }
-
-
 
     }
     else {
         my $soap = Test::MockModule->new('SOAP::Lite');
-        $soap->mock( call => sub {
-            my $xml .= <<'EOF';
+        $soap->mock(
+            call => sub {
+                my $xml .= <<'EOF';
   <getAllCreativesResponse>
     <ns10:getAllCreativesReturn
 xmlns:ns10="https://adwords.google.com/api/adwords/v6">
@@ -465,48 +455,47 @@ xmlns:ns11="https://adwords.google.com/api/adwords/v6">
   </getAllCreativesResponse>
 EOF
 
-            $xml = $self->gen_full_response($xml);
-            my $env = SOAP::Deserializer->deserialize($xml);
-            return $env;
-        });
+                $xml = $self->gen_full_response($xml);
+                my $env = SOAP::Deserializer->deserialize($xml);
+                return $env;
+            }
+        );
 
         my @creatives = $self->{obj}->getAllCreatives(1001);
 
-        ok ($creatives[0]->adGroupId == 1001, 'getAllCreatives');
-        ok ($creatives[1]->adGroupId == 1001, 'getAllCreatives');
-        ok ($creatives[1]->image->height == 60, 'getAllCreatives');
-
-
+        ok( $creatives[0]->adGroupId == 1001,   'getAllCreatives' );
+        ok( $creatives[1]->adGroupId == 1001,   'getAllCreatives' );
+        ok( $creatives[1]->image->height == 60, 'getAllCreatives' );
 
     }
-}
+} # end sub getAllCreatives :
 
 sub getCreative : Test(no_plan)
 {
     my $self = shift;
 
-    $sub_name = (caller 0)[3];
+    $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if (not $tests{$sub_name}) {
+    if ( not $tests{$sub_name} ) {
         return;
     }
 
+    if ( $self->{sandbox} ) {
 
-    if ($self->{sandbox}) {
-
-        my $adgroup_id = $self->_get_adgroup_id();
+        my $adgroup_id  = $self->_get_adgroup_id();
         my $creative_id = $self->{_creative_id};
-        
-        my $creative = $self->{obj}->getCreative($adgroup_id, $creative_id);
 
-        ok ($creative->adGroupId eq $adgroup_id, 'getCreative');
-        ok ($creative->id eq $self->{_creative_id}, 'getCreative');
+        my $creative = $self->{obj}->getCreative( $adgroup_id, $creative_id );
+
+        ok( $creative->adGroupId eq $adgroup_id, 'getCreative' );
+        ok( $creative->id eq $self->{_creative_id}, 'getCreative' );
 
     }
     else {
         my $soap = Test::MockModule->new('SOAP::Lite');
-        $soap->mock( call => sub {
-            my $xml .= <<'EOF';
+        $soap->mock(
+            call => sub {
+                my $xml .= <<'EOF';
   <getCreativeResponse xmlns="">
    <ns1:getCreativeReturn
 xmlns:ns1="https://adwords.google.com/api/adwords/v6">
@@ -532,53 +521,53 @@ xmlns:ns1="https://adwords.google.com/api/adwords/v6">
   </getCreativeResponse>
 EOF
 
-            $xml = $self->gen_full_response($xml);
-            my $env = SOAP::Deserializer->deserialize($xml);
-            return $env;
-        });
+                $xml = $self->gen_full_response($xml);
+                my $env = SOAP::Deserializer->deserialize($xml);
+                return $env;
+            }
+        );
 
-        my $creative = $self->{obj}->getCreative(1001, 21111);
+        my $creative = $self->{obj}->getCreative( 1001, 21111 );
 
-        ok ($creative->adGroupId == 1001, 'getCreative');
-        ok ($creative->image->height == 60, 'getCreative');
-
+        ok( $creative->adGroupId == 1001, 'getCreative' );
+        ok( $creative->image->height == 60, 'getCreative' );
 
     }
-}
+} # end sub getCreative :
 
 sub getCreativeStats : Test(no_plan)
 {
     my $self = shift;
 
-    $sub_name = (caller 0)[3];
+    $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if (not $tests{$sub_name}) {
+    if ( not $tests{$sub_name} ) {
         return;
     }
 
-
-    if ($self->{sandbox}) {
+    if ( $self->{sandbox} ) {
 
         my $adgroup_id = $self->_get_adgroup_id();
 
-        my @stats = $self->{obj}->getCreativeStats({
-            adGroupId => $adgroup_id,
-            creativeIds => [ $self->{_creative_id} ],
-            startDay => '2006-12-01',
-            endDay => '2006-12-15',
-            inPST => 1,
-        });
+        my @stats = $self->{obj}->getCreativeStats(
+            {
+                adGroupId   => $adgroup_id,
+                creativeIds => [ $self->{_creative_id} ],
+                startDay    => '2006-12-01',
+                endDay      => '2006-12-15',
+                inPST       => 1,
+            }
+        );
 
-        ok ($stats[0]->id == $self->{_creative_id}, 'getCreativeStats');
+        ok( $stats[0]->id == $self->{_creative_id}, 'getCreativeStats' );
 
-       
-
-    }
+    } # end if ( $self->{sandbox} )
     else {
 
         my $soap = Test::MockModule->new('SOAP::Lite');
-        $soap->mock( call => sub {
-            my $xml .= <<'EOF';
+        $soap->mock(
+            call => sub {
+                my $xml .= <<'EOF';
 <getCreativeStatsResponse xmlns="">
    <ns1:getCreativeStatsReturn
 xmlns:ns1="https://adwords.google.com/api/adwords/v5">
@@ -603,73 +592,75 @@ xmlns:ns2="https://adwords.google.com/api/adwords/v5">
   </getCreativeStatsResponse>
 EOF
 
-            $xml = $self->gen_full_response($xml);
-            my $env = SOAP::Deserializer->deserialize($xml);
-            return $env;
-        });
+                $xml = $self->gen_full_response($xml);
+                my $env = SOAP::Deserializer->deserialize($xml);
+                return $env;
+            }
+        );
 
         my $adgroup_id = 1004;
 
-        my @stats = $self->{obj}->getCreativeStats({
-            adGroupId => $adgroup_id,
-            creativeIds => [ 1001, 1002 ],
-            startDay => '2006-09-01',
-            endDay => '2006-09-15',
-            inPST => 1,
-        });
+        my @stats = $self->{obj}->getCreativeStats(
+            {
+                adGroupId   => $adgroup_id,
+                creativeIds => [ 1001, 1002 ],
+                startDay    => '2006-09-01',
+                endDay      => '2006-09-15',
+                inPST       => 1,
+            }
+        );
 
-        ok ($stats[0]->id == 1001, 'getCreativeStats');
-        ok ($stats[0]->clicks == 10, 'getCreativeStats');
-        ok ($stats[1]->id == 1002, 'getCreativeStats');
-        
+        ok( $stats[0]->id == 1001,   'getCreativeStats' );
+        ok( $stats[0]->clicks == 10, 'getCreativeStats' );
+        ok( $stats[1]->id == 1002,   'getCreativeStats' );
 
     }
 
+} # end sub getCreativeStats :
 
-}
-
-sub updateCreatives: Test(no_plan)
+sub updateCreatives : Test(no_plan)
 {
     my $self = shift;
 
-    $sub_name = (caller 0)[3];
+    $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if (not $tests{$sub_name}) {
+    if ( not $tests{$sub_name} ) {
         return;
     }
 
-
-    if ($self->{sandbox}) {
+    if ( $self->{sandbox} ) {
 
         my $adgroup_id = $self->_get_adgroup_id();
 
         my $creative1 = Google::Adwords::Creative->new;
         $creative1->adGroupId($adgroup_id);
-        $creative1->id($self->{_creative_id});
+        $creative1->id( $self->{_creative_id} );
         $creative1->status('Paused');
 
         my $ret = $self->{obj}->updateCreatives($creative1);
-        ok ($ret == 1, 'updateCreatives');
+        ok( $ret == 1, 'updateCreatives' );
 
         # reset
         $creative1->adGroupId($adgroup_id);
-        $creative1->id($self->{_creative_id});
+        $creative1->id( $self->{_creative_id} );
         $creative1->status('Enabled');
         $ret = $self->{obj}->updateCreatives($creative1);
-        ok ($ret == 1, 'updateCreatives');
+        ok( $ret == 1, 'updateCreatives' );
 
-    }
+    } # end if ( $self->{sandbox} )
     else {
         my $soap = Test::MockModule->new('SOAP::Lite');
-        $soap->mock( call => sub {
-            my $xml .= <<'EOF';
+        $soap->mock(
+            call => sub {
+                my $xml .= <<'EOF';
   <updateCreativesResponse xmlns=""/>
 EOF
 
-            $xml = $self->gen_full_response($xml);
-            my $env = SOAP::Deserializer->deserialize($xml);
-            return $env;
-        });
+                $xml = $self->gen_full_response($xml);
+                my $env = SOAP::Deserializer->deserialize($xml);
+                return $env;
+            }
+        );
 
         my $adgroup_id = '4728';
 
@@ -679,20 +670,18 @@ EOF
         $creative1->status('Paused');
 
         my $ret = $self->{obj}->updateCreatives($creative1);
-        ok ($ret == 1, 'updateCreatives');
+        ok( $ret == 1, 'updateCreatives' );
 
         # reset
         $creative1->adGroupId($adgroup_id);
         $creative1->id(16516);
         $creative1->status('Enabled');
         $ret = $self->{obj}->updateCreatives($creative1);
-        ok ($ret == 1, 'updateCreatives');
-
+        ok( $ret == 1, 'updateCreatives' );
 
     }
 
-}
+} # end sub updateCreatives :
 
 1;
-
 

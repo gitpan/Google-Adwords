@@ -13,13 +13,13 @@ sub test_class { return "Google::Adwords::AdService"; }
 
 # tests to run
 my %tests = (
-    addAds              => 1,
-    addAds_image        => 1,
-    getActiveAds        => 1,
-    getAd               => 1,
-    getAdStats          => 1,
-    getAllAds           => 1,
-    updateAds           => 1,
+    addAds       => 1,
+    addAds_image => 1,
+    getActiveAds => 1,
+    getAd        => 1,
+    getAdStats   => 1,
+    getAllAds    => 1,
+    updateAds    => 1,
 );
 
 sub start_of_each_test : Test(setup)
@@ -27,25 +27,23 @@ sub start_of_each_test : Test(setup)
     my $self = shift;
 
     # set debug to whatever was passed in as param
-    $self->{obj}->debug($self->{debug});
+    $self->{obj}->debug( $self->{debug} );
 }
-
 
 sub addAds : Test(no_plan)
 {
     my $self = shift;
 
-    $sub_name = (caller 0)[3];
+    $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if (not $tests{$sub_name}) {
+    if ( not $tests{$sub_name} ) {
         return;
     }
 
-
-    if ($self->{sandbox}) {
-
+    if ( $self->{sandbox} ) {
 
         my $adgroup_id = $self->_get_adgroup_id();
+
         #my $adgroup_id = 20048;
 
         my $ad = Google::Adwords::Ad->new;
@@ -56,22 +54,24 @@ sub addAds : Test(no_plan)
         $ad->adGroupId($adgroup_id);
         $ad->destinationUrl('http://aarohan.biz');
         $ad->displayUrl('aarohan.biz');
+
         #$ad->status('Paused');
 
-
         my @ads = $self->{obj}->addAds($ad);
-        ok ($ads[0]->adType eq 'TextAd', 'addAds (adType)',);
+        ok( $ads[0]->adType eq 'TextAd', 'addAds (adType)', );
+
         #ok ($ads[0]->status eq 'Paused', 'addAds (status)',);
-        ok ($ads[0]->adGroupId == $adgroup_id, 'addAds (adGroupId)',);
+        ok( $ads[0]->adGroupId == $adgroup_id, 'addAds (adGroupId)', );
 
         # save for further use
         $self->{_ad_id} = $ads[0]->id;
 
-    }
+    } # end if ( $self->{sandbox} )
     else {
         my $soap = Test::MockModule->new('SOAP::Lite');
-        $soap->mock( call => sub {
-            my $xml .= <<'EOF';
+        $soap->mock(
+            call => sub {
+                my $xml .= <<'EOF';
 <addAdsResponse xmlns="">
    <ns1:addAdsReturn xsi:type="ns1:TextAd"
 xmlns:ns1="https://adwords.google.com/api/adwords/v8">
@@ -89,10 +89,11 @@ xmlns:ns1="https://adwords.google.com/api/adwords/v8">
   </addAdsResponse>
 EOF
 
-            $xml = $self->gen_full_response($xml);
-            my $env = SOAP::Deserializer->deserialize($xml);
-            return $env;
-        });
+                $xml = $self->gen_full_response($xml);
+                my $env = SOAP::Deserializer->deserialize($xml);
+                return $env;
+            }
+        );
 
         my $ad = Google::Adwords::Ad->new;
         $ad->adType('TextAd');
@@ -105,31 +106,29 @@ EOF
         $ad->status('Paused');
 
         my @ads = $self->{obj}->addAds($ad);
-        ok ($ads[0]->adGroupId == 20048, 'addAds (adGroupId)');
-        ok ($ads[0]->id == 24632, 'addAds (id)');
-        ok ($ads[0]->adType eq 'TextAd', 'addAds (adType)');
-        ok ($ads[0]->description1 eq 'really', 'addAds (description1)');
-
-
+        ok( $ads[0]->adGroupId == 20048, 'addAds (adGroupId)' );
+        ok( $ads[0]->id == 24632,        'addAds (id)' );
+        ok( $ads[0]->adType       eq 'TextAd', 'addAds (adType)' );
+        ok( $ads[0]->description1 eq 'really', 'addAds (description1)' );
 
     }
 
-}
+} # end sub addAds :
 
 sub addAds_image : Test(no_plan)
 {
     my $self = shift;
 
-    $sub_name = (caller 0)[3];
+    $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if (not $tests{$sub_name}) {
+    if ( not $tests{$sub_name} ) {
         return;
     }
 
-
-    if ($self->{sandbox}) {
+    if ( $self->{sandbox} ) {
 
         my $adgroup_id = $self->_get_adgroup_id();
+
         #my $adgroup_id = 20048;
 
         my $image_ad = Google::Adwords::Ad->new;
@@ -137,6 +136,7 @@ sub addAds_image : Test(no_plan)
         $image_ad->adGroupId($adgroup_id);
         $image_ad->destinationUrl('http://aarohan.biz');
         $image_ad->displayUrl('aarohan.biz');
+
         #$image_ad->status('Paused');
 
         my $image = Google::Adwords::Image->new;
@@ -145,14 +145,15 @@ sub addAds_image : Test(no_plan)
         $image_ad->image($image);
 
         my @ads = $self->{obj}->addAds($image_ad);
-        ok ($ads[0]->adGroupId == $adgroup_id, 'addAds Image (adGroupId)');
-        ok ($ads[0]->adType eq 'ImageAd', 'addAds Image (adType)');
+        ok( $ads[0]->adGroupId == $adgroup_id, 'addAds Image (adGroupId)' );
+        ok( $ads[0]->adType eq 'ImageAd', 'addAds Image (adType)' );
 
-    }
+    } # end if ( $self->{sandbox} )
     else {
         my $soap = Test::MockModule->new('SOAP::Lite');
-        $soap->mock( call => sub {
-            my $xml .= <<'EOF';
+        $soap->mock(
+            call => sub {
+                my $xml .= <<'EOF';
 <addAdsResponse xmlns="">
    <ns1:addAdsReturn xsi:type="ns1:ImageAd"
 xmlns:ns1="https://adwords.google.com/api/adwords/v8">
@@ -176,10 +177,11 @@ xmlns:ns1="https://adwords.google.com/api/adwords/v8">
 </addAdsResponse>
 EOF
 
-            $xml = $self->gen_full_response($xml);
-            my $env = SOAP::Deserializer->deserialize($xml);
-            return $env;
-        });
+                $xml = $self->gen_full_response($xml);
+                my $env = SOAP::Deserializer->deserialize($xml);
+                return $env;
+            }
+        );
 
         my $image_ad = Google::Adwords::Ad->new;
         $image_ad->adType('ImageAd');
@@ -194,45 +196,45 @@ EOF
         $image_ad->image($image);
 
         my @ads = $self->{obj}->addAds($image_ad);
-        ok ($ads[0]->id == 24633, 'addAds Image (id)');
-        ok ($ads[0]->image->width == 300, 'addAds Image (width)');
-        ok ($ads[0]->adType eq 'ImageAd', 'addAds Image (adType)');
-
+        ok( $ads[0]->id == 24633, 'addAds Image (id)' );
+        ok( $ads[0]->image->width == 300, 'addAds Image (width)' );
+        ok( $ads[0]->adType eq 'ImageAd', 'addAds Image (adType)' );
 
     }
 
-}
+} # end sub addAds_image :
 
 sub getActiveAds : Test(no_plan)
 {
     my $self = shift;
 
-
-    $sub_name = (caller 0)[3];
+    $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if (not $tests{$sub_name}) {
+    if ( not $tests{$sub_name} ) {
         return;
     }
 
-    if ($self->{sandbox}) {
+    if ( $self->{sandbox} ) {
 
         my $adgroup_id = $self->_get_adgroup_id();
+
         #my $adgroup_id = 20048;
 
         my @ads = $self->{obj}->getActiveAds($adgroup_id);
 
         # should get two or more
-        ok (scalar @ads >= 2, 'getActiveAds');
+        ok( scalar @ads >= 2, 'getActiveAds' );
 
         for (@ads) {
-            ok ($_->id =~ /\d+/, 'getActiveAds id: ' . $_->id);
+            ok( $_->id =~ /\d+/, 'getActiveAds id: ' . $_->id );
         }
 
-    }
+    } # end if ( $self->{sandbox} )
     else {
         my $soap = Test::MockModule->new('SOAP::Lite');
-        $soap->mock( call => sub {
-            my $xml .= <<'EOF';
+        $soap->mock(
+            call => sub {
+                my $xml .= <<'EOF';
 <getActiveAdsResponse xmlns="">
    <ns1:getActiveAdsReturn xsi:type="ns1:TextAd"
 xmlns:ns1="https://adwords.google.com/api/adwords/v8">
@@ -288,57 +290,58 @@ xmlns:ns3="https://adwords.google.com/api/adwords/v8">
   </getActiveAdsResponse>
 EOF
 
-            $xml = $self->gen_full_response($xml);
-            my $env = SOAP::Deserializer->deserialize($xml);
-            return $env;
-        });
+                $xml = $self->gen_full_response($xml);
+                my $env = SOAP::Deserializer->deserialize($xml);
+                return $env;
+            }
+        );
 
         my $adgroup_id = 20048;
 
         my @ads = $self->{obj}->getActiveAds($adgroup_id);
 
         # should get two or more
-        ok (scalar @ads >= 2, 'getActiveAds');
-        ok ($ads[0]->adGroupId == $adgroup_id, 'getActiveAds (adGroupId)');
+        ok( scalar @ads >= 2, 'getActiveAds' );
+        ok( $ads[0]->adGroupId == $adgroup_id, 'getActiveAds (adGroupId)' );
 
         for (@ads) {
-            ok ($_->id =~ /\d+/, 'getActiveAds id: ' . $_->id);
+            ok( $_->id =~ /\d+/, 'getActiveAds id: ' . $_->id );
         }
-
 
     }
 
-
-}
+} # end sub getActiveAds :
 
 sub getAd : Test(no_plan)
 {
     my $self = shift;
 
-    $sub_name = (caller 0)[3];
+    $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if (not $tests{$sub_name}) {
+    if ( not $tests{$sub_name} ) {
         return;
     }
 
-
-    if ($self->{sandbox}) {
+    if ( $self->{sandbox} ) {
 
         my $adgroup_id = $self->_get_adgroup_id();
+
         #my $adgroup_id = 20048;
 
         my $ad_id = $self->{_ad_id};
-        #my $ad_id = 24626;
-        
-        my $ad = $self->{obj}->getAd($adgroup_id, $ad_id);
-        ok ($ad->adGroupId == $adgroup_id, 'getAd');
-        ok ($ad->id eq $ad_id, 'getAd');
 
-    }
+        #my $ad_id = 24626;
+
+        my $ad = $self->{obj}->getAd( $adgroup_id, $ad_id );
+        ok( $ad->adGroupId == $adgroup_id, 'getAd' );
+        ok( $ad->id eq $ad_id, 'getAd' );
+
+    } # end if ( $self->{sandbox} )
     else {
         my $soap = Test::MockModule->new('SOAP::Lite');
-        $soap->mock( call => sub {
-            my $xml .= <<'EOF';
+        $soap->mock(
+            call => sub {
+                my $xml .= <<'EOF';
 <getAdResponse xmlns="">
    <ns1:getAdReturn xsi:type="ns1:TextAd"
 xmlns:ns1="https://adwords.google.com/api/adwords/v8">
@@ -356,39 +359,40 @@ xmlns:ns1="https://adwords.google.com/api/adwords/v8">
   </getAdResponse>
 EOF
 
-            $xml = $self->gen_full_response($xml);
-            my $env = SOAP::Deserializer->deserialize($xml);
-            return $env;
-        });
+                $xml = $self->gen_full_response($xml);
+                my $env = SOAP::Deserializer->deserialize($xml);
+                return $env;
+            }
+        );
 
         my $adgroup_id = 20048;
-        my $ad_id = 24626;
-        
-        my $ad = $self->{obj}->getAd($adgroup_id, $ad_id);
-        ok ($ad->adGroupId == $adgroup_id, 'getAd (adGroupId)');
-        ok ($ad->id eq $ad_id, 'getAd (id)');
+        my $ad_id      = 24626;
 
+        my $ad = $self->{obj}->getAd( $adgroup_id, $ad_id );
+        ok( $ad->adGroupId == $adgroup_id, 'getAd (adGroupId)' );
+        ok( $ad->id eq $ad_id, 'getAd (id)' );
 
     }
-}
+} # end sub getAd :
 
 sub getAdStats : Test(no_plan)
 {
     my $self = shift;
 
-    $sub_name = (caller 0)[3];
+    $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if (not $tests{$sub_name}) {
+    if ( not $tests{$sub_name} ) {
         return;
     }
 
-
-    if ($self->{sandbox}) {
+    if ( $self->{sandbox} ) {
 
         my $adgroup_id = $self->_get_adgroup_id();
+
         #my $adgroup_id = 20048;
 
         my $ad_ids = [ $self->{_ad_id} ];
+
         #my $ad_ids = [ 24626 ],
 
         #my @stats = $self->{obj}->getAdStats({
@@ -401,74 +405,73 @@ sub getAdStats : Test(no_plan)
 
         #ok (ref $stats[0] eq 'Google::Adwords::StatsRecord', 'getAdStats');
 
-       
-
-    }
+    } # end if ( $self->{sandbox} )
     else {
 
         my $soap = Test::MockModule->new('SOAP::Lite');
-        $soap->mock( call => sub {
-            my $xml .= <<'EOF';
+        $soap->mock(
+            call => sub {
+                my $xml .= <<'EOF';
   <getAdStatsResponse/>
 EOF
 
-            $xml = $self->gen_full_response($xml);
-            my $env = SOAP::Deserializer->deserialize($xml);
-            return $env;
-        });
+                $xml = $self->gen_full_response($xml);
+                my $env = SOAP::Deserializer->deserialize($xml);
+                return $env;
+            }
+        );
 
         my $adgroup_id = 1004;
 
-        my @stats = $self->{obj}->getAdStats({
-            adGroupId => $adgroup_id,
-            adIds => [ 1001, 1002 ],
-            startDay => '2006-09-01',
-            endDay => '2006-09-15',
-            inPST => 1,
-        });
+        my @stats = $self->{obj}->getAdStats(
+            {
+                adGroupId => $adgroup_id,
+                adIds     => [ 1001, 1002 ],
+                startDay  => '2006-09-01',
+                endDay    => '2006-09-15',
+                inPST     => 1,
+            }
+        );
 
         #ok ($stats[0]->id == 1001, 'getCreativeStats');
         #ok ($stats[0]->clicks == 10, 'getCreativeStats');
         #ok ($stats[1]->id == 1002, 'getCreativeStats');
-        
 
     }
 
-
-}
+} # end sub getAdStats :
 
 sub getAllAds : Test(no_plan)
 {
     my $self = shift;
 
-
-    $sub_name = (caller 0)[3];
+    $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if (not $tests{$sub_name}) {
+    if ( not $tests{$sub_name} ) {
         return;
     }
 
-    if ($self->{sandbox}) {
+    if ( $self->{sandbox} ) {
 
         my $adgroup_id = $self->_get_adgroup_id();
+
         #my $adgroup_id = 20048;
 
         my @ads = $self->{obj}->getAllAds($adgroup_id);
 
         # should get two or more
-        ok (scalar @ads >= 2, 'getAllAds');
+        ok( scalar @ads >= 2, 'getAllAds' );
 
         for (@ads) {
-            ok ($_->id =~ /\d+/, 'getAllAds id: ' . $_->id);
+            ok( $_->id =~ /\d+/, 'getAllAds id: ' . $_->id );
         }
 
-
-
-    }
+    } # end if ( $self->{sandbox} )
     else {
         my $soap = Test::MockModule->new('SOAP::Lite');
-        $soap->mock( call => sub {
-            my $xml .= <<'EOF';
+        $soap->mock(
+            call => sub {
+                my $xml .= <<'EOF';
 <getAllAdsResponse xmlns="">
    <ns1:getAllAdsReturn xsi:type="ns1:TextAd"
 xmlns:ns1="https://adwords.google.com/api/adwords/v8">
@@ -486,39 +489,41 @@ xmlns:ns1="https://adwords.google.com/api/adwords/v8">
   </getAllAdsResponse>
 EOF
 
-            $xml = $self->gen_full_response($xml);
-            my $env = SOAP::Deserializer->deserialize($xml);
-            return $env;
-        });
+                $xml = $self->gen_full_response($xml);
+                my $env = SOAP::Deserializer->deserialize($xml);
+                return $env;
+            }
+        );
 
         my $adgroup_id = 20048;
 
         my @ads = $self->{obj}->getAllAds($adgroup_id);
 
         for (@ads) {
-            ok ($_->id =~ /\d+/, 'getAllAds id: ' . $_->id);
+            ok( $_->id =~ /\d+/, 'getAllAds id: ' . $_->id );
         }
 
     }
-}
+} # end sub getAllAds :
 
-sub updateAds: Test(no_plan)
+sub updateAds : Test(no_plan)
 {
     my $self = shift;
 
-    $sub_name = (caller 0)[3];
+    $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if (not $tests{$sub_name}) {
+    if ( not $tests{$sub_name} ) {
         return;
     }
 
-
-    if ($self->{sandbox}) {
+    if ( $self->{sandbox} ) {
 
         my $adgroup_id = $self->_get_adgroup_id();
+
         #my $adgroup_id = 20048;
-        
+
         my $ad_id = $self->{_ad_id};
+
         #my $ad_id = 24626;
 
         my $ad1 = Google::Adwords::Ad->new;
@@ -528,23 +533,25 @@ sub updateAds: Test(no_plan)
         $ad1->status('Paused');
 
         my $ret = $self->{obj}->updateAds($ad1);
-        ok ($ret == 1, 'updateAds');
+        ok( $ret == 1, 'updateAds' );
 
-    }
+    } # end if ( $self->{sandbox} )
     else {
         my $soap = Test::MockModule->new('SOAP::Lite');
-        $soap->mock( call => sub {
-            my $xml .= <<'EOF';
+        $soap->mock(
+            call => sub {
+                my $xml .= <<'EOF';
   <updateAdsResponse xmlns=""/>
 EOF
 
-            $xml = $self->gen_full_response($xml);
-            my $env = SOAP::Deserializer->deserialize($xml);
-            return $env;
-        });
+                $xml = $self->gen_full_response($xml);
+                my $env = SOAP::Deserializer->deserialize($xml);
+                return $env;
+            }
+        );
 
         my $adgroup_id = 20048;
-        
+
         my $ad_id = 24626;
 
         my $ad1 = Google::Adwords::Ad->new;
@@ -554,13 +561,11 @@ EOF
         $ad1->status('Paused');
 
         my $ret = $self->{obj}->updateAds($ad1);
-        ok ($ret == 1, 'updateAds');
-
+        ok( $ret == 1, 'updateAds' );
 
     }
 
-}
+} # end sub updateAds :
 
 1;
-
 

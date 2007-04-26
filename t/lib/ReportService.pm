@@ -22,21 +22,20 @@ sub start_of_each_test : Test(setup)
     my $self = shift;
 
     # set debug to whatever was passed in as param
-    $self->{obj}->debug($self->{debug});
+    $self->{obj}->debug( $self->{debug} );
 }
 
 sub deleteReport : Test(no_plan)
 {
     my $self = shift;
 
-    $sub_name = (caller 0)[3];
+    $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if (not $tests{$sub_name}) {
+    if ( not $tests{$sub_name} ) {
         return;
     }
 
-
-    if ($self->{sandbox}) {
+    if ( $self->{sandbox} ) {
 
         #$self->{obj}->deleteReport(11);
         return;
@@ -44,46 +43,48 @@ sub deleteReport : Test(no_plan)
     }
     else {
         my $soap = Test::MockModule->new('SOAP::Lite');
-        $soap->mock( call => sub {
-            my $xml .= <<'EOF';
+        $soap->mock(
+            call => sub {
+                my $xml .= <<'EOF';
   <deleteReportResponse xmlns="" />
 EOF
 
-            $xml = $self->gen_full_response($xml);
-            my $env = SOAP::Deserializer->deserialize($xml);
-            return $env;
-        });
+                $xml = $self->gen_full_response($xml);
+                my $env = SOAP::Deserializer->deserialize($xml);
+                return $env;
+            }
+        );
 
         my $ret = $self->{obj}->deleteReport(1);
-        ok ($ret == 1, 'deleteReport'); 
+        ok( $ret == 1, 'deleteReport' );
 
     }
 
-}
+} # end sub deleteReport :
 
 sub z1_getAllJobs : Test(no_plan)
 {
     my $self = shift;
 
-
-    $sub_name = (caller 0)[3];
+    $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if (not $tests{$sub_name}) {
+    if ( not $tests{$sub_name} ) {
         return;
     }
 
-    if ($self->{sandbox}) {
+    if ( $self->{sandbox} ) {
 
         my @jobs = $self->{obj}->getAllJobs;
         for (@jobs) {
-            ok ($_->id =~ /\d+/, 'getAllJobs id: ' . $_->id);
+            ok( $_->id =~ /\d+/, 'getAllJobs id: ' . $_->id );
         }
 
     }
     else {
         my $soap = Test::MockModule->new('SOAP::Lite');
-        $soap->mock( call => sub {
-            my $xml .= <<'EOF';
+        $soap->mock(
+            call => sub {
+                my $xml .= <<'EOF';
   <getAllJobsResponse xmlns="">
    <ns1:getAllJobsReturn xsi:type="ns1:KeywordReportJob"
 xmlns:ns1="https://adwords.google.com/api/adwords/v6">
@@ -111,155 +112,148 @@ xmlns:ns2="https://adwords.google.com/api/adwords/v6">
   </getAllJobsResponse>
 EOF
 
-            $xml = $self->gen_full_response($xml);
-            my $env = SOAP::Deserializer->deserialize($xml);
-            return $env;
-        });
+                $xml = $self->gen_full_response($xml);
+                my $env = SOAP::Deserializer->deserialize($xml);
+                return $env;
+            }
+        );
 
         my @jobs = $self->{obj}->getAllJobs;
         for (@jobs) {
-            ok ($_->id =~ /\d+/, 'getAllJobs id: ' . $_->id);
+            ok( $_->id =~ /\d+/, 'getAllJobs id: ' . $_->id );
         }
-
 
     }
 
-}
+} # end sub z1_getAllJobs :
 
 sub z3_getGzipReportDownloadUrl : Test(no_plan)
 {
     my $self = shift;
 
-
-    $sub_name = (caller 0)[3];
+    $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if (not $tests{$sub_name}) {
+    if ( not $tests{$sub_name} ) {
         return;
     }
 
-    if ($self->{sandbox}) {
+    if ( $self->{sandbox} ) {
 
-        my $url = $self->{obj}->getGzipReportDownloadUrl($self->{_job_id});
+        my $url = $self->{obj}->getGzipReportDownloadUrl( $self->{_job_id} );
 
     }
     else {
         my $soap = Test::MockModule->new('SOAP::Lite');
-        $soap->mock( call => sub {
-            my $xml .= <<'EOF';
+        $soap->mock(
+            call => sub {
+                my $xml .= <<'EOF';
   <getGzipReportDownloadUrlResponse xmlns="" />
 EOF
 
-            $xml = $self->gen_full_response($xml);
-            my $env = SOAP::Deserializer->deserialize($xml);
-            return $env;
-        });
+                $xml = $self->gen_full_response($xml);
+                my $env = SOAP::Deserializer->deserialize($xml);
+                return $env;
+            }
+        );
 
         my @jobs = $self->{obj}->getAllJobs;
         for (@jobs) {
-            ok ($_->id =~ /\d+/, 'getAllJobs');
+            ok( $_->id =~ /\d+/, 'getAllJobs' );
         }
-
 
     }
 
-}
+} # end sub z3_getGzipReportDownloadUrl :
 
 sub z2_getReportJobStatus : Test(no_plan)
 {
     my $self = shift;
 
-    $sub_name = (caller 0)[3];
+    $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if (not $tests{$sub_name}) {
+    if ( not $tests{$sub_name} ) {
         return;
     }
 
+    if ( $self->{sandbox} ) {
 
-    if ($self->{sandbox}) {
-
-        my $status = $self->{obj}->getReportJobStatus($self->{_job_id});
-        ok ($status eq 'Pending', 'getReportJobStatus');
+        my $status = $self->{obj}->getReportJobStatus( $self->{_job_id} );
+        ok( $status eq 'Pending', 'getReportJobStatus' );
 
     }
     else {
         my $soap = Test::MockModule->new('SOAP::Lite');
-        $soap->mock( call => sub {
-            my $xml .= <<'EOF';
+        $soap->mock(
+            call => sub {
+                my $xml .= <<'EOF';
   <getReportJobStatusResponse xmlns="">
    <ns1:getReportJobStatusReturn
 xmlns:ns1="https://adwords.google.com/api/adwords/v6">Pending</ns1:getReportJobStatusReturn>
   </getReportJobStatusResponse>
 EOF
 
-            $xml = $self->gen_full_response($xml);
-            my $env = SOAP::Deserializer->deserialize($xml);
-            return $env;
-        });
+                $xml = $self->gen_full_response($xml);
+                my $env = SOAP::Deserializer->deserialize($xml);
+                return $env;
+            }
+        );
 
         my $status = $self->{obj}->getReportJobStatus(11);
-        ok ($status eq 'Pending', 'getReportJobStatus');
+        ok( $status eq 'Pending', 'getReportJobStatus' );
 
     }
 
-}
+} # end sub z2_getReportJobStatus :
 
 sub z0_scheduleReportJob : Test(no_plan)
 {
     my $self = shift;
 
-    $sub_name = (caller 0)[3];
+    $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if (not $tests{$sub_name}) {
+    if ( not $tests{$sub_name} ) {
         return;
     }
 
+    if ( $self->{sandbox} ) {
 
-    if ($self->{sandbox}) {
+        my $job = Google::Adwords::ReportJob->new->startDay('2007-02-25')
+            ->endDay('2007-02-27')->name('test')->aggregationType('Summary');
 
-        my $job = Google::Adwords::ReportJob->new
-            ->startDay('2007-02-25')
-            ->endDay('2007-02-27')
-            ->name('test')
-            ->aggregationType('Summary')
-        ;
-
-        my $job_id 
-            = $self->{obj}->scheduleReportJob('AccountReportJob', $job);
-        ok ($job_id =~ /\d+/, 'scheduleReportJob id: ' . $job_id);
+        my $job_id
+            = $self->{obj}->scheduleReportJob( 'AccountReportJob', $job );
+        ok( $job_id =~ /\d+/, 'scheduleReportJob id: ' . $job_id );
 
         # save for further use
         $self->{_job_id} = $job_id;
     }
     else {
         my $soap = Test::MockModule->new('SOAP::Lite');
-        $soap->mock( call => sub {
-            my $xml .= <<'EOF';
+        $soap->mock(
+            call => sub {
+                my $xml .= <<'EOF';
   <scheduleReportJobResponse
 xmlns="https://adwords.google.com/api/adwords/v6">
    <scheduleReportJobReturn>1935158656</scheduleReportJobReturn>
   </scheduleReportJobResponse>
 EOF
 
-            $xml = $self->gen_full_response($xml);
-            my $env = SOAP::Deserializer->deserialize($xml);
-            return $env;
-        });
+                $xml = $self->gen_full_response($xml);
+                my $env = SOAP::Deserializer->deserialize($xml);
+                return $env;
+            }
+        );
 
-        my $job = Google::Adwords::ReportJob->new
-            ->startDay('2006-08-01')
-            ->endDay('2006-08-01')
-            ->name('test')
-            ->aggregationType('Summary')
-        ;
+        my $job = Google::Adwords::ReportJob->new->startDay('2006-08-01')
+            ->endDay('2006-08-01')->name('test')->aggregationType('Summary');
 
-        my $job_id 
-            = $self->{obj}->scheduleReportJob('AccountReportJob', $job);
-        ok ($job_id eq '1935158656', 'scheduleReportJob');
-
+        my $job_id
+            = $self->{obj}->scheduleReportJob( 'AccountReportJob', $job );
+        ok( $job_id eq '1935158656', 'scheduleReportJob' );
 
     }
 
-}
+} # end sub z0_scheduleReportJob :
 
 1;
 

@@ -12,9 +12,9 @@ sub test_class { return "Google::Adwords::TrafficEstimatorService"; }
 
 # tests to run
 my %tests = (
-    estimateAdGroupList     => 1,
-    estimateCampaignList    => 1,
-    estimateKeywordList     => 1,
+    estimateAdGroupList  => 1,
+    estimateCampaignList => 1,
+    estimateKeywordList  => 1,
 );
 
 sub start_of_each_test : Test(setup)
@@ -22,49 +22,44 @@ sub start_of_each_test : Test(setup)
     my $self = shift;
 
     # set debug to whatever was passed in as param
-    $self->{obj}->debug($self->{debug});
+    $self->{obj}->debug( $self->{debug} );
 }
 
 sub estimateAdGroupList : Test(no_plan)
 {
     my $self = shift;
 
-    $sub_name = (caller 0)[3];
+    $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if (not $tests{$sub_name}) {
+    if ( not $tests{$sub_name} ) {
         return;
     }
 
+    if ( $self->{sandbox} ) {
 
-    if ($self->{sandbox}) {
+        my $kwreq1
+            = Google::Adwords::KeywordRequest->new->text('web marketing')
+            ->type('Broad')->maxCpc(1000000);
 
+        my $kwreq2 = Google::Adwords::KeywordRequest->new->text(
+            'marketing analytics')->maxCpc(1000000)->type('Broad');
 
-         my $kwreq1 = Google::Adwords::KeywordRequest->new
-            ->text('web marketing')
-            ->type('Broad')
-            ->maxCpc(1000000);
-
-        my $kwreq2 = Google::Adwords::KeywordRequest->new
-            ->text('marketing analytics')
-            ->maxCpc(1000000)
-            ->type('Broad');
-
-        my $adgroup_request1 = Google::Adwords::AdGroupRequest->new
-            ->maxCpc(50000000)
-            ->keywordRequests($kwreq1, $kwreq2);
-
+        my $adgroup_request1
+            = Google::Adwords::AdGroupRequest->new->maxCpc(50000000)
+            ->keywordRequests( $kwreq1, $kwreq2 );
 
         my @estimates = $self->{obj}->estimateAdGroupList($adgroup_request1);
 
-        ok (ref $estimates[0] eq 'Google::Adwords::AdGroupEstimate',
-                'estimateAdGroupList');
-        ok (scalar @{$estimates[0]->keywordEstimates} == 2,
-                'estimateAdGroupList');
-    }
+        ok( ref $estimates[0] eq 'Google::Adwords::AdGroupEstimate',
+            'estimateAdGroupList' );
+        ok( scalar @{ $estimates[0]->keywordEstimates } == 2,
+            'estimateAdGroupList' );
+    } # end if ( $self->{sandbox} )
     else {
         my $soap = Test::MockModule->new('SOAP::Lite');
-        $soap->mock( call => sub {
-            my $xml .= <<'EOF';
+        $soap->mock(
+            call => sub {
+                my $xml .= <<'EOF';
   <estimateAdGroupListResponse xmlns="">
    <ns1:estimateAdGroupListReturn
 xmlns:ns1="https://adwords.google.com/api/adwords/v6">
@@ -91,90 +86,81 @@ xmlns:ns1="https://adwords.google.com/api/adwords/v6">
   </estimateAdGroupListResponse>
 EOF
 
-            $xml = $self->gen_full_response($xml);
-            my $env = SOAP::Deserializer->deserialize($xml);
-            return $env;
-        });
+                $xml = $self->gen_full_response($xml);
+                my $env = SOAP::Deserializer->deserialize($xml);
+                return $env;
+            }
+        );
 
-         my $kwreq1 = Google::Adwords::KeywordRequest->new
-            ->text('web marketing')
-            ->type('Broad')
-            ->maxCpc(1000000);
+        my $kwreq1
+            = Google::Adwords::KeywordRequest->new->text('web marketing')
+            ->type('Broad')->maxCpc(1000000);
 
-        my $kwreq2 = Google::Adwords::KeywordRequest->new
-            ->text('marketing analytics')
-            ->maxCpc(1000000)
-            ->type('Broad');
+        my $kwreq2 = Google::Adwords::KeywordRequest->new->text(
+            'marketing analytics')->maxCpc(1000000)->type('Broad');
 
-        my $adgroup_request1 = Google::Adwords::AdGroupRequest->new
-            ->maxCpc(50000000)
-            ->keywordRequests($kwreq1, $kwreq2);
-
+        my $adgroup_request1
+            = Google::Adwords::AdGroupRequest->new->maxCpc(50000000)
+            ->keywordRequests( $kwreq1, $kwreq2 );
 
         my @estimates = $self->{obj}->estimateAdGroupList($adgroup_request1);
 
-        ok (ref $estimates[0] eq 'Google::Adwords::AdGroupEstimate',
-                'estimateAdGroupList');
-        ok (scalar @{$estimates[0]->keywordEstimates} == 2,
-                'estimateAdGroupList');
-        ok ($estimates[0]->keywordEstimates->[1]->lowerCpc == 123506,
-                'estimateAdGroupList');
+        ok( ref $estimates[0] eq 'Google::Adwords::AdGroupEstimate',
+            'estimateAdGroupList' );
+        ok( scalar @{ $estimates[0]->keywordEstimates } == 2,
+            'estimateAdGroupList' );
+        ok( $estimates[0]->keywordEstimates->[1]->lowerCpc == 123506,
+            'estimateAdGroupList' );
     }
 
-}
+} # end sub estimateAdGroupList :
 
 sub estimateCampaignList : Test(no_plan)
 {
     my $self = shift;
 
-    $sub_name = (caller 0)[3];
+    $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if (not $tests{$sub_name}) {
+    if ( not $tests{$sub_name} ) {
         return;
     }
 
+    if ( $self->{sandbox} ) {
 
-    if ($self->{sandbox}) {
+        my $kwreq1
+            = Google::Adwords::KeywordRequest->new->text('web marketing')
+            ->type('Broad')->maxCpc(1000000);
 
+        my $kwreq2 = Google::Adwords::KeywordRequest->new->text(
+            'marketing analytics')->maxCpc(1000000)->type('Broad');
 
-         my $kwreq1 = Google::Adwords::KeywordRequest->new
-            ->text('web marketing')
-            ->type('Broad')
-            ->maxCpc(1000000);
+        my $adgroup_request1
+            = Google::Adwords::AdGroupRequest->new->maxCpc(50000000)
+            ->keywordRequests( $kwreq1, $kwreq2 );
 
-        my $kwreq2 = Google::Adwords::KeywordRequest->new
-            ->text('marketing analytics')
-            ->maxCpc(1000000)
-            ->type('Broad');
-
-        my $adgroup_request1 = Google::Adwords::AdGroupRequest->new
-            ->maxCpc(50000000)
-            ->keywordRequests($kwreq1, $kwreq2);
-
-        my $cmpgreq1 = Google::Adwords::CampaignRequest->new
-            ->geoTargeting({
-                cities => [ 'Pelican, AK US' ] })
-            ->languageTargeting({
-             languages => [ 'fr', 'en' ] })
+        my $cmpgreq1 = Google::Adwords::CampaignRequest->new->geoTargeting(
+            { cities => ['Pelican, AK US'] } )
+            ->languageTargeting( { languages => [ 'fr', 'en' ] } )
             ->adGroupRequests($adgroup_request1);
 
         my @estimates = $self->{obj}->estimateCampaignList($cmpgreq1);
- 
-        ok (ref $estimates[0] eq 'Google::Adwords::CampaignEstimate',
-            'estimateCampaignList');
-        
-        my $adgroup_estimate  = $estimates[0]->adGroupEstimates->[0];
-        ok (ref $adgroup_estimate eq 'Google::Adwords::AdGroupEstimate',
-            'estimateCampaignList');
 
-        ok (scalar @{$adgroup_estimate->keywordEstimates} == 2,
-            'estimateCampaignList');
+        ok( ref $estimates[0] eq 'Google::Adwords::CampaignEstimate',
+            'estimateCampaignList' );
 
-    }
+        my $adgroup_estimate = $estimates[0]->adGroupEstimates->[0];
+        ok( ref $adgroup_estimate eq 'Google::Adwords::AdGroupEstimate',
+            'estimateCampaignList' );
+
+        ok( scalar @{ $adgroup_estimate->keywordEstimates } == 2,
+            'estimateCampaignList' );
+
+    } # end if ( $self->{sandbox} )
     else {
         my $soap = Test::MockModule->new('SOAP::Lite');
-        $soap->mock( call => sub {
-            my $xml .= <<'EOF';
+        $soap->mock(
+            call => sub {
+                my $xml .= <<'EOF';
   <estimateCampaignListResponse xmlns="">
    <ns1:estimateCampaignListReturn
 xmlns:ns1="https://adwords.google.com/api/adwords/v6">
@@ -204,85 +190,77 @@ xmlns:ns1="https://adwords.google.com/api/adwords/v6">
   </estimateCampaignListResponse>
 EOF
 
-            $xml = $self->gen_full_response($xml);
-            my $env = SOAP::Deserializer->deserialize($xml);
-            return $env;
-        });
+                $xml = $self->gen_full_response($xml);
+                my $env = SOAP::Deserializer->deserialize($xml);
+                return $env;
+            }
+        );
 
-         my $kwreq1 = Google::Adwords::KeywordRequest->new
-            ->text('web marketing')
-            ->type('Broad')
-            ->maxCpc(1000000);
+        my $kwreq1
+            = Google::Adwords::KeywordRequest->new->text('web marketing')
+            ->type('Broad')->maxCpc(1000000);
 
-        my $kwreq2 = Google::Adwords::KeywordRequest->new
-            ->text('marketing analytics')
-            ->maxCpc(1000000)
-            ->type('Broad');
+        my $kwreq2 = Google::Adwords::KeywordRequest->new->text(
+            'marketing analytics')->maxCpc(1000000)->type('Broad');
 
-        my $adgroup_request1 = Google::Adwords::AdGroupRequest->new
-            ->maxCpc(50000000)
-            ->keywordRequests($kwreq1, $kwreq2);
+        my $adgroup_request1
+            = Google::Adwords::AdGroupRequest->new->maxCpc(50000000)
+            ->keywordRequests( $kwreq1, $kwreq2 );
 
-        my $cmpgreq1 = Google::Adwords::CampaignRequest->new
-            ->geoTargeting({
-                cities => [ 'Pelican, AK US' ] })
-            ->languageTargeting({
-             languages => [ 'fr', 'en' ] })
+        my $cmpgreq1 = Google::Adwords::CampaignRequest->new->geoTargeting(
+            { cities => ['Pelican, AK US'] } )
+            ->languageTargeting( { languages => [ 'fr', 'en' ] } )
             ->adGroupRequests($adgroup_request1);
 
         my @estimates = $self->{obj}->estimateCampaignList($cmpgreq1);
- 
-        ok (ref $estimates[0] eq 'Google::Adwords::CampaignEstimate',
-            'estimateCampaignList');
-        
-        my $adgroup_estimate  = $estimates[0]->adGroupEstimates->[0];
-        ok (ref $adgroup_estimate eq 'Google::Adwords::AdGroupEstimate',
-            'estimateCampaignList');
 
-        ok (scalar @{$adgroup_estimate->keywordEstimates} == 2,
-            'estimateCampaignList');
+        ok( ref $estimates[0] eq 'Google::Adwords::CampaignEstimate',
+            'estimateCampaignList' );
 
-        ok ($adgroup_estimate->keywordEstimates->[1]->upperCpc == 646489,
-            'estimateCampaignList');
+        my $adgroup_estimate = $estimates[0]->adGroupEstimates->[0];
+        ok( ref $adgroup_estimate eq 'Google::Adwords::AdGroupEstimate',
+            'estimateCampaignList' );
+
+        ok( scalar @{ $adgroup_estimate->keywordEstimates } == 2,
+            'estimateCampaignList' );
+
+        ok( $adgroup_estimate->keywordEstimates->[1]->upperCpc == 646489,
+            'estimateCampaignList' );
     }
 
-}
+} # end sub estimateCampaignList :
 
 sub estimateKeywordList : Test(no_plan)
 {
     my $self = shift;
 
-    $sub_name = (caller 0)[3];
+    $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if (not $tests{$sub_name}) {
+    if ( not $tests{$sub_name} ) {
         return;
     }
 
+    if ( $self->{sandbox} ) {
 
-    if ($self->{sandbox}) {
+        my $kwreq1
+            = Google::Adwords::KeywordRequest->new->text('web marketing')
+            ->type('Broad')->maxCpc(1000000);
 
+        my $kwreq2 = Google::Adwords::KeywordRequest->new->text(
+            'marketing analytics')->maxCpc(1000000)->type('Broad');
 
-         my $kwreq1 = Google::Adwords::KeywordRequest->new
-            ->text('web marketing')
-            ->type('Broad')
-            ->maxCpc(1000000);
+        my @estimates = $self->{obj}->estimateKeywordList( $kwreq1, $kwreq2 );
 
-        my $kwreq2 = Google::Adwords::KeywordRequest->new
-            ->text('marketing analytics')
-            ->maxCpc(1000000)
-            ->type('Broad');
+        ok( scalar @estimates == 2, 'estimateKeywordList' );
+        ok( ref $estimates[0] eq 'Google::Adwords::KeywordEstimate',
+            'estimateKeywordList' );
 
-        my @estimates = $self->{obj}->estimateKeywordList($kwreq1, $kwreq2);
-
-        ok (scalar @estimates == 2, 'estimateKeywordList');
-        ok (ref $estimates[0] eq 'Google::Adwords::KeywordEstimate',
-            'estimateKeywordList');
-
-    }
+    } # end if ( $self->{sandbox} )
     else {
         my $soap = Test::MockModule->new('SOAP::Lite');
-        $soap->mock( call => sub {
-            my $xml .= <<'EOF';
+        $soap->mock(
+            call => sub {
+                my $xml .= <<'EOF';
   <estimateKeywordListResponse xmlns="">
    <ns1:estimateKeywordListReturn
 xmlns:ns1="https://adwords.google.com/api/adwords/v6">
@@ -307,32 +285,29 @@ xmlns:ns2="https://adwords.google.com/api/adwords/v6">
   </estimateKeywordListResponse>
 EOF
 
-            $xml = $self->gen_full_response($xml);
-            my $env = SOAP::Deserializer->deserialize($xml);
-            return $env;
-        });
+                $xml = $self->gen_full_response($xml);
+                my $env = SOAP::Deserializer->deserialize($xml);
+                return $env;
+            }
+        );
 
-         my $kwreq1 = Google::Adwords::KeywordRequest->new
-            ->text('web marketing')
-            ->type('Broad')
-            ->maxCpc(1000000);
+        my $kwreq1
+            = Google::Adwords::KeywordRequest->new->text('web marketing')
+            ->type('Broad')->maxCpc(1000000);
 
-        my $kwreq2 = Google::Adwords::KeywordRequest->new
-            ->text('marketing analytics')
-            ->maxCpc(1000000)
-            ->type('Broad');
+        my $kwreq2 = Google::Adwords::KeywordRequest->new->text(
+            'marketing analytics')->maxCpc(1000000)->type('Broad');
 
-        my @estimates = $self->{obj}->estimateKeywordList($kwreq1, $kwreq2);
- 
-        ok (scalar @estimates == 2, 'estimateKeywordList');
-        ok (ref $estimates[0] eq 'Google::Adwords::KeywordEstimate',
-            'estimateKeywordList');
-        ok ($estimates[0]->lowerClicksPerDay eq '21.138144',
-            'estimateKeywordList');
+        my @estimates = $self->{obj}->estimateKeywordList( $kwreq1, $kwreq2 );
+
+        ok( scalar @estimates == 2, 'estimateKeywordList' );
+        ok( ref $estimates[0] eq 'Google::Adwords::KeywordEstimate',
+            'estimateKeywordList' );
+        ok( $estimates[0]->lowerClicksPerDay eq '21.138144',
+            'estimateKeywordList' );
     }
 
-}
+} # end sub estimateKeywordList :
 
 1;
-
 

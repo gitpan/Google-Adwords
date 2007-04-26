@@ -71,7 +71,7 @@ sub addCreative
         push @creative_params,
             SOAP::Data->name( 'image' => \SOAP::Data->value(@image_params) )
             ->type('');
-    }
+    } # end if ( defined $creative...
     else {
         if ( defined $creative->headline ) {
             push @creative_params,
@@ -187,7 +187,7 @@ sub addCreativeList
             }
             push @creative_params, SOAP::Data->name(
                 'image' => \SOAP::Data->value(@image_params) )->type('');
-        }
+        } # end if ( defined $creative...
         else {
             if ( defined $creative->headline ) {
                 push @creative_params,
@@ -358,20 +358,20 @@ sub getCreative
 ### INSTANCE METHOD ################################################
 # Usage      :
 #   my @creative_stats = $obj->getCreativeStats({
-#       adGroupId	=> 1234
-#	    creativeIds	=> [ 3982, 2787, 17872 ],
-#	    startDay 	=> $startDay,
-#	    endDay	=> $endDay,
-#	    inPST	=> 1,
+#       adGroupId       => 1234
+#           creativeIds => [ 3982, 2787, 17872 ],
+#           startDay    => $startDay,
+#           endDay      => $endDay,
+#           inPST       => 1,
 #   });
 # Purpose    : Get stats on a set of creatives
 # Returns    :  A list of StatsRecord object for each creative
 # Parameters :
 #   adGroupId : The ad group that contains the creative to be queried
-#	creativeIds  : array reference of creative ids
-#	startDay : starting day of the stats YYYY-MM-DD
-#	endDay : end day of the stats YYYY-MM-DD
-#	inPST : True = get stats in America/Los_Angeles timezone (Google headquarters) regardless of the parent account's localtimezone.
+#       creativeIds  : array reference of creative ids
+#       startDay : starting day of the stats YYYY-MM-DD
+#       endDay : end day of the stats YYYY-MM-DD
+#       inPST : True = get stats in America/Los_Angeles timezone (Google headquarters) regardless of the parent account's localtimezone.
 # Throws     : no exceptions
 # Comments   : none
 # See Also   : n/a
@@ -506,18 +506,18 @@ This documentation refers to Google::Adwords::CreativeService version 0.3.1
     # or 
     $creative_service->clientCustomerId($customerid);
 
-    my $adgroupid	= 123456789;
+    my $adgroupid       = 123456789;
 
     # get all the creatives for an adgroup
-    my @getallcreatives	= $creative_service->getAllCreatives($adgroupid);
+    my @getallcreatives = $creative_service->getAllCreatives($adgroupid);
     for ( @getallcreatives ) {
         print "Creative name : " . $_->name . " , Id : " . $_->id . "\n";
     }
 
     # get a specific creative from an AdGroup
-    my $creativeid	= 987654321;
+    my $creativeid      = 987654321;
 
-    my $getcreative	= $creative_service->getCreative($adgroupid, $creativeid);
+    my $getcreative     = $creative_service->getCreative($adgroupid, $creativeid);
     print "Get creative: " . $getcreative->name . ", Id : " . $getcreative->id . "\n";
 
     # add a creative
@@ -529,13 +529,13 @@ This documentation refers to Google::Adwords::CreativeService version 0.3.1
             ->description1('desc1 added via API')
             ->description2('desc2 added via API');
 
-    my $addcreative	= $creative_service->addCreative($creative_text);
+    my $addcreative     = $creative_service->addCreative($creative_text);
     print "Added Creative ID: " . $addcreative->id . "\n";
 
     # add a image creative
     my $data_blurb = read_file('image.gif');
 
-    my $image	= Google::Adwords::Image->new
+    my $image   = Google::Adwords::Image->new
             ->name('Image #1')
             ->data($data_blurb)
             ->type('image');
@@ -546,7 +546,7 @@ This documentation refers to Google::Adwords::CreativeService version 0.3.1
             ->displayUrl('http://www.example.com')
             ->image( $image );
     
-    my $addcreative	= $creative_service->addCreative($creative_image);
+    my $addcreative     = $creative_service->addCreative($creative_image);
     print "Added Creative ID: " . $addcreative->id . "\n";
     print "Image Height: " . $addcreative->image->height . "\n";
 

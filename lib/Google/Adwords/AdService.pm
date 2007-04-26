@@ -62,17 +62,17 @@ sub _create_request_params
                                 SOAP::Data->name( $_ => $image->$_ )
                                 ->type('');
                         }
-                    }
-                }
+                    } # end if ( defined $image->$_)
+                } # end for (@image_fields)
 
                 push @params, SOAP::Data->name(
                     $_ => \SOAP::Data->value(@image_params) )->type('');
-            }
+            } # end if ( ( $_ eq 'image' )...
             else {
                 push @params, SOAP::Data->name( $_ => $ad->$_ )->type('');
             }
-        }
-    }
+        } # end if ( defined $ad->$_ )
+    } # end for (@fields_base_ad)
 
     return @params;
 } # end sub _create_request_params
@@ -149,7 +149,7 @@ sub _parse_ad_response
     }
 
     return $self->_create_object_from_hash( $r, 'Google::Adwords::Ad' );
-} # end sub _parse_ad_response
+}
 
 ### INSTANCE METHOD ########################################################
 # Usage      :
@@ -270,20 +270,20 @@ sub getAd
 ### INSTANCE METHOD ################################################
 # Usage      :
 #   my @ad_stats = $obj->getAdStats({
-#       adGroupId	=> 1234
-#	    adIds	=> [ 3982, 2787, 17872 ],
-#	    startDay 	=> $startDay,
-#	    endDay	=> $endDay,
-#	    inPST	=> 1,
+#       adGroupId       => 1234
+#           adIds       => [ 3982, 2787, 17872 ],
+#           startDay    => $startDay,
+#           endDay      => $endDay,
+#           inPST       => 1,
 #   });
 # Purpose    : Get stats on a set of Ads
 # Returns    :  A list of StatsRecord object for each Ad
 # Parameters :
 #   adGroupId : The ad group that contains the Ads to be queried
-#	creativeIds  : array reference of Ad Ids
-#	startDay : starting day of the stats YYYY-MM-DD
-#	endDay : end day of the stats YYYY-MM-DD
-#	inPST : True = get stats in America/Los_Angeles timezone
+#       creativeIds  : array reference of Ad Ids
+#       startDay : starting day of the stats YYYY-MM-DD
+#       endDay : end day of the stats YYYY-MM-DD
+#       inPST : True = get stats in America/Los_Angeles timezone
 #           (Google headquarters) regardless of the parent account's localtimezone.
 # Throws     : no exceptions
 # Comments   : none
@@ -515,7 +515,7 @@ This documentation refers to Google::Adwords::AdService version 0.3
 
         # if you use a MCC
         #$service->clientEmail('clientemail@domain.com');
-	# or 
+        # or 
         #$service->clientCustomerId('xxx-xxx-xxxx');
 
         # Add the two ads

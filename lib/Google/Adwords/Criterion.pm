@@ -59,22 +59,22 @@ This documentation refers to Google::Adwords::Criterion version 0.2.1
     # or 
     $criterion_service->clientCustomerId($customer_id);
 
-    my $adgroupid	= 123456789;
+    my $adgroupid       = 123456789;
 
     # get all the criteria for an adgroup
-    my @getallcriteria	= $criterion_service->getAllCriteria($adgroupid);
+    my @getallcriteria  = $criterion_service->getAllCriteria($adgroupid);
     for ( @getallcriteria ) {
         print "Criterion text : " . $_->text . " , Id : " . $_->id . "\n";
     }
 
     # get a specific criterion from an AdGroup
-    my $criterionid	= 987654321;
+    my $criterionid     = 987654321;
 
     my $getcriterion = $criterion_service->getCriteria($adgroupid, [ $criterionid ]);
     print "Get criterion: " . $getcriterion->text . ", Id : " . $getcriterion->id . "\n";
 
     # remove a criterion
-    my $ret	= $criterion_service->removeCriteria($adgroupid, [ $criterionid ]);
+    my $ret     = $criterion_service->removeCriteria($adgroupid, [ $criterionid ]);
     
     # add a criterion
     my $criterion_keyword = Google::Adwords::Criterion->new
@@ -83,7 +83,7 @@ This documentation refers to Google::Adwords::Criterion version 0.2.1
             ->type('Broad')
             ->text('Aarohan & Technologies');
 
-    my $addcriterion	= $criterion_service->addCriteria($criterion_keyword);
+    my $addcriterion    = $criterion_service->addCriteria($criterion_keyword);
     print "Added Criterion ID: " . $addcriterion->id . "\n";
 
 

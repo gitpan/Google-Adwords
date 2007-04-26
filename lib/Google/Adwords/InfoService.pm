@@ -2,7 +2,7 @@ package Google::Adwords::InfoService;
 use strict;
 use warnings;
 
-use version; our $VERSION = qv('0.1.1');
+use version; our $VERSION = qv('0.2');
 
 use base 'Google::Adwords::Service';
 
@@ -31,7 +31,7 @@ sub getUsageQuotaThisMonth
 
     return $result->valueof(
         "//getUsageQuotaThisMonthResponse/getUsageQuotaThisMonthReturn");
-} # end sub getUsageQuotaThisMonth
+}
 
 ### INSTANCE METHOD ################################################
 # Usage      : my $quota = $obj->getFreeUsageQuotaThisMonth();
@@ -55,7 +55,7 @@ sub getFreeUsageQuotaThisMonth
     );
 
     return $result->valueof(
-"//getFreeUsageQuotaThisMonthResponse/getFreeUsageQuotaThisMonthReturn"
+        "//getFreeUsageQuotaThisMonthResponse/getFreeUsageQuotaThisMonthReturn"
     );
 } # end sub getFreeUsageQuotaThisMonth
 
@@ -230,11 +230,6 @@ sub getUnitCountForClients
 
     my @params;
 
-    push @params,
-        SOAP::Data->name( 'startDate' => $args_ref->{'startDate'} )->type('');
-    push @params,
-        SOAP::Data->name( 'endDate' => $args_ref->{'endDate'} )->type('');
-
     # clientEmails
     my @client_emails = ();
     if (   ( exists $args_ref->{'clientEmails'} )
@@ -246,6 +241,11 @@ sub getUnitCountForClients
     }
     push @params,
         SOAP::Data->name( 'clientEmails' => @client_emails )->type('');
+
+    push @params,
+        SOAP::Data->name( 'startDate' => $args_ref->{'startDate'} )->type('');
+    push @params,
+        SOAP::Data->name( 'endDate' => $args_ref->{'endDate'} )->type('');
 
     # call the service
     # create the SOAP service
@@ -283,7 +283,7 @@ API calls
  
 =head1 VERSION
  
-This documentation refers to Google::Adwords::InfoService version 0.0.2
+This documentation refers to Google::Adwords::InfoService version 0.2
  
  
 =head1 SYNOPSIS

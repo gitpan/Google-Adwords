@@ -154,7 +154,7 @@ sub updateAccountInfo
             SOAP::Data->name(
             'billingAddress' => \SOAP::Data->value(@billing_address) )
             ->type('');
-    }
+    } # end if ( defined $account->billingAddress)
 
     # currencyCode
     if ( defined $account->currencyCode ) {
@@ -186,7 +186,7 @@ sub updateAccountInfo
             SOAP::Data->name(
             'defaultAdsCoverage' => \SOAP::Data->value(@coveragetype_params) )
             ->type('');
-    }
+    } # end if ( defined $account->defaultAdsCoverage)
 
     # descriptiveName
     if ( defined $account->descriptiveName ) {
@@ -211,7 +211,7 @@ sub updateAccountInfo
         push @account_params,
             SOAP::Data->name( 'emailPromotionsPreferences' =>
                 \SOAP::Data->value(@emailpromprefs_params) )->type('');
-    }
+    } # end if ( defined $account->emailPromotionsPreferences)
 
     # languagePreference
     if ( defined $account->languagePreference ) {
@@ -237,7 +237,7 @@ sub updateAccountInfo
             SOAP::Data->name(
             'primaryAddress' => \SOAP::Data->value(@primary_address) )
             ->type('');
-    }
+    } # end if ( defined $account->primaryAddress)
 
     # primaryBusinessCategory
     if ( defined $account->primaryBusinessCategory ) {
@@ -292,8 +292,8 @@ This documentation refers to Google::Adwords::AccountService version 0.3
     $service->email($email)
             ->password($password)
             ->clientEmail($cemail)
-	   or
-	    ->clientCustomerId($ccustomerid)
+           or
+            ->clientCustomerId($ccustomerid)
             ->applicationToken($app_token)
             ->developerToken($dev_token);
 

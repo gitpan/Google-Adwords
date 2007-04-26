@@ -36,8 +36,9 @@ sub estimateAdGroupList
             push @adgrouprequest_params,
                 SOAP::Data->name( 'maxCpc' => $_->maxCpc )->type('');
         }
-        if ( defined $_->keywordRequests && scalar( $_->keywordRequests ) ) {
-            my @p = ( ref( $_->keywordRequests ) eq 'ARRAY' )
+        if ( defined $_->keywordRequests ) {
+            my @p =
+                ( ref( $_->keywordRequests ) eq 'ARRAY' )
                 ? @{ $_->keywordRequests }
                 : $_->keywordRequests;
             foreach my $kwreq (@p) {
@@ -54,12 +55,12 @@ sub estimateAdGroupList
                         \SOAP::Data->value(@keywordrequest_params) )
                     ->type('');
             }
-        }
+        } # end if ( defined $_->keywordRequests)
         push @params,
             SOAP::Data->name(
             'adGroupRequests' => \SOAP::Data->value(@adgrouprequest_params) )
             ->type('');
-    }
+    } # end for (@adgrouprequest)
 
     my $result = $self->_create_service_and_call(
         {
@@ -77,7 +78,8 @@ sub estimateAdGroupList
         )
     {
         my @keywordestimate;
-        my $ra_keywordestimate = ( ref( $c->{keywordEstimates} ) eq 'ARRAY' )
+        my $ra_keywordestimate =
+            ( ref( $c->{keywordEstimates} ) eq 'ARRAY' )
             ? $c->{keywordEstimates}
             : [ $c->{keywordEstimates} ];
         for ( @{$ra_keywordestimate} ) {
@@ -133,7 +135,7 @@ sub estimateCampaignList
 
             push @campaignrequest_params, SOAP::Data->name(
                 'geoTargeting' => \SOAP::Data->value(@geo_data), )->type('');
-        }
+        } # end if ( defined $campaign...
 
         # languageTargeting
         if ( defined $campaign->languageTargeting ) {
@@ -165,7 +167,8 @@ sub estimateCampaignList
         if ( defined $campaign->adGroupRequests
             && $campaign->adGroupRequests )
         {
-            my @p = ( ref( $campaign->adGroupRequests ) eq 'ARRAY' )
+            my @p =
+                ( ref( $campaign->adGroupRequests ) eq 'ARRAY' )
                 ? @{ $campaign->adGroupRequests }
                 : $campaign->adGroupRequests;
             foreach my $adgrpreq (@p) {
@@ -180,7 +183,8 @@ sub estimateCampaignList
 
                 # keywordRequests
                 if ( defined $adgrpreq->keywordRequests ) {
-                    my @p = ( ref( $adgrpreq->keywordRequests ) eq 'ARRAY' )
+                    my @p =
+                        ( ref( $adgrpreq->keywordRequests ) eq 'ARRAY' )
                         ? @{ $adgrpreq->keywordRequests }
                         : $adgrpreq->keywordRequests;
                     foreach my $kwreq (@p) {
@@ -197,13 +201,13 @@ sub estimateCampaignList
                                 \SOAP::Data->value(@keywordrequest_params) )
                             ->type('');
                     }
-                }
+                } # end if ( defined $adgrpreq...
                 push @campaignrequest_params,
                     SOAP::Data->name( 'adGroupRequests' =>
                         \SOAP::Data->value(@adgrouprequest_params) )
                     ->type('');
             }
-        }
+        } # end if ( defined $campaign...
         push @params,
             SOAP::Data->name(
             'campaignRequests' => \SOAP::Data->value(@campaignrequest_params)
@@ -226,13 +230,14 @@ sub estimateCampaignList
         )
     {
         my @adgroupestimate;
-        my $ra_adgroupestimate = ( ref( $c->{adGroupEstimates} ) eq 'ARRAY' )
+        my $ra_adgroupestimate =
+            ( ref( $c->{adGroupEstimates} ) eq 'ARRAY' )
             ? $c->{adGroupEstimates}
             : [ $c->{adGroupEstimates} ];
         foreach my $adgrpest ( @{$ra_adgroupestimate} ) {
             my @keywordestimate;
-            my $ra_keywordestimate
-                = ( ref( $adgrpest->{keywordEstimates} ) eq 'ARRAY' )
+            my $ra_keywordestimate =
+                ( ref( $adgrpest->{keywordEstimates} ) eq 'ARRAY' )
                 ? $adgrpest->{keywordEstimates}
                 : [ $adgrpest->{keywordEstimates} ];
             for ( @{$ra_keywordestimate} ) {
@@ -346,14 +351,14 @@ This documentation refers to Google::Adwords::TrafficEstimatorService version
 
     # create some KeywordRequest objects
     my $kwreq1 = Google::Adwords::KeywordRequest->new
-		->text('web analytics')
-		->type('Broad')
-		->maxCpc(1000000);
+                ->text('web analytics')
+                ->type('Broad')
+                ->maxCpc(1000000);
 
     my $kwreq2 = Google::Adwords::KeywordRequest->new
-		->text('anti spam product')
-		->type('Broad')
-		->maxCpc(1000000);
+                ->text('anti spam product')
+                ->type('Broad')
+                ->maxCpc(1000000);
 
     # estimateKeywordList
     my @keyword_estimates = $service->estimateKeywordList($kwreq1, $kwreq2);
@@ -364,8 +369,8 @@ This documentation refers to Google::Adwords::TrafficEstimatorService version
 
     # Create AdGroupRequest objects
     my $adgrpreq1 = Google::Adwords::AdGroupRequest->new
-			->maxCpc(50000000)
-			->keywordRequests($kwreq1, $kwreq2);
+                        ->maxCpc(50000000)
+                        ->keywordRequests($kwreq1, $kwreq2);
 
     # estimateAdGroupList
     my @adgroupestimates = $service->estimateAdGroupList($adgrpreq1);
@@ -381,7 +386,7 @@ This documentation refers to Google::Adwords::TrafficEstimatorService version
     my $cmpgreq1 = Google::Adwords::CampaignRequest->new;
 
     # geoTargeting
-	$cmpgreq1->geoTargeting({ cities => [ 'Pelican, AK US' ] });
+        $cmpgreq1->geoTargeting({ cities => [ 'Pelican, AK US' ] });
 
     # languageTargeting
     $cmpgreq1->languageTargeting({

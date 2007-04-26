@@ -1,5 +1,12 @@
 Revision history for Perl module Google::Adwords
 
+v1.2.3  Thu Apr 26 13:37:37 IST 2007
+    - Bug fix for InfoService::getUnitCountForClients(). Thanks to Bartosz
+      Jakubski for the patch. The order of the method parameters were
+      important.
+    - Added t/perlcritic.t and t/perlcriticrc to include Perl::Critic in the
+      build process
+
 v1.2.2  Sat Apr 14 18:38:49 IST 2007
     - included t/pod.t in distribution
 

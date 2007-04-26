@@ -40,7 +40,7 @@ This documentation refers to Google::Adwords::AccountInfo version 0.0.1
  
     use Google::Adwords::AccountInfo;
 
-    my $accountinfo	= Google::Adwords::AccountInfo->new
+    my $accountinfo = Google::Adwords::AccountInfo->new
                         ->currencyCode('EUR')
                         ->descriptiveName('My Account');
 

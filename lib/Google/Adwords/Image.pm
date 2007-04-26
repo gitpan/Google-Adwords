@@ -63,7 +63,7 @@ This documentation refers to Google::Adwords::Image version 0.0.1
     # Lets add an image creative
     my $data_blurb = read_file('image.gif');
 
-    my $image	= Google::Adwords::Image->new
+    my $image   = Google::Adwords::Image->new
             ->name('Image #1')
             ->data($data_blurb)
             ->type('image');
@@ -74,7 +74,7 @@ This documentation refers to Google::Adwords::Image version 0.0.1
             ->displayUrl('http://www.example.com')
             ->image( $image );
     
-    my $addcreative	= $creative_service->addCreative($creative_image);
+    my $addcreative     = $creative_service->addCreative($creative_image);
     print "Added Creative ID: " . $addcreative->id . "\n";
     print "Image Height: " . $addcreative->image->height . "\n";
 
