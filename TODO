@@ -1,10 +1,9 @@
 
 - *Service objects should be a singleton
-- Lots more good examples
+- Lots of more good examples
 - CriterionService.checkCriteria()
 - CreativeService.checkCreative() and CreativeService.checkCreativeList()
 - Error handling - ApiException and ApiError objects
 - Error handling - use croak/carp for errors
-- support for Adwords API v9
 - switch to Module::Build ?
 

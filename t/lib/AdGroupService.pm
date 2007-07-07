@@ -463,8 +463,10 @@ sub updateAdGroup : Test(no_plan)
     if ( $self->{sandbox} ) {
 
         my $adgroup = Google::Adwords::AdGroup->new;
+
+        #$adgroup->id( 17618 );
         $adgroup->id( $self->{_adgroup_id} );
-        $adgroup->maxCpc(5000000);
+        $adgroup->status('Paused');
 
         my $ret = $self->{obj}->updateAdGroup($adgroup);
 
@@ -512,10 +514,10 @@ sub updateAdGroupList : Test(no_plan)
 
         my $adgroup1 = Google::Adwords::AdGroup->new;
         $adgroup1->id( $self->{_adgroup_id_0} );
-        $adgroup1->maxCpc(5000000);
+        $adgroup1->status('Paused');
         my $adgroup2 = Google::Adwords::AdGroup->new;
         $adgroup2->id( $self->{_adgroup_id_1} );
-        $adgroup2->maxCpc(5000000);
+        $adgroup2->status('Paused');
 
         my @adgroups;
         push @adgroups, $adgroup1, $adgroup2;

@@ -2,7 +2,7 @@ package Google::Adwords::AdGroupService;
 use strict;
 use warnings;
 
-use version; our $VERSION = qv('0.0.2');
+use version; our $VERSION = qv('0.2');
 
 use base 'Google::Adwords::Service';
 use Date::Manip;
@@ -306,7 +306,6 @@ sub getAllAdGroups
 #           adGroupIds  => [ arrayref of adgroup ids ],
 #           startDay => $startDay,
 #           endDay      => $endDay,
-#           inPST       => $inPST;
 #   });
 # Purpose    : Get stats on a set of adgroups
 # Returns    : StatsRecord object for each adgroup
@@ -315,7 +314,6 @@ sub getAllAdGroups
 #       adGroupIds  : array reference of adgroup ids
 #       startDay : starting day of the stats YYYY-MM-DD
 #       endDay : end day of the stats YYYY-MM-DD
-#       inPST : True = get stats in America/Los_Angeles timezone (Google headquarters) regardless of the parent account's localtimezone.
 # Throws     : no exceptions
 # Comments   : none
 # See Also   : n/a
@@ -327,14 +325,12 @@ sub getAdGroupStats
     my $ra_id      = $args_ref->{adGroupIds} || [];
     my $startDay   = $args_ref->{startDay}   || '';
     my $endDay     = $args_ref->{endDay}     || '';
-    my $inPST      = $args_ref->{inPST}      || 0;
 
     my @params;
     push @params, SOAP::Data->name( 'campaignId' => $campaignId )->type('');
     push @params, SOAP::Data->name( 'adGroupIds' => @{$ra_id} )->type('');
     push @params, SOAP::Data->name( 'startDay'   => $startDay )->type('');
     push @params, SOAP::Data->name( 'endDay'     => $endDay )->type('');
-    push @params, SOAP::Data->name( 'inPST'      => $inPST )->type('');
 
     my $result = $self->_create_service_and_call(
         {
@@ -506,7 +502,7 @@ AdGroupService API calls
  
 =head1 VERSION
  
-This documentation refers to Google::Adwords::AdGroupService version 0.0.2
+This documentation refers to Google::Adwords::AdGroupService version 0.2
  
 =head1 SYNOPSIS
  
@@ -695,7 +691,6 @@ is one day.
         adGroupIds      => [ $id1, $id2, $id3 ],
         startDay => '2006-08-01'
         endDay  => '2006-08-31',
-        inPST   => 1,
     });
 
 =back
@@ -719,9 +714,6 @@ be collected. Format is YYYY-MM-DD
 =item * endDay - The ending day of the period for which statistics are to be
 collected, inclusive. Format is YYYY-MM-DD
 
-
-=item * inPST : 1 => get stats in America/Los_Angeles timezone (Google headquarters) 
-regardless of the parent account's localtimezone.
 
 
 =back

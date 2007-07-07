@@ -46,11 +46,13 @@ $password   = $password->{value};
 $currency   = $currency->{value};
 $client_num = $client_num->{value};
 
+=head1
 # test values during development
-#my $email = '';
-#my $password = '';
-#my $currency = '';
-#my $client_num = '1';
+my $email = '';
+my $password = '';
+my $currency = 'INR';
+my $client_num = '2';
+=cut
 
 my $params_ref = {
     sandbox        => 1,

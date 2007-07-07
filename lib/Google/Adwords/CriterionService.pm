@@ -2,7 +2,7 @@ package Google::Adwords::CriterionService;
 use strict;
 use warnings;
 
-use version; our $VERSION = qv('0.3');
+use version; our $VERSION = qv('0.4');
 
 use base 'Google::Adwords::Service';
 
@@ -425,7 +425,6 @@ sub getCriteria
 #           criterionIds => [ 3982, 2787, 17872 ],
 #           startDay    => $startDay,
 #           endDay      => $endDay,
-#           inPST       => 1,
 #   });
 # Purpose    : Get stats on a set of criteria
 # Returns    :  A list of StatsRecord object for each criterion
@@ -434,7 +433,6 @@ sub getCriteria
 #       creativeIds  : array reference of criteria ids
 #       startDay : starting day of the stats YYYY-MM-DD
 #       endDay : end day of the stats YYYY-MM-DD
-#       inPST : True = get stats in America/Los_Angeles timezone (Google headquarters) regardless of the parent account's localtimezone.
 # Throws     : no exceptions
 # Comments   : none
 # See Also   : n/a
@@ -446,14 +444,12 @@ sub getCriterionStats
     my $ra_id     = $args_ref->{criterionIds} || [];
     my $startDay  = $args_ref->{startDay}     || '';
     my $endDay    = $args_ref->{endDay}       || '';
-    my $inPST     = $args_ref->{inPST}        || 0;
 
     my @params;
     push @params, SOAP::Data->name( 'adGroupId'    => $adgroupid )->type('');
     push @params, SOAP::Data->name( 'criterionIds' => @{$ra_id} )->type('');
     push @params, SOAP::Data->name( 'startDay'     => $startDay )->type('');
     push @params, SOAP::Data->name( 'endDay'       => $endDay )->type('');
-    push @params, SOAP::Data->name( 'inPST'        => $inPST )->type('');
 
     my $result = $self->_create_service_and_call(
         {
@@ -489,7 +485,7 @@ CriterionService API calls
  
 =head1 VERSION
  
-This documentation refers to Google::Adwords::CriterionService version 0.3
+This documentation refers to Google::Adwords::CriterionService version 0.4
  
  
 =head1 SYNOPSIS
@@ -516,14 +512,14 @@ This documentation refers to Google::Adwords::CriterionService version 0.3
     # get all the criteria for an adgroup
     my @getallcriteria  = $criterion_service->getAllCriteria($adgroupid);
     for ( @getallcriteria ) {
-        print "Criterion name : " . $_->name . " , Id : " . $_->id . "\n";
+        print "Criterion Id : " . $_->id . "\n";
     }
 
     # get a specific criterion from an AdGroup
     my $criterionid     = 987654321;
 
     my $getcriterion = $criterion_service->getCriteria($adgroupid, [ $criterionid ]);
-    print "Get criterion: " . $getcriterion->name . ", Id : " . $getcriterion->id . "\n";
+    print "Got Criterion Id : " . $getcriterion->id . "\n";
 
     # remove a criterion
     my $ret     = $criterion_service->removeCriteria($adgroupid, [ $criterionid ]);
@@ -700,7 +696,6 @@ http://www.google.com/apis/adwords/developer/StatsRecord.html
         criterionIds => [ 3982, 2787, 17872 ],
         startDay    => $startDay,
         endDay      => $endDay,
-        inPST       => 1,
     });
 
 =head3 Parameters
@@ -719,8 +714,6 @@ be collected in format YYYY-MM-DD
 * endDay => The ending day of the period for which statistics are to be
 collected in format YYYY-MM-DD
 
-* inPST => Set to 1 to get stats in America/Los_Angeles timezone (Google
-headquarters) regardless of the parent account's localtimezone.
 
 =back
 

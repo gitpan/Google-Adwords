@@ -2,14 +2,14 @@ package Google::Adwords::Service;
 use strict;
 use warnings;
 
-use version; our $VERSION = qv('0.7.1');
+use version; our $VERSION = qv('0.8');
 
 use base qw/ Class::Accessor::Chained Google::Adwords /;
 use SOAP::Lite;
 use Readonly;
 
-Readonly my $default_api_version => 'v8';
-Readonly my $user_agent          => "Google::Adwords v1.2.3";
+Readonly my $default_api_version => 'v9';
+Readonly my $user_agent          => "Google::Adwords v1.3";
 Readonly my $endpoint            => 'https://adwords.google.com/api/adwords';
 Readonly my $endpoint_sandbox    => 'https://sandbox.google.com/api/adwords';
 Readonly my $default_timeout => 35;    # HTTP timeout in seconds
@@ -283,7 +283,7 @@ Google::Adwords::Service - Base class for the Service modules
  
 =head1 VERSION
  
-This documentation refers to Google::Adwords::Service version 0.7.1
+This documentation refers to Google::Adwords::Service version 0.8
  
  
 =head1 DESCRIPTION
@@ -353,7 +353,7 @@ These accessors/methods are available across all the child Service modules
 =head2 B<api_version()>
 
     The Adwords API version you want to use. In format 'v*'. So, to use 
-    version 7 of the API, set this to a value of 'v7'. Default value is 'v8'.
+    version 7 of the API, set this to a value of 'v7'. Default value is 'v9'.
 
 =head2 B<use_sandbox()>
 

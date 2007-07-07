@@ -1,5 +1,11 @@
 Revision history for Perl module Google::Adwords
 
+v1.3    Sat Jul  7 06:08:10 IST 2007
+    - Default API version is now v9
+    - Removed the inPST parameter from CampaignService.getCampaignStats(),
+      AdGroupService.getAdGroupStats(), CriterionService.getCriterionStats()
+    - fixed POD of CriterionService
+
 v1.2.3  Thu Apr 26 13:37:37 IST 2007
     - Bug fix for InfoService::getUnitCountForClients(). Thanks to Bartosz
       Jakubski for the patch. The order of the method parameters were

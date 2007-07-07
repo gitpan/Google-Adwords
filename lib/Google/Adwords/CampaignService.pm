@@ -2,7 +2,7 @@ package Google::Adwords::CampaignService;
 use strict;
 use warnings;
 
-use version; our $VERSION = qv('0.5');
+use version; our $VERSION = qv('0.6');
 
 use base 'Google::Adwords::Service';
 use Date::Manip;
@@ -427,7 +427,6 @@ sub getCampaignList
 #           campaignids => [ 3982, 2787, 17872 ],
 #           startDay => $startDay,
 #           endDay      => $endDay,
-#           inPST       => 1,
 #   });
 # Purpose    : Get stats on a set of campaign
 # Returns    :  A list of StatsRecord object for each campaign
@@ -435,7 +434,6 @@ sub getCampaignList
 #       ids  : array reference of campaign ids
 #       startDay : starting day of the stats YYYY-MM-DD
 #       endDay : end day of the stats YYYY-MM-DD
-#       inPST : True = get stats in America/Los_Angeles timezone (Google headquarters) regardless of the parent account's localtimezone.
 # Throws     : no exceptions
 # Comments   : none
 # See Also   : n/a
@@ -446,13 +444,11 @@ sub getCampaignStats
     my $ra_id    = $args_ref->{campaignids} || [];
     my $startDay = $args_ref->{startDay}    || '';
     my $endDay   = $args_ref->{endDay}      || '';
-    my $inPST    = $args_ref->{inPST}       || 0;
 
     my @params;
     push @params, SOAP::Data->name( 'campaignids' => @{$ra_id} )->type('');
     push @params, SOAP::Data->name( 'startDay'    => $startDay )->type('');
     push @params, SOAP::Data->name( 'endDay'      => $endDay )->type('');
-    push @params, SOAP::Data->name( 'inPST'       => $inPST )->type('');
 
     my $result = $self->_create_service_and_call(
         {
@@ -643,7 +639,7 @@ Google::Adwords::CampaignService - Interface to the Google Adwords CampaignServi
  
 =head1 VERSION
  
-This documentation refers to Google::Adwords::CampaignService version 0.5
+This documentation refers to Google::Adwords::CampaignService version 0.6
  
  
 =head1 SYNOPSIS
@@ -859,7 +855,6 @@ L<http://www.google.com/apis/adwords/developer/StatsRecord.html>
         campaignids     => [ 3567, 4567, 8819 ],
         startDay => '2006-08-01',
         endDay  => '2006-08-31',
-        inPST   => 1;
     });
 
 =head3 Parameters
@@ -876,8 +871,6 @@ be collected in format YYYY-MM-DD
 * endDay => The ending day of the period for which statistics are to be
 collected in format YYYY-MM-DD
 
-* inPST => Set to 1 to get stats in America/Los_Angeles timezone (Google
-headquarters) regardless of the parent account's localtimezone.
 
 =back
 
