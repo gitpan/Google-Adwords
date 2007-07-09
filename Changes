@@ -1,5 +1,8 @@
 Revision history for Perl module Google::Adwords
 
+v1.3.1  Mon Jul  9 18:48:33 IST 2007
+    - Removed the inPST parameter from AdService.getAdStats()
+
 v1.3    Sat Jul  7 06:08:10 IST 2007
     - Default API version is now v9
     - Removed the inPST parameter from CampaignService.getCampaignStats(),
