@@ -32,11 +32,13 @@ sub getAccountInfo : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my $account_info = $self->{obj}->getAccountInfo();
 
@@ -47,7 +49,8 @@ sub getAccountInfo : Test(no_plan)
         );
 
     }
-    else {
+    else
+    {
 
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
@@ -122,17 +125,20 @@ sub getClientAccounts : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         #my @emails = $self->{obj}->getClientAccounts();
 
         return;
     }
-    else {
+    else
+    {
 
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
@@ -160,11 +166,13 @@ sub updateAccountInfo : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my $account_info = Google::Adwords::AccountInfo->new;
 
@@ -178,8 +186,9 @@ sub updateAccountInfo : Test(no_plan)
 
         return;
 
-    } # end if ( $self->{sandbox} )
-    else {
+    } # end if ( $self->{sandbox} ...
+    else
+    {
 
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(

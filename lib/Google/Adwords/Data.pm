@@ -22,10 +22,12 @@ sub get
 
     # check if called from within Google::Adwords:: namespace
     my $package = caller 1;
-    if ( $package =~ /^Google::Adwords::\w+Service$/ ) {
+    if ( $package =~ /^Google::Adwords::\w+Service$/ )
+    {
         return encode_entities( $value, '<>&' );
     }
-    else {
+    else
+    {
         return $value;
     }
 } # end sub get

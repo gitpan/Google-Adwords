@@ -1,5 +1,25 @@
 Revision history for Perl module Google::Adwords
 
+v1.5    Tue Sep  4 18:01:04 IST 2007
+    - support for v10 of the Adwords API
+    - All methods which use geoTargeting now use the
+      Google::Adwords::GeoTarget object instead of a hashref
+    - Modules added to distro
+        o Google::Adwords::GeoTarget
+        o Google::Adwords::CityTargets
+        o Google::Adwords::CountryTargets
+        o Google::Adwords::MetroTargets
+        o Google::Adwords::RegionTargets
+    - Added maxContentCpc to AdGroupService.updateAdGroup(). Thanks to
+      Tony Jewell for the bug report
+    - languageTargeting and networkTargeting now return the
+      Campaign object when used in a set call. Thanks to Stephen Turner for
+      the bug report.
+
+v1.4    Mon Jul 30 18:21:27 IST 2007
+    - AdService.checkAds() is implemented
+    - Google::Adwords::ApiError added to distribution
+
 v1.3.1  Mon Jul  9 18:48:33 IST 2007
     - Removed the inPST parameter from AdService.getAdStats()
 

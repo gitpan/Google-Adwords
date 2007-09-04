@@ -2,7 +2,7 @@ package Google::Adwords::Campaign;
 use strict;
 use warnings;
 
-use version; our $VERSION = qv('0.3');
+use version; our $VERSION = qv('0.4');
 
 use base 'Google::Adwords::Data';
 
@@ -29,15 +29,18 @@ sub new
 
     my $class = ref $proto || $proto;
 
-    if (@_) {
+    if (@_)
+    {
         my $obj     = $class->SUPER::new();
         my $hashref = shift;
-        for ( keys %{$hashref} ) {
+        for ( keys %{$hashref} )
+        {
             $obj->$_( $hashref->{$_} );
         }
         return $obj;
     }
-    else {
+    else
+    {
         return $class->SUPER::new();
     }
 } # end sub new
@@ -49,52 +52,30 @@ sub languageTargeting
     my $sub_name = ( caller 0 )[3];
 
     # if its a get
-    if ( not @_ ) {
+    if ( not @_ )
+    {
         my $lang_ref = $self->get($sub_name);
 
         # check if not array ref
-        for ( keys %{$lang_ref} ) {
-            if ( ( ref $lang_ref->{$_} ) ne 'ARRAY' ) {
+        for ( keys %{$lang_ref} )
+        {
+            if ( ( ref $lang_ref->{$_} ) ne 'ARRAY' )
+            {
 
                 #my @langs = split /, ?/, $lang_ref->{$_};
                 $lang_ref->{$_} = [ $lang_ref->{$_} ];
             }
         }
         return $lang_ref;
-    }
-    else {
+    } # end if ( not @_ )
+    else
+    {
 
         # set
-        return $self->set( $sub_name, @_ );
+        $self->set( $sub_name, @_ );
+        return $self;
     }
 } # end sub languageTargeting
-
-sub geoTargeting
-{
-    my $self = shift;
-
-    my $sub_name = ( caller 0 )[3];
-
-    # if its a get
-    if ( not @_ ) {
-        my $lang_ref = $self->get($sub_name);
-
-        # check if not array ref
-        for ( keys %{$lang_ref} ) {
-            if ( ( ref $lang_ref->{$_} ) ne 'ARRAY' ) {
-
-                #my @langs = split /, ?/, $lang_ref->{$_};
-                $lang_ref->{$_} = [ $lang_ref->{$_} ];
-            }
-        }
-        return $lang_ref;
-    }
-    else {
-
-        # set
-        return $self->set( $sub_name, @_ );
-    }
-} # end sub geoTargeting
 
 sub networkTargeting
 {
@@ -103,23 +84,28 @@ sub networkTargeting
     my $sub_name = ( caller 0 )[3];
 
     # if its a get
-    if ( not @_ ) {
+    if ( not @_ )
+    {
         my $lang_ref = $self->get($sub_name);
 
         # check if not array ref
-        for ( keys %{$lang_ref} ) {
-            if ( ( ref $lang_ref->{$_} ) ne 'ARRAY' ) {
+        for ( keys %{$lang_ref} )
+        {
+            if ( ( ref $lang_ref->{$_} ) ne 'ARRAY' )
+            {
 
                 #my @langs = split /, ?/, $lang_ref->{$_};
                 $lang_ref->{$_} = [ $lang_ref->{$_} ];
             }
         }
         return $lang_ref;
-    }
-    else {
+    } # end if ( not @_ )
+    else
+    {
 
         # set
-        return $self->set( $sub_name, @_ );
+        $self->set( $sub_name, @_ );
+        return $self;
     }
 } # end sub networkTargeting
 
@@ -150,9 +136,11 @@ This documentation refers to Google::Adwords::Campaign version 0.3
     $campaign->dailyBudget(10000000);
 
     # target a certain city in US
-    $campaign->geoTargeting({
-       cities => [ 'Pelican, AK US' ], 
-    });
+    my $geo_target = Google::Adwords::GeoTarget->new();
+    my $city_targets = Google::Adwords::CityTargets->new();
+    $city_targets->cities([ 'Pelican, AK US' ]);
+    $geo_target->cityTargets($city_targets);
+    $campaign->geoTargeting($geo_target);
   
     # create the campaign service object
     my $campaign_service = Google::Adwords::CampaignService->new();
@@ -239,38 +227,34 @@ B<geoTargeting()>
 
 =over 4
 
-A hashref with keys:
-
-* countries - An arrayref of country codes
-
-* regions - An arrayref of region codes
-
-* cities - An arrayref of city codes
-
-* metros - An arrayref of metro codes
-
+Accept/return a Google::Adwords::GeoTarget object
 
 Example usage:
 
     # Set target countries as US and India
-    $campaign->geoTargeting({
-        countries => [ 'US', 'IN' ],
-    });
+    my $geo_target = Google::Adwords::GeoTarget->new();
+    my $targets = Google::Adwords::CountryTargets->new();
+    $targets->countries([ 'US', 'IN' ]);
+    $geo_target->countryTargets($targets);
+    $campaign->geoTargeting($geo_target);
 
     # Only target Adelaide in Australia
-    $campaign->geoTargeting({
-        cities => [ 'Adelaide, SA AU' ],
-    });
+    my $targets = Google::Adwords::CityTargets->new();
+    $targets->cities([ 'Adelaide, SA AU' ]);
+    $geo_target->cityTargets($targets);
+    $campaign->geoTargeting($geo_target);
 
     # By region, target Berlin in Germany
-    $campaign->geoTargeting({
-        regions => [ 'DE-BE' ],
-    });
+    my $targets = Google::Adwords::RegionTargets->new();
+    $targets->regions([ 'DE-BE' ]);
+    $geo_target->regionTargets($targets);
+    $campaign->geoTargeting($geo_target);
 
     # By metros, target Los Angeles
-    $campaign->geoTargeting({
-        metros => [ '803' ],
-    });
+    my $targets = Google::Adwords::MetroTargets->new();
+    $targets->metros([ '803' ]);
+    $geo_target->metroTargets($targets);
+    $campaign->geoTargeting($geo_target);
 
 
 The codes are available here:
@@ -363,6 +347,16 @@ http://www.google.com/apis/adwords/developer/NetworkTarget.html
 =over 4
 
 =item * L<Google::Adwords::CampaignService>
+
+=item * L<Google::Adwords::GeoTarget>
+
+=item * L<Google::Adwords::CityTargets>
+
+=item * L<Google::Adwords::CountryTargets>
+
+=item * L<Google::Adwords::MetroTargets>
+
+=item * L<Google::Adwords::RegionTargets>
 
 =item * L<Google::Adwords::AdSchedule>
 

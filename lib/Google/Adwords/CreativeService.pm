@@ -24,47 +24,56 @@ sub addCreative
 {
     my ( $self, $creative ) = @_;
 
-    if ( not defined $creative ) {
+    if ( not defined $creative )
+    {
         die "Must provide a defined creative object.";
     }
-    if ( !UNIVERSAL::isa( $creative, 'Google::Adwords::Creative' ) ) {
+    if ( !UNIVERSAL::isa( $creative, 'Google::Adwords::Creative' ) )
+    {
         die "Object is a not a Google::Adwords::Creative object.";
     }
 
     my @creative_params;
 
-    if ( defined $creative->adGroupId ) {
+    if ( defined $creative->adGroupId )
+    {
         push @creative_params,
             SOAP::Data->name( 'adGroupId' => $creative->adGroupId )->type('');
     }
 
-    if ( defined $creative->destinationUrl ) {
+    if ( defined $creative->destinationUrl )
+    {
         push @creative_params,
             SOAP::Data->name( 'destinationUrl' => $creative->destinationUrl )
             ->type('');
     }
 
-    if ( defined $creative->displayUrl ) {
+    if ( defined $creative->displayUrl )
+    {
         push @creative_params,
             SOAP::Data->name( 'displayUrl' => $creative->displayUrl )
             ->type('');
     }
 
     # if we have image defined then it's an image, otherwise it's a text
-    if ( defined $creative->image ) {
+    if ( defined $creative->image )
+    {
         my $image = $creative->image;
         my @image_params;
-        if ( defined $image->data ) {
+        if ( defined $image->data )
+        {
             push @image_params,
                 SOAP::Data->name(
                 'data' => SOAP::Data->type( base64 => $image->data ) )
                 ->type('');
         }
-        if ( defined $image->name ) {
+        if ( defined $image->name )
+        {
             push @image_params,
                 SOAP::Data->name( 'name' => $image->name )->type('');
         }
-        if ( defined $image->type ) {
+        if ( defined $image->type )
+        {
             push @image_params,
                 SOAP::Data->name( 'type' => $image->type )->type('');
         }
@@ -72,25 +81,30 @@ sub addCreative
             SOAP::Data->name( 'image' => \SOAP::Data->value(@image_params) )
             ->type('');
     } # end if ( defined $creative...
-    else {
-        if ( defined $creative->headline ) {
+    else
+    {
+        if ( defined $creative->headline )
+        {
             push @creative_params,
                 SOAP::Data->name( 'headline' => $creative->headline )
                 ->type('');
         }
-        if ( defined $creative->description1 ) {
+        if ( defined $creative->description1 )
+        {
             push @creative_params,
                 SOAP::Data->name( 'description1' => $creative->description1 )
                 ->type('');
         }
-        if ( defined $creative->description2 ) {
+        if ( defined $creative->description2 )
+        {
             push @creative_params,
                 SOAP::Data->name( 'description2' => $creative->description2 )
                 ->type('');
         }
     }
 
-    if ( defined $creative->exemptionRequest ) {
+    if ( defined $creative->exemptionRequest )
+    {
         push @creative_params, SOAP::Data->name(
             'exemptionRequest' => $creative->exemptionRequest )->type('');
     }
@@ -111,7 +125,8 @@ sub addCreative
     # get response data in a hash
     my $data = $result->valueof("//addCreativeResponse/addCreativeReturn");
 
-    if ( $data->{image} ) {
+    if ( $data->{image} )
+    {
         $data->{image} = $self->_create_object_from_hash( $data->{image},
             'Google::Adwords::Image' );
     }
@@ -136,75 +151,90 @@ sub addCreativeList
 {
     my ( $self, @creative_list ) = @_;
 
-    if ( !@creative_list ) {
+    if ( !@creative_list )
+    {
         die "Must provide a defined creative object.";
     }
 
     my @params;
 
-    foreach my $creative (@creative_list) {
+    foreach my $creative (@creative_list)
+    {
 
         my @creative_params;
 
-        if ( !UNIVERSAL::isa( $creative, 'Google::Adwords::Creative' ) ) {
+        if ( !UNIVERSAL::isa( $creative, 'Google::Adwords::Creative' ) )
+        {
             die "Object is a not a Google::Adwords::Creative object.";
         }
 
-        if ( defined $creative->adGroupId ) {
+        if ( defined $creative->adGroupId )
+        {
             push @creative_params,
                 SOAP::Data->name( 'adGroupId' => $creative->adGroupId )
                 ->type('');
         }
 
-        if ( defined $creative->destinationUrl ) {
+        if ( defined $creative->destinationUrl )
+        {
             push @creative_params, SOAP::Data->name(
                 'destinationUrl' => $creative->destinationUrl )->type('');
         }
 
-        if ( defined $creative->displayUrl ) {
+        if ( defined $creative->displayUrl )
+        {
             push @creative_params,
                 SOAP::Data->name( 'displayUrl' => $creative->displayUrl )
                 ->type('');
         }
 
         # if we have image defined then it's an image, otherwise it's a text
-        if ( defined $creative->image ) {
+        if ( defined $creative->image )
+        {
             my $image = $creative->image;
             my @image_params;
-            if ( defined $image->data ) {
+            if ( defined $image->data )
+            {
                 push @image_params,
                     SOAP::Data->name(
                     'data' => SOAP::Data->type( base64 => $image->data ) )
                     ->type('');
             }
-            if ( defined $image->name ) {
+            if ( defined $image->name )
+            {
                 push @image_params,
                     SOAP::Data->name( 'name' => $image->name )->type('');
             }
-            if ( defined $image->type ) {
+            if ( defined $image->type )
+            {
                 push @image_params,
                     SOAP::Data->name( 'type' => $image->type )->type('');
             }
             push @creative_params, SOAP::Data->name(
                 'image' => \SOAP::Data->value(@image_params) )->type('');
         } # end if ( defined $creative...
-        else {
-            if ( defined $creative->headline ) {
+        else
+        {
+            if ( defined $creative->headline )
+            {
                 push @creative_params,
                     SOAP::Data->name( 'headline' => $creative->headline )
                     ->type('');
             }
-            if ( defined $creative->description1 ) {
+            if ( defined $creative->description1 )
+            {
                 push @creative_params, SOAP::Data->name(
                     'description1' => $creative->description1 )->type('');
             }
-            if ( defined $creative->description2 ) {
+            if ( defined $creative->description2 )
+            {
                 push @creative_params, SOAP::Data->name(
                     'description2' => $creative->description2 )->type('');
             }
         }
 
-        if ( defined $creative->exemptionRequest ) {
+        if ( defined $creative->exemptionRequest )
+        {
             push @creative_params, SOAP::Data->name(
                 'exemptionRequest' => $creative->exemptionRequest )->type('');
         }
@@ -224,7 +254,8 @@ sub addCreativeList
     foreach my $c (
         $result->valueof("//addCreativeListResponse/addCreativeListReturn") )
     {
-        if ( $c->{image} ) {
+        if ( $c->{image} )
+        {
             $c->{image} = $self->_create_object_from_hash( $c->{image},
                 'Google::Adwords::Image' );
         }
@@ -266,7 +297,8 @@ sub getActiveCreatives
             "//getActiveCreativesResponse/getActiveCreativesReturn")
         )
     {
-        if ( $c->{image} ) {
+        if ( $c->{image} )
+        {
             $c->{image} = $self->_create_object_from_hash( $c->{image},
                 'Google::Adwords::Image' );
         }
@@ -306,7 +338,8 @@ sub getAllCreatives
     foreach my $c (
         $result->valueof("//getAllCreativesResponse/getAllCreativesReturn") )
     {
-        if ( $c->{image} ) {
+        if ( $c->{image} )
+        {
             $c->{image} = $self->_create_object_from_hash( $c->{image},
                 'Google::Adwords::Image' );
         }
@@ -344,7 +377,8 @@ sub getCreative
     );
 
     my $data = $result->valueof("//getCreativeResponse/getCreativeReturn");
-    if ( $data->{image} ) {
+    if ( $data->{image} )
+    {
         $data->{image} = $self->_create_object_from_hash( $data->{image},
             'Google::Adwords::Image' );
     }
@@ -429,21 +463,26 @@ sub updateCreatives
 
     my @params;
 
-    foreach my $creative (@creatives) {
+    foreach my $creative (@creatives)
+    {
 
         my @creative_params;
 
-        if ( !UNIVERSAL::isa( $creative, 'Google::Adwords::Creative' ) ) {
+        if ( !UNIVERSAL::isa( $creative, 'Google::Adwords::Creative' ) )
+        {
             die "Object is a not a Google::Adwords::Creative object.";
         }
 
-        if ( not defined $creative->id ) {
+        if ( not defined $creative->id )
+        {
             die "id must be set for the Cretive object\n";
         }
-        if ( not defined $creative->adGroupId ) {
+        if ( not defined $creative->adGroupId )
+        {
             die "adGroupId must be set for the Cretive object\n";
         }
-        if ( not defined $creative->status ) {
+        if ( not defined $creative->status )
+        {
             die "status must be set for the Cretive object\n";
         }
 

@@ -7,6 +7,9 @@ use Test::MockModule;
 use Google::Adwords::AdGroupRequest;
 use Google::Adwords::KeywordRequest;
 use Google::Adwords::CampaignRequest;
+use Google::Adwords::GeoTarget;
+use Google::Adwords::CityTargets;
+use Google::Adwords::CountryTargets;
 
 sub test_class { return "Google::Adwords::TrafficEstimatorService"; }
 
@@ -31,11 +34,13 @@ sub estimateAdGroupList : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my $kwreq1
             = Google::Adwords::KeywordRequest->new->text('web marketing')
@@ -54,8 +59,9 @@ sub estimateAdGroupList : Test(no_plan)
             'estimateAdGroupList' );
         ok( scalar @{ $estimates[0]->keywordEstimates } == 2,
             'estimateAdGroupList' );
-    } # end if ( $self->{sandbox} )
-    else {
+    } # end if ( $self->{sandbox} ...
+    else
+    {
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
             call => sub {
@@ -121,11 +127,13 @@ sub estimateCampaignList : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my $kwreq1
             = Google::Adwords::KeywordRequest->new->text('web marketing')
@@ -138,8 +146,13 @@ sub estimateCampaignList : Test(no_plan)
             = Google::Adwords::AdGroupRequest->new->maxCpc(50000000)
             ->keywordRequests( $kwreq1, $kwreq2 );
 
-        my $cmpgreq1 = Google::Adwords::CampaignRequest->new->geoTargeting(
-            { cities => ['Pelican, AK US'] } )
+        my $geo_target   = Google::Adwords::GeoTarget->new();
+        my $city_targets = Google::Adwords::CityTargets->new();
+        $city_targets->cities( ['Aberdeen, SCT GB'] );
+        $geo_target->cityTargets($city_targets);
+
+        my $cmpgreq1
+            = Google::Adwords::CampaignRequest->new->geoTargeting($geo_target)
             ->languageTargeting( { languages => [ 'fr', 'en' ] } )
             ->adGroupRequests($adgroup_request1);
 
@@ -155,8 +168,9 @@ sub estimateCampaignList : Test(no_plan)
         ok( scalar @{ $adgroup_estimate->keywordEstimates } == 2,
             'estimateCampaignList' );
 
-    } # end if ( $self->{sandbox} )
-    else {
+    } # end if ( $self->{sandbox} ...
+    else
+    {
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
             call => sub {
@@ -207,8 +221,13 @@ EOF
             = Google::Adwords::AdGroupRequest->new->maxCpc(50000000)
             ->keywordRequests( $kwreq1, $kwreq2 );
 
-        my $cmpgreq1 = Google::Adwords::CampaignRequest->new->geoTargeting(
-            { cities => ['Pelican, AK US'] } )
+        my $geo_target   = Google::Adwords::GeoTarget->new();
+        my $city_targets = Google::Adwords::CityTargets->new();
+        $city_targets->cities( ['Aberdeen, SCT GB'] );
+        $geo_target->cityTargets($city_targets);
+
+        my $cmpgreq1
+            = Google::Adwords::CampaignRequest->new->geoTargeting($geo_target)
             ->languageTargeting( { languages => [ 'fr', 'en' ] } )
             ->adGroupRequests($adgroup_request1);
 
@@ -236,11 +255,13 @@ sub estimateKeywordList : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my $kwreq1
             = Google::Adwords::KeywordRequest->new->text('web marketing')
@@ -255,8 +276,9 @@ sub estimateKeywordList : Test(no_plan)
         ok( ref $estimates[0] eq 'Google::Adwords::KeywordEstimate',
             'estimateKeywordList' );
 
-    } # end if ( $self->{sandbox} )
-    else {
+    } # end if ( $self->{sandbox} ...
+    else
+    {
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
             call => sub {

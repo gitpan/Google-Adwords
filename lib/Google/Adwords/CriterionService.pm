@@ -24,17 +24,21 @@ sub addCriteria
 
     my @params = ();
 
-    for my $criterion (@criteria) {
+    for my $criterion (@criteria)
+    {
 
-        if ( !UNIVERSAL::isa( $criterion, 'Google::Adwords::Criterion' ) ) {
+        if ( !UNIVERSAL::isa( $criterion, 'Google::Adwords::Criterion' ) )
+        {
 
             #next;
             die "Object is a not a Google::Adwords::Criterion object.";
         }
-        if ( not defined $criterion->adGroupId ) {
+        if ( not defined $criterion->adGroupId )
+        {
             die "adGroupId must be set for the criterion\n";
         }
-        if ( not defined $criterion->criterionType ) {
+        if ( not defined $criterion->criterionType )
+        {
             die "criterionType must be set for the criterion\n";
         }
         my @criterion_params;
@@ -65,7 +69,8 @@ sub addCriteria
             )
         {
 
-            if ( defined $criterion->$_ ) {
+            if ( defined $criterion->$_ )
+            {
                 push @criterion_params,
                     SOAP::Data->name( $_ => $criterion->$_ )->type('');
             }
@@ -74,7 +79,7 @@ sub addCriteria
         push @params, SOAP::Data->name(
             'criterion' => \SOAP::Data->value(@criterion_params) )->type('');
 
-    } # end for my $criterion (@criteria)
+    } # end for my $criterion (@criteria...
 
     my $result = $self->_create_service_and_call(
         {
@@ -117,17 +122,21 @@ sub setCampaignNegativeCriteria
 
     my @criterion_params;
 
-    for my $criterion ( @{$criterions_ref} ) {
+    for my $criterion ( @{$criterions_ref} )
+    {
 
-        if ( !UNIVERSAL::isa( $criterion, 'Google::Adwords::Criterion' ) ) {
+        if ( !UNIVERSAL::isa( $criterion, 'Google::Adwords::Criterion' ) )
+        {
 
             #next;
             die "Object is a not a Google::Adwords::Criterion object.";
         }
-        if ( not defined $criterion->adGroupId ) {
+        if ( not defined $criterion->adGroupId )
+        {
             die "adGroupId must be set for the criterion\n";
         }
-        if ( not defined $criterion->criterionType ) {
+        if ( not defined $criterion->criterionType )
+        {
             die "criterionType must be set for the criterion\n";
         }
         my @criterion_params_inner;
@@ -158,7 +167,8 @@ sub setCampaignNegativeCriteria
             )
         {
 
-            if ( defined $criterion->$_ ) {
+            if ( defined $criterion->$_ )
+            {
                 push @criterion_params_inner,
                     SOAP::Data->name( $_ => $criterion->$_ )->type('');
             }
@@ -202,19 +212,24 @@ sub updateCriteria
 
     my @params;
 
-    for my $criterion (@criteria) {
-        if ( !UNIVERSAL::isa( $criterion, 'Google::Adwords::Criterion' ) ) {
+    for my $criterion (@criteria)
+    {
+        if ( !UNIVERSAL::isa( $criterion, 'Google::Adwords::Criterion' ) )
+        {
 
             #next;
             die "Object is a not a Google::Adwords::Criterion object.";
         }
-        if ( not defined $criterion->id ) {
+        if ( not defined $criterion->id )
+        {
             die "id must be set for the criterion\n";
         }
-        if ( not defined $criterion->adGroupId ) {
+        if ( not defined $criterion->adGroupId )
+        {
             die "adGroupId must be set for the criterion\n";
         }
-        if ( not defined $criterion->criterionType ) {
+        if ( not defined $criterion->criterionType )
+        {
             die "criterionType must be set for the criterion\n";
         }
         my @criterion_params_inner;
@@ -246,7 +261,8 @@ sub updateCriteria
             )
         {
 
-            if ( defined $criterion->$_ ) {
+            if ( defined $criterion->$_ )
+            {
                 push @criterion_params_inner,
                     SOAP::Data->name( $_ => $criterion->$_ )->type('');
             }
@@ -256,7 +272,7 @@ sub updateCriteria
             SOAP::Data->name(
             'criterion' => \SOAP::Data->value(@criterion_params_inner) )
             ->type('');
-    } # end for my $criterion (@criteria)
+    } # end for my $criterion (@criteria...
 
     my $result = $self->_create_service_and_call(
         {

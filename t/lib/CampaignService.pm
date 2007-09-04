@@ -4,6 +4,9 @@ use base qw/ Service /;
 use Test::More;
 use Test::MockModule;
 use Google::Adwords::Campaign;
+use Google::Adwords::GeoTarget;
+use Google::Adwords::CityTargets;
+use Google::Adwords::CountryTargets;
 use Google::Adwords::AdSchedule;
 use Google::Adwords::SchedulingInterval;
 
@@ -40,7 +43,8 @@ sub addCampaign : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
@@ -50,15 +54,19 @@ sub addCampaign : Test(no_plan)
     $campaign->dailyBudget(100000);
     $campaign->languageTargeting( { languages => 'en', } );
 
-    #$campaign->geo_targeting({
-    #    countries => [ 'US', 'IN' ],
-    #    #metros => [ 600, 606 ],
-    #});
+    # geoTargeting
+    my $geo_target      = Google::Adwords::GeoTarget->new();
+    my $country_targets = Google::Adwords::CountryTargets->new();
+    $country_targets->countries( [ 'US', 'IN' ] );
+    $geo_target->countryTargets($country_targets);
+    $campaign->geoTargeting($geo_target);
+
     #$campaign->network_targeting({
     #    network_types => [ 'GoogleSearch' ],
     #});
 
-    if ( $self->{'sandbox'} ) {
+    if ( $self->{'sandbox'} )
+    {
         my $camp = $self->{'obj'}->addCampaign($campaign);
         ok( $camp->dailyBudget == 100000, 'addCampaign' );
         ok( $camp->id =~ /\d+/, 'addCampaign - id: ' . $camp->id );
@@ -70,7 +78,8 @@ sub addCampaign : Test(no_plan)
         $self->_set_campaign_id( $camp->id );
     }
 
-    else {
+    else
+    {
 
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
@@ -91,6 +100,16 @@ sub addCampaign : Test(no_plan)
      <ns1:networkTypes>SearchNetwork</ns1:networkTypes>
      <ns1:networkTypes>ContentNetwork</ns1:networkTypes>
     </ns1:networkTargeting>
+    <ns1:geoTargeting>
+     <ns1:targetAll>false</ns1:targetAll>
+     <ns1:countryTargets>
+      <ns1:countries>US</ns1:countries>
+     </ns1:countryTargets>
+     <ns1:regionTargets xsi:nil="true"/>
+     <ns1:metroTargets xsi:nil="true"/>
+     <ns1:cityTargets xsi:nil="true"/>
+     <ns1:proximityTargets xsi:nil="true"/>
+    </ns1:geoTargeting>
     <ns1:schedule>
       <ns1:status>Disabled</ns1:status>
     </ns1:schedule>
@@ -119,6 +138,16 @@ EOF
         ok( $campaign_obj->schedule->status eq 'Disabled',
             'ad schedule disabled' );
 
+        my $geo_target = $campaign_obj->geoTargeting();
+
+        #die Dumper $geo_target;
+        ok( $geo_target->targetAll eq 'false', 'geoTarget targetAll' );
+        isa_ok( $geo_target->countryTargets,
+            'Google::Adwords::CountryTargets' );
+
+        #ok (ref $geo_target->countryTargets->countries eq 'ARRAY',
+        #'geoTarget (countries)');
+
     }
 
 } # end sub addCampaign :
@@ -129,7 +158,8 @@ sub addCampaign_schedule : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
@@ -149,7 +179,8 @@ sub addCampaign_schedule : Test(no_plan)
 
     $campaign->schedule($ad_schedule);
 
-    if ( $self->{'sandbox'} ) {
+    if ( $self->{'sandbox'} )
+    {
         my $camp = $self->{'obj'}->addCampaign($campaign);
         ok( $camp->dailyBudget == 100000, 'addCampaign' );
         ok( $camp->id =~ /\d+/, 'addCampaign - id: ' . $camp->id );
@@ -161,7 +192,8 @@ sub addCampaign_schedule : Test(no_plan)
         $self->_set_campaign_id( $camp->id );
     }
 
-    else {
+    else
+    {
 
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
@@ -233,11 +265,13 @@ sub getAllAdWordsCampaigns : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
         my @campaigns = $self->{'obj'}->getAllAdWordsCampaigns();
 
         #print Dumper(\@campaigns);
@@ -245,11 +279,13 @@ sub getAllAdWordsCampaigns : Test(no_plan)
         # we added 3 campaigns. check it.
         ok( scalar @campaigns >= 3,
             'getAllAdWordsCampaigns (got more than three)' );
-        for (@campaigns) {
+        for (@campaigns)
+        {
             ok( $_->id =~ /\d+/, 'getAllAdWordsCampaigns - id: ' . $_->id );
         }
     }
-    else {
+    else
+    {
 
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
@@ -311,11 +347,13 @@ sub getCampaign : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
         my $campaign = $self->{obj}->getCampaign( $self->{_campaign_id} );
         ok(
             $campaign->id == $self->{_campaign_id},
@@ -323,7 +361,8 @@ sub getCampaign : Test(no_plan)
         );
     }
 
-    else {
+    else
+    {
 
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
@@ -367,11 +406,13 @@ sub setOptimizeAdServing : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my $ret
             = $self->{obj}->setOptimizeAdServing( $self->{_campaign_id}, 1 );
@@ -380,7 +421,8 @@ sub setOptimizeAdServing : Test(no_plan)
         ok( $ret == 1, 'setOptimizeAdServing' );
 
     }
-    else {
+    else
+    {
 
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
@@ -410,11 +452,13 @@ sub getOptimizeAdServing : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my $ret = $self->{obj}->getOptimizeAdServing( $self->{_campaign_id} );
 
@@ -422,7 +466,8 @@ sub getOptimizeAdServing : Test(no_plan)
         ok( $ret == 1, 'getOptimizeAdServing' );
 
     }
-    else {
+    else
+    {
 
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
@@ -452,11 +497,13 @@ sub addCampaignList : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my @campaigns;
         my $campaign1 = Google::Adwords::Campaign->new();
@@ -480,8 +527,9 @@ sub addCampaignList : Test(no_plan)
         $self->{_campaign_id_0} = $responses[0]->id;
         $self->{_campaign_id_1} = $responses[1]->id;
 
-    } # end if ( $self->{sandbox} )
-    else {
+    } # end if ( $self->{sandbox} ...
+    else
+    {
 
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
@@ -551,11 +599,13 @@ sub getCampaignList : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         # use the stored campaign ids
         my @campaigns = $self->{obj}->getCampaignList(
@@ -568,8 +618,9 @@ sub getCampaignList : Test(no_plan)
         ok( $campaigns[1]->id == $self->{_campaign_id_0}, 'getCampaignList' );
         ok( $campaigns[2]->id == $self->{_campaign_id_1}, 'getCampaignList' );
 
-    }
-    else {
+    } # end if ( $self->{sandbox} ...
+    else
+    {
 
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
@@ -630,11 +681,13 @@ sub updateCampaign : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my $campaign = Google::Adwords::Campaign->new();
         $campaign->id( $self->{_campaign_id} );
@@ -644,7 +697,8 @@ sub updateCampaign : Test(no_plan)
         ok( $ret == 1, 'updateCampaign' );
 
     }
-    else {
+    else
+    {
 
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
@@ -676,11 +730,13 @@ sub updateCampaignList : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my @campaigns;
 
@@ -697,8 +753,9 @@ sub updateCampaignList : Test(no_plan)
         my $ret = $self->{obj}->updateCampaignList(@campaigns);
         ok( $ret == 1, 'updateCampaignList' );
 
-    } # end if ( $self->{sandbox} )
-    else {
+    } # end if ( $self->{sandbox} ...
+    else
+    {
 
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
@@ -738,11 +795,13 @@ sub getCampaignStats : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my @stats = $self->{obj}->getCampaignStats(
             {
@@ -758,8 +817,9 @@ sub getCampaignStats : Test(no_plan)
         ok( $stats[0]->clicks == 0,                   'getCampaignStats' );
         ok( $stats[1]->id == $self->{_campaign_id_1}, 'getCampaignStats' );
 
-    } # end if ( $self->{sandbox} )
-    else {
+    } # end if ( $self->{sandbox} ...
+    else
+    {
 
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(

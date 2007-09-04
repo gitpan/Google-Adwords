@@ -31,17 +31,20 @@ sub deleteReport : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         #$self->{obj}->deleteReport(11);
         return;
 
     }
-    else {
+    else
+    {
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
             call => sub {
@@ -68,19 +71,23 @@ sub z1_getAllJobs : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my @jobs = $self->{obj}->getAllJobs;
-        for (@jobs) {
+        for (@jobs)
+        {
             ok( $_->id =~ /\d+/, 'getAllJobs id: ' . $_->id );
         }
 
     }
-    else {
+    else
+    {
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
             call => sub {
@@ -119,7 +126,8 @@ EOF
         );
 
         my @jobs = $self->{obj}->getAllJobs;
-        for (@jobs) {
+        for (@jobs)
+        {
             ok( $_->id =~ /\d+/, 'getAllJobs id: ' . $_->id );
         }
 
@@ -133,16 +141,19 @@ sub z3_getGzipReportDownloadUrl : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my $url = $self->{obj}->getGzipReportDownloadUrl( $self->{_job_id} );
 
     }
-    else {
+    else
+    {
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
             call => sub {
@@ -157,7 +168,8 @@ EOF
         );
 
         my @jobs = $self->{obj}->getAllJobs;
-        for (@jobs) {
+        for (@jobs)
+        {
             ok( $_->id =~ /\d+/, 'getAllJobs' );
         }
 
@@ -171,17 +183,20 @@ sub z2_getReportJobStatus : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my $status = $self->{obj}->getReportJobStatus( $self->{_job_id} );
         ok( $status eq 'Pending', 'getReportJobStatus' );
 
     }
-    else {
+    else
+    {
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
             call => sub {
@@ -211,11 +226,13 @@ sub z0_scheduleReportJob : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my $job = Google::Adwords::ReportJob->new->startDay('2007-02-25')
             ->endDay('2007-02-27')->name('test')->aggregationType('Summary');
@@ -227,7 +244,8 @@ sub z0_scheduleReportJob : Test(no_plan)
         # save for further use
         $self->{_job_id} = $job_id;
     }
-    else {
+    else
+    {
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
             call => sub {

@@ -34,36 +34,6 @@ sub accessors : Test(no_plan)
     $got_ref = $self->{'obj'}->languageTargeting();
     ok( $got_ref->{languages}[0] eq 'en', 'language_targeting' );
 
-    # geo_targeting
-    $self->{'obj'}->geoTargeting(
-        {
-            countries => [ 'US',             'IN', ],
-            regions   => [ 'US-CA',          'BR-AC' ],
-            cities    => [ 'Pelican, AK US', 'Sitka, AK US' ],
-            metros    => [ 606,              693 ],
-        }
-    );
-    $got_ref = $self->{'obj'}->geoTargeting();
-
-    ok( $got_ref->{'countries'}[1] eq 'IN', 'geo_targeting (countries)' );
-    ok( $got_ref->{'cities'}[0] eq 'Pelican, AK US',
-        'geo_targeting (cities)' );
-
-    $self->{'obj'}->geoTargeting( { countries => 'US', } );
-    $got_ref = $self->{'obj'}->geoTargeting();
-    ok( $got_ref->{'countries'}[0] eq 'US', 'geo_targeting (countries)' );
-
-    $self->{'obj'}->geoTargeting(
-        {
-            countries => 'US',
-            cities    => 'Pelican, AK US',
-        }
-    );
-    $got_ref = $self->{'obj'}->geoTargeting();
-    ok( $got_ref->{'countries'}[0] eq 'US', 'geo_targeting (countries)' );
-    ok( $got_ref->{'cities'}[0] eq 'Pelican, AK US',
-        'geo_targeting (cities)' );
-
     # networkTargeting
     $self->{'obj'}->networkTargeting(
         { networkTypes => [ 'GoogleSearch', 'ContentNetwork' ] } );

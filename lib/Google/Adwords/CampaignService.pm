@@ -2,13 +2,18 @@ package Google::Adwords::CampaignService;
 use strict;
 use warnings;
 
-use version; our $VERSION = qv('0.6');
+use version; our $VERSION = qv('0.8');
 
 use base 'Google::Adwords::Service';
 use Date::Manip;
 
 # data types
 use Google::Adwords::Campaign;
+use Google::Adwords::GeoTarget;
+use Google::Adwords::CityTargets;
+use Google::Adwords::CountryTargets;
+use Google::Adwords::MetroTargets;
+use Google::Adwords::RegionTargets;
 use Google::Adwords::StatsRecord;
 use Google::Adwords::AdSchedule;
 use Google::Adwords::SchedulingInterval;
@@ -33,31 +38,36 @@ sub _create_campaign_params
         SOAP::Data->name( 'dailyBudget' => $campaign->dailyBudget )->type('');
 
     # campaign name
-    if ( defined $campaign->name ) {
+    if ( defined $campaign->name )
+    {
         push @campaign_params,
             SOAP::Data->name( 'name' => $campaign->name )->type('');
     }
 
     # status
-    if ( defined $campaign->status ) {
+    if ( defined $campaign->status )
+    {
         push @campaign_params,
             SOAP::Data->name( 'status' => $campaign->status )->type('');
     }
 
     # start_day
-    if ( defined $campaign->startDay ) {
+    if ( defined $campaign->startDay )
+    {
         push @campaign_params,
             SOAP::Data->name( 'startDay' => $campaign->startDay )->type('');
     }
 
     # end_day
-    if ( defined $campaign->endDay ) {
+    if ( defined $campaign->endDay )
+    {
         push @campaign_params,
             SOAP::Data->name( 'endDay' => $campaign->endDay )->type('');
     }
 
     # Ad schedule
-    if ( defined $campaign->schedule ) {
+    if ( defined $campaign->schedule )
+    {
 
         my @schedule_params;
 
@@ -67,10 +77,13 @@ sub _create_campaign_params
             ->type('');
 
         # intervals
-        foreach my $interval ( @{ $campaign->schedule->intervals } ) {
+        foreach my $interval ( @{ $campaign->schedule->intervals } )
+        {
             my @interval_params;
-            for (qw/day endHour endMinute multiplier startHour startMinute/) {
-                if ( defined $interval->$_ ) {
+            for (qw/day endHour endMinute multiplier startHour startMinute/)
+            {
+                if ( defined $interval->$_ )
+                {
                     push @interval_params,
                         SOAP::Data->name( $_ => $interval->$_ )->type('');
                 }
@@ -86,13 +99,16 @@ sub _create_campaign_params
     } # end if ( defined $campaign...
 
     # budget optimizer settings
-    if ( defined $campaign->budgetOptimizerSettings ) {
+    if ( defined $campaign->budgetOptimizerSettings )
+    {
 
         my @budget_params;
         my $budget = $campaign->budgetOptimizerSettings;
 
-        for (qw/bidCeiling enabled takeOnOptimizedBids/) {
-            if ( defined $budget->$_ ) {
+        for (qw/bidCeiling enabled takeOnOptimizedBids/)
+        {
+            if ( defined $budget->$_ )
+            {
                 push @budget_params,
                     SOAP::Data->name( $_ => $budget->$_ )->type('');
             }
@@ -123,26 +139,52 @@ sub _create_campaign_params
     } # end if ( ( defined $campaign...
 
     # geo_targeting
-    if (   ( defined $campaign->geoTargeting )
-        && ( ref $campaign->geoTargeting eq 'HASH' ) )
+    if ( defined $campaign->geoTargeting )
     {
-        my $geo_ref = $campaign->geoTargeting;
+        my $geo_obj = $campaign->geoTargeting;
+
+        #die ref $geo_obj;
         my @geo_data;
 
-        for (qw/countries cities metros regions/) {
-            if (    ( exists $geo_ref->{$_} )
-                and ( scalar @{ $geo_ref->{$_} } > 0 ) )
-            {
-                push @geo_data,
-                    SOAP::Data->name( $_ => @{ $geo_ref->{$_} } )->type('');
-            }
+        if ( defined $geo_obj->targetAll )
+        {
+            push @geo_data,
+                SOAP::Data->name( targetAll => $geo_obj->targetAll )
+                ->type('');
         }
 
-        if ( scalar @geo_data > 0 ) {
+        # hash to map API params
+        my %geo_target_params = (
+            'countryTargets' => 'countries',
+            'cityTargets'    => 'cities',
+            'metroTargets'   => 'metros',
+            'regionTargets'  => 'regions',
+        );
+
+        for ( keys %geo_target_params )
+        {
+            if ( defined $geo_obj->$_ )
+            {
+                my $targets = $geo_obj->$_;
+                my $key     = $geo_target_params{$_};
+
+                if (    ( defined $targets->$key )
+                    and ( scalar @{ $targets->$key } > 0 ) )
+                {
+                    push @geo_data,
+                        SOAP::Data->name(
+                        $_ => \SOAP::Data->name( $key => @{ $targets->$key } )
+                            ->type('') )->type('');
+                }
+            }
+        } # end for ( keys %geo_target_params...
+
+        if ( scalar @geo_data > 0 )
+        {
             push @campaign_params, SOAP::Data->name(
                 'geoTargeting' => \SOAP::Data->value(@geo_data), )->type('');
         }
-    } # end if ( ( defined $campaign...
+    } # end if ( defined $campaign...
 
     # network_targeting
     if (   ( defined $campaign->networkTargeting )
@@ -177,6 +219,8 @@ sub _create_campaign_object
 {
     my ( $self, $data ) = @_;
 
+    #use Data::Dumper;
+    #die Dumper $data;
     # format dates
     $data->{'startDay'}
         = UnixDate( ParseDate( $data->{'startDay'} ), "%Y-%m-%d %H:%M:%S" );
@@ -184,7 +228,8 @@ sub _create_campaign_object
         = UnixDate( ParseDate( $data->{'endDay'} ), "%Y-%m-%d %H:%M:%S" );
 
     # budgetOptimizerSettings
-    if ( exists $data->{budgetOptimizerSettings} ) {
+    if ( exists $data->{budgetOptimizerSettings} )
+    {
         $data->{budgetOptimizerSettings} = $self->_create_object_from_hash(
             $data->{budgetOptimizerSettings},
             'Google::Adwords::BudgetOptimizerSettings' );
@@ -192,17 +237,21 @@ sub _create_campaign_object
 
     # ad schedule
     my @intervals;
-    if ( exists $data->{schedule}{intervals} ) {
+    if ( exists $data->{schedule}{intervals} )
+    {
 
         # check if we have multiple intervals
-        if ( ref $data->{schedule}{intervals} eq 'ARRAY' ) {
-            for ( @{ $data->{schedule}{intervals} } ) {
+        if ( ref $data->{schedule}{intervals} eq 'ARRAY' )
+        {
+            for ( @{ $data->{schedule}{intervals} } )
+            {
                 push @intervals,
                     $self->_create_object_from_hash( $_,
                     "Google::Adwords::SchedulingInterval" );
             }
         }
-        else {
+        else
+        {
 
             # just a single interval
             push @intervals,
@@ -210,13 +259,41 @@ sub _create_campaign_object
                 "Google::Adwords::SchedulingInterval" );
         }
     } # end if ( exists $data->{schedule...
-    if ( scalar @intervals > 0 ) {
+    if ( scalar @intervals > 0 )
+    {
         $data->{schedule}{intervals} = \@intervals;
     }
     my $ad_schedule = $self->_create_object_from_hash( $data->{schedule},
         "Google::Adwords::AdSchedule" );
 
     $data->{schedule} = $ad_schedule;
+
+    # geoTargeting
+    if ( exists $data->{geoTargeting} )
+    {
+
+        #use Data::Dumper;
+        #die Dumper $data->{geoTargeting};
+
+        for ( keys %{ $data->{geoTargeting} } )
+        {
+            next if ( $_ eq 'targetAll' );
+
+            my $geo_ref = $data->{geoTargeting};
+            if ( defined $geo_ref->{$_} )
+            {
+                my $target_obj
+                    = $self->_create_object_from_hash( $geo_ref->{$_},
+                    "Google::Adwords::" . ucfirst $_ );
+                $data->{geoTargeting}{$_} = $target_obj;
+            }
+
+        }
+
+        $data->{geoTargeting}
+            = $self->_create_object_from_hash( $data->{geoTargeting},
+            'Google::Adwords::GeoTarget' );
+    } # end if ( exists $data->{geoTargeting...
 
     # get campaign object
     my $campaign_response = $self->_create_object_from_hash( $data,
@@ -240,7 +317,8 @@ sub addCampaign
     my ( $self, $campaign ) = @_;
 
     # daily_budget should be present
-    if ( not defined $campaign->dailyBudget ) {
+    if ( not defined $campaign->dailyBudget )
+    {
         die "dailyBudget should be set for the campaign object";
     }
 
@@ -281,8 +359,10 @@ sub addCampaignList
     my ( $self, @campaigns ) = @_;
 
     # daily_budget should be present
-    for (@campaigns) {
-        if ( not defined $_->dailyBudget ) {
+    for (@campaigns)
+    {
+        if ( not defined $_->dailyBudget )
+        {
             die "dailyBudget should be set for the campaign object";
         }
     }
@@ -291,7 +371,8 @@ sub addCampaignList
     my @params;
 
     # loop over campaign objects
-    for (@campaigns) {
+    for (@campaigns)
+    {
 
         my @campaign_params = _create_campaign_params($_);
 
@@ -518,10 +599,12 @@ sub setOptimizeAdServing
 {
     my ( $self, $id, $enable ) = @_;
 
-    if ( not defined $id ) {
+    if ( not defined $id )
+    {
         die "setOptimizeAdServing : need to provide campaign id.\n";
     }
-    if ( not defined $enable ) {
+    if ( not defined $enable )
+    {
         die "setOptimizeAdServing : need to provide enable flag.\n";
     }
 
@@ -556,7 +639,8 @@ sub updateCampaign
     my ( $self, $campaign ) = @_;
 
     # id should be present
-    if ( not defined $campaign->id ) {
+    if ( not defined $campaign->id )
+    {
         die "id should be set for the campaign object";
     }
 
@@ -596,8 +680,10 @@ sub updateCampaignList
     my ( $self, @campaigns ) = @_;
 
     # id should be present
-    for (@campaigns) {
-        if ( not defined $_->id ) {
+    for (@campaigns)
+    {
+        if ( not defined $_->id )
+        {
             die "id should be set for the campaign object";
         }
     }
@@ -605,7 +691,8 @@ sub updateCampaignList
     my @params;
 
     # loop over campaign objects
-    for my $campaign (@campaigns) {
+    for my $campaign (@campaigns)
+    {
 
         my @campaign_params = _create_campaign_params($campaign);
         push @campaign_params,
@@ -645,6 +732,8 @@ This documentation refers to Google::Adwords::CampaignService version 0.6
 =head1 SYNOPSIS
  
     use Google::Adwords::Campaign;
+    use Google::Adwords::GeoTarget;
+    use Google::Adwords::CityTargets;
     use Google::Adwords::CampaignService;
 
     # create a new campaign object
@@ -655,9 +744,11 @@ This documentation refers to Google::Adwords::CampaignService version 0.6
     $campaign->dailyBudget(10000000);
 
     # target a certain city in US
-    $campaign->geoTargeting({
-       cities => [ 'Pelican, AK US' ], 
-    });
+    my $geo_target = Google::Adwords::GeoTarget->new();
+    my $city_targets = Google::Adwords::CityTargets->new();
+    $city_targets->cities([ 'Pelican, AK US' ]);
+    $geo_target->cityTargets($city_targets);
+    $campaign->geoTargeting($geo_target);
   
     # create the campaign service object
     my $campaign_service = Google::Adwords::CampaignService->new();
@@ -1020,6 +1111,16 @@ Returns 1 on success
 =over 4
 
 =item * L<Google::Adwords::Campaign>
+
+=item * L<Google::Adwords::GeoTarget>
+
+=item * L<Google::Adwords::CityTargets>
+
+=item * L<Google::Adwords::CountryTargets>
+
+=item * L<Google::Adwords::MetroTargets>
+
+=item * L<Google::Adwords::RegionTargets>
 
 =item * L<Google::Adwords::StatsRecord>
 

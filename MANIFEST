@@ -22,13 +22,16 @@ lib/Google/Adwords/AdGroupService.pm
 lib/Google/Adwords/Ad.pm
 lib/Google/Adwords/AdSchedule.pm
 lib/Google/Adwords/AdService.pm
+lib/Google/Adwords/ApiError.pm
 lib/Google/Adwords/BudgetOptimizerSettings.pm
 lib/Google/Adwords/Business.pm
 lib/Google/Adwords/CampaignEstimate.pm
 lib/Google/Adwords/Campaign.pm
 lib/Google/Adwords/CampaignRequest.pm
 lib/Google/Adwords/CampaignService.pm
+lib/Google/Adwords/CityTargets.pm
 lib/Google/Adwords/ClientUsageRecord.pm
+lib/Google/Adwords/CountryTargets.pm
 lib/Google/Adwords/CoverageType.pm
 lib/Google/Adwords/Creative.pm
 lib/Google/Adwords/CreativeService.pm
@@ -37,6 +40,7 @@ lib/Google/Adwords/Criterion.pm
 lib/Google/Adwords/CriterionService.pm
 lib/Google/Adwords/Data.pm
 lib/Google/Adwords/EmailPromotionsPreferences.pm
+lib/Google/Adwords/GeoTarget.pm
 lib/Google/Adwords/Image.pm
 lib/Google/Adwords/InfoService.pm
 lib/Google/Adwords/KeywordEstimate.pm
@@ -44,6 +48,8 @@ lib/Google/Adwords/KeywordRequest.pm
 lib/Google/Adwords/KeywordToolService.pm
 lib/Google/Adwords/KeywordVariation.pm
 lib/Google/Adwords/KeywordVariations.pm
+lib/Google/Adwords/MetroTargets.pm
+lib/Google/Adwords/RegionTargets.pm
 lib/Google/Adwords/ReportJob.pm
 lib/Google/Adwords/ReportService.pm
 lib/Google/Adwords/SchedulingInterval.pm
@@ -66,6 +72,7 @@ t/lib/CampaignService.pm
 t/lib/CreativeService.pm
 t/lib/CriterionService.pm
 t/lib/Data.pm
+t/lib/GeoTarget.pm
 t/lib/InfoService.pm
 t/lib/KeywordToolService.pm
 t/lib/ReportService.pm

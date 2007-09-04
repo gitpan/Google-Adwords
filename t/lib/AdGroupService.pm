@@ -25,16 +25,19 @@ sub addAdGroup : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my $adgroup = Google::Adwords::AdGroup->new();
         $adgroup->maxCpc(100000);
         my $campaign_id = $self->_get_campaign_id();
-        if ( not defined $campaign_id ) {
+        if ( not defined $campaign_id )
+        {
             diag("addCampaign was not called");
             return;
         }
@@ -51,8 +54,9 @@ sub addAdGroup : Test(no_plan)
         # save for further module tests
         $self->_set_adgroup_id( $adgroup_response->id );
 
-    } # end if ( $self->{sandbox} )
-    else {
+    } # end if ( $self->{sandbox} ...
+    else
+    {
 
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
@@ -104,14 +108,17 @@ sub addAdGroupList : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my $campaign_id = $self->_get_campaign_id();
-        if ( not defined $campaign_id ) {
+        if ( not defined $campaign_id )
+        {
             diag("addCampaign was not called");
             return;
         }
@@ -138,8 +145,9 @@ sub addAdGroupList : Test(no_plan)
         # save for further use
         $self->{_adgroup_id_0} = $new_adgroups[0]->id;
         $self->{_adgroup_id_1} = $new_adgroups[1]->id;
-    } # end if ( $self->{sandbox} )
-    else {
+    } # end if ( $self->{sandbox} ...
+    else
+    {
 
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
@@ -197,18 +205,21 @@ sub getAdGroup : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my $adgroup = $self->{obj}->getAdGroup( $self->{_adgroup_id} );
 
         ok( $adgroup->campaignId == $self->_get_campaign_id(), 'getAdGroup' );
         ok( $adgroup->id == $self->{_adgroup_id}, 'getAdGroup' );
     }
-    else {
+    else
+    {
 
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
@@ -247,11 +258,13 @@ sub getAdGroupList : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my @adgroup_ids = ( $self->{_adgroup_id_0}, $self->{_adgroup_id_1}, );
         my @adgroups = $self->{obj}->getAdGroupList(@adgroup_ids);
@@ -259,7 +272,8 @@ sub getAdGroupList : Test(no_plan)
         ok( $adgroups[0]->id == $self->{_adgroup_id_0}, 'getAdGroupList' );
         ok( $adgroups[1]->id == $self->{_adgroup_id_1}, 'getAdGroupList' );
     }
-    else {
+    else
+    {
 
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
@@ -306,22 +320,26 @@ sub getAllAdGroups : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my @adgroups
             = $self->{obj}->getAllAdGroups( $self->_get_campaign_id );
 
         # must get three or more
         ok( scalar @adgroups >= 3, 'getAllAdGroups' );
-        for (@adgroups) {
+        for (@adgroups)
+        {
             ok( $_->id =~ /\d+/, 'getAllAdGroups id: ' . $_->id );
         }
     }
-    else {
+    else
+    {
 
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
@@ -367,14 +385,17 @@ sub getAdGroupStats : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my $campaign_id = $self->_get_campaign_id;
-        if ( not defined $campaign_id ) {
+        if ( not defined $campaign_id )
+        {
             diag("addCampaign was not called");
             return;
         }
@@ -393,8 +414,9 @@ sub getAdGroupStats : Test(no_plan)
         ok( $stats[0]->id == $self->{_adgroup_id_0}, 'getAdGroupStats' );
         ok( $stats[1]->id == $self->{_adgroup_id_1}, 'getAdGroupStats' );
 
-    } # end if ( $self->{sandbox} )
-    else {
+    } # end if ( $self->{sandbox} ...
+    else
+    {
 
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
@@ -456,11 +478,13 @@ sub updateAdGroup : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my $adgroup = Google::Adwords::AdGroup->new;
 
@@ -473,7 +497,8 @@ sub updateAdGroup : Test(no_plan)
         ok( $ret == 1, 'updateAdGroup' );
 
     }
-    else {
+    else
+    {
 
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
@@ -506,11 +531,13 @@ sub updateAdGroupList : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my $adgroup1 = Google::Adwords::AdGroup->new;
         $adgroup1->id( $self->{_adgroup_id_0} );
@@ -526,8 +553,9 @@ sub updateAdGroupList : Test(no_plan)
 
         ok( $ret == 1, 'updateAdGroupList' );
 
-    } # end if ( $self->{sandbox} )
-    else {
+    } # end if ( $self->{sandbox} ...
+    else
+    {
 
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(

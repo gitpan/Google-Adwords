@@ -6,6 +6,7 @@ use lib 't/lib';
 use Service;
 use InfoService;
 use Campaign;
+use GeoTarget;
 use CampaignService;
 use AdGroupService;
 use AccountService;

@@ -33,11 +33,13 @@ sub addCriteria : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my $adgroup_id = $self->_get_adgroup_id();
 
@@ -67,8 +69,9 @@ sub addCriteria : Test(no_plan)
         # save criterion id for further use
         $self->{_criterion_id_0} = $criterions_response[0]->id;
         $self->{_criterion_id_1} = $criterions_response[1]->id;
-    } # end if ( $self->{sandbox} )
-    else {
+    } # end if ( $self->{sandbox} ...
+    else
+    {
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
             call => sub {
@@ -146,22 +149,26 @@ sub getAllCriteria : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my $adgroup_id = $self->_get_adgroup_id();
 
         my @criterions = $self->{obj}->getAllCriteria($adgroup_id);
 
-        for (@criterions) {
+        for (@criterions)
+        {
             ok( $_->id =~ /\d+/, 'getAllCriteria id: ' . $_->id );
         }
 
     }
-    else {
+    else
+    {
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
             call => sub {
@@ -210,7 +217,8 @@ EOF
 
         my @criterions = $self->{obj}->getAllCriteria($adgroup_id);
 
-        for (@criterions) {
+        for (@criterions)
+        {
             ok( $_->id =~ /\d+/, 'getAllCriteria id: ' . $_->id );
         }
 
@@ -224,24 +232,28 @@ sub getCampaignNegativeCriteria : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my $campaign_id = $self->_get_campaign_id();
 
         my @criterions
             = $self->{obj}->getCampaignNegativeCriteria($campaign_id);
 
-        for (@criterions) {
+        for (@criterions)
+        {
             ok( $_->id =~ /\d+/,
                 'getCampaignNegativeCriteria id: ' . $_->id );
         }
 
-    }
-    else {
+    } # end if ( $self->{sandbox} ...
+    else
+    {
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
             call => sub {
@@ -260,7 +272,8 @@ EOF
         my @criterions
             = $self->{obj}->getCampaignNegativeCriteria($campaign_id);
 
-        for (@criterions) {
+        for (@criterions)
+        {
             ok( $_->id =~ /\d+/,
                 'getCampaignNegativeCriteria id: ' . $_->id );
         }
@@ -275,11 +288,13 @@ sub getCriteria : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my $adgroup_id = $self->_get_adgroup_id();
         my $criterion_ids
@@ -288,12 +303,14 @@ sub getCriteria : Test(no_plan)
         my @criterions
             = $self->{obj}->getCriteria( $adgroup_id, $criterion_ids );
 
-        for (@criterions) {
+        for (@criterions)
+        {
             ok( $_->id =~ /\d+/, 'getCriteria id: ' . $_->id );
         }
 
-    }
-    else {
+    } # end if ( $self->{sandbox} ...
+    else
+    {
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
             call => sub {
@@ -344,7 +361,8 @@ EOF
         my @criterions
             = $self->{obj}->getCriteria( $adgroup_id, $criterion_ids );
 
-        for (@criterions) {
+        for (@criterions)
+        {
             ok( $_->id =~ /\d+/, 'getCriteria id: ' . $_->id );
         }
 
@@ -358,11 +376,13 @@ sub getCriterionStats : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my $adgroup_id = $self->_get_adgroup_id();
         my $criterion_ids
@@ -378,11 +398,13 @@ sub getCriterionStats : Test(no_plan)
             }
         );
 
-        for (@stats) {
+        for (@stats)
+        {
             ok( $_->id =~ /\d+/, 'getCriterionStats id: ' . $_->id );
         }
-    } # end if ( $self->{sandbox} )
-    else {
+    } # end if ( $self->{sandbox} ...
+    else
+    {
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
             call => sub {
@@ -419,7 +441,8 @@ EOF
             }
         );
 
-        for (@stats) {
+        for (@stats)
+        {
             ok( $_->id =~ /\d+/, 'getCriterionStats id: ' . $_->id );
         }
     }
@@ -432,11 +455,13 @@ sub setCampaignNegativeCriteria : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my $adgroup_id  = $self->_get_adgroup_id();
         my $campaign_id = $self->_get_campaign_id();
@@ -458,8 +483,9 @@ sub setCampaignNegativeCriteria : Test(no_plan)
         );
 
         ok( $ret == 1, 'setCampaignNegativeCriteria' );
-    } # end if ( $self->{sandbox} )
-    else {
+    } # end if ( $self->{sandbox} ...
+    else
+    {
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
             call => sub {
@@ -504,11 +530,13 @@ sub updateCriteria : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my $adgroup_id = $self->_get_adgroup_id();
 
@@ -529,8 +557,9 @@ sub updateCriteria : Test(no_plan)
         my $ret = $self->{obj}->updateCriteria( $criterion1, $criterion2 );
 
         ok( $ret == 1, 'updateCriteria' );
-    } # end if ( $self->{sandbox} )
-    else {
+    } # end if ( $self->{sandbox} ...
+    else
+    {
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
             call => sub {

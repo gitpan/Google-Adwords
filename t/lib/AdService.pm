@@ -8,6 +8,9 @@ use Data::Dumper;
 use Google::Adwords::Ad;
 use Google::Adwords::StatsRecord;
 use Google::Adwords::Image;
+use Google::Adwords::GeoTarget;
+use Google::Adwords::CityTargets;
+use Google::Adwords::CountryTargets;
 
 sub test_class { return "Google::Adwords::AdService"; }
 
@@ -20,6 +23,7 @@ my %tests = (
     getAdStats   => 1,
     getAllAds    => 1,
     updateAds    => 1,
+    checkAds     => 1,
 );
 
 sub start_of_each_test : Test(setup)
@@ -36,11 +40,13 @@ sub addAds : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my $adgroup_id = $self->_get_adgroup_id();
 
@@ -66,8 +72,9 @@ sub addAds : Test(no_plan)
         # save for further use
         $self->{_ad_id} = $ads[0]->id;
 
-    } # end if ( $self->{sandbox} )
-    else {
+    } # end if ( $self->{sandbox} ...
+    else
+    {
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
             call => sub {
@@ -121,11 +128,13 @@ sub addAds_image : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my $adgroup_id = $self->_get_adgroup_id();
 
@@ -148,8 +157,9 @@ sub addAds_image : Test(no_plan)
         ok( $ads[0]->adGroupId == $adgroup_id, 'addAds Image (adGroupId)' );
         ok( $ads[0]->adType eq 'ImageAd', 'addAds Image (adType)' );
 
-    } # end if ( $self->{sandbox} )
-    else {
+    } # end if ( $self->{sandbox} ...
+    else
+    {
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
             call => sub {
@@ -210,11 +220,13 @@ sub getActiveAds : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my $adgroup_id = $self->_get_adgroup_id();
 
@@ -225,12 +237,14 @@ sub getActiveAds : Test(no_plan)
         # should get two or more
         ok( scalar @ads >= 2, 'getActiveAds' );
 
-        for (@ads) {
+        for (@ads)
+        {
             ok( $_->id =~ /\d+/, 'getActiveAds id: ' . $_->id );
         }
 
-    } # end if ( $self->{sandbox} )
-    else {
+    } # end if ( $self->{sandbox} ...
+    else
+    {
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
             call => sub {
@@ -304,7 +318,8 @@ EOF
         ok( scalar @ads >= 2, 'getActiveAds' );
         ok( $ads[0]->adGroupId == $adgroup_id, 'getActiveAds (adGroupId)' );
 
-        for (@ads) {
+        for (@ads)
+        {
             ok( $_->id =~ /\d+/, 'getActiveAds id: ' . $_->id );
         }
 
@@ -318,26 +333,29 @@ sub getAd : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my $adgroup_id = $self->_get_adgroup_id();
 
-        #my $adgroup_id = 20048;
+        #my $adgroup_id = 120740;
 
         my $ad_id = $self->{_ad_id};
 
-        #my $ad_id = 24626;
+        #my $ad_id = 117416;
 
         my $ad = $self->{obj}->getAd( $adgroup_id, $ad_id );
         ok( $ad->adGroupId == $adgroup_id, 'getAd' );
         ok( $ad->id eq $ad_id, 'getAd' );
 
-    } # end if ( $self->{sandbox} )
-    else {
+    } # end if ( $self->{sandbox} ...
+    else
+    {
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
             call => sub {
@@ -381,11 +399,13 @@ sub getAdStats : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my $adgroup_id = $self->_get_adgroup_id();
 
@@ -400,13 +420,13 @@ sub getAdStats : Test(no_plan)
         #    adIds => $ad_ids,
         #    startDay => '2007-02-19',
         #    endDay => '2007-02-19',
-        #    inPST => 0,
         #});
 
         #ok (ref $stats[0] eq 'Google::Adwords::StatsRecord', 'getAdStats');
 
-    } # end if ( $self->{sandbox} )
-    else {
+    } # end if ( $self->{sandbox} ...
+    else
+    {
 
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
@@ -429,7 +449,6 @@ EOF
                 adIds     => [ 1001, 1002 ],
                 startDay  => '2006-09-01',
                 endDay    => '2006-09-15',
-                inPST     => 1,
             }
         );
 
@@ -447,11 +466,13 @@ sub getAllAds : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my $adgroup_id = $self->_get_adgroup_id();
 
@@ -462,12 +483,14 @@ sub getAllAds : Test(no_plan)
         # should get two or more
         ok( scalar @ads >= 2, 'getAllAds' );
 
-        for (@ads) {
+        for (@ads)
+        {
             ok( $_->id =~ /\d+/, 'getAllAds id: ' . $_->id );
         }
 
-    } # end if ( $self->{sandbox} )
-    else {
+    } # end if ( $self->{sandbox} ...
+    else
+    {
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
             call => sub {
@@ -499,7 +522,8 @@ EOF
 
         my @ads = $self->{obj}->getAllAds($adgroup_id);
 
-        for (@ads) {
+        for (@ads)
+        {
             ok( $_->id =~ /\d+/, 'getAllAds id: ' . $_->id );
         }
 
@@ -512,11 +536,13 @@ sub updateAds : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my $adgroup_id = $self->_get_adgroup_id();
 
@@ -535,8 +561,9 @@ sub updateAds : Test(no_plan)
         my $ret = $self->{obj}->updateAds($ad1);
         ok( $ret == 1, 'updateAds' );
 
-    } # end if ( $self->{sandbox} )
-    else {
+    } # end if ( $self->{sandbox} ...
+    else
+    {
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
             call => sub {
@@ -551,8 +578,7 @@ EOF
         );
 
         my $adgroup_id = 20048;
-
-        my $ad_id = 24626;
+        my $ad_id      = 24626;
 
         my $ad1 = Google::Adwords::Ad->new;
         $ad1->adType('TextAd');
@@ -566,6 +592,99 @@ EOF
     }
 
 } # end sub updateAds :
+
+sub checkAds : Test(no_plan)
+{
+    my $self = shift;
+
+    $sub_name = ( caller 0 )[3];
+    $sub_name =~ s/^.+:://;
+    if ( not $tests{$sub_name} )
+    {
+        return;
+    }
+
+    if ( $self->{sandbox} )
+    {
+
+        my $adgroup_id = $self->_get_adgroup_id();
+
+        #my $adgroup_id = 120740;
+
+        my $ad_id = $self->{_ad_id};
+
+        #my $ad_id = 117416;
+
+        my $ad1 = Google::Adwords::Ad->new;
+        $ad1->adType('TextAd');
+        $ad1->id($ad_id);
+        $ad1->adGroupId($adgroup_id);
+        $ad1->destinationUrl('http://aarohan.biz');
+        $ad1->displayUrl('http://aarohan.biz');
+        $ad1->headline('Test headline');
+        $ad1->description1('Test headline');
+        $ad1->description2('Test headline');
+
+        #my $ret = $self->{obj}->checkAds({
+        #    ads => [ $ad1 ],
+        #    languageTarget => [ 'hi' ],
+        #    geoTarget => {
+        #        countries => [ 'IN' ],
+        #    },
+        #});
+
+        #ok( $ret == 1, 'updateAds' );
+
+    } # end if ( $self->{sandbox} ...
+    else
+    {
+        my $soap = Test::MockModule->new('SOAP::Lite');
+        $soap->mock(
+            call => sub {
+                my $xml .= <<'EOF';
+  <checkAdsResponse xmlns=""/>
+EOF
+
+                $xml = $self->gen_full_response($xml);
+                my $env = SOAP::Deserializer->deserialize($xml);
+                return $env;
+            }
+        );
+
+        #my $adgroup_id = $self->_get_adgroup_id();
+        my $adgroup_id = 120740;
+
+        #my $ad_id = $self->{_ad_id};
+        my $ad_id = 117416;
+
+        my $ad1 = Google::Adwords::Ad->new;
+        $ad1->adType('TextAd');
+        $ad1->id($ad_id);
+        $ad1->adGroupId($adgroup_id);
+        $ad1->destinationUrl('http://aarohan.biz');
+        $ad1->displayUrl('http://aarohan.biz');
+        $ad1->headline('Test headline');
+        $ad1->description1('Test headline');
+        $ad1->description2('Test headline');
+
+        my $geo_target   = Google::Adwords::GeoTarget->new();
+        my $city_targets = Google::Adwords::CityTargets->new();
+        $city_targets->cities( ['Aberdeen, SCT GB'] );
+        $geo_target->cityTargets($city_targets);
+
+        my $ret = $self->{obj}->checkAds(
+            {
+                ads            => [$ad1],
+                languageTarget => ['hi'],
+                geoTarget      => $geo_target,
+            }
+        );
+
+        #print "--$ret--\n";
+
+    }
+
+} # end sub checkAds :
 
 1;
 

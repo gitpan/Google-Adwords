@@ -27,10 +27,12 @@ sub addAdGroup
     my ( $self, $campaignId, $adgroup ) = @_;
 
     # campaignId should be present
-    if ( not defined $campaignId ) {
+    if ( not defined $campaignId )
+    {
         die "campaignId should be set.";
     }
-    if ( not defined $adgroup ) {
+    if ( not defined $adgroup )
+    {
         die "adgroup object must be specified.";
     }
     if (    ( not defined $adgroup->maxCpc )
@@ -42,32 +44,37 @@ sub addAdGroup
     my @adgroup_params;
 
     # adgroup name
-    if ( defined $adgroup->name ) {
+    if ( defined $adgroup->name )
+    {
         push @adgroup_params,
             SOAP::Data->name( 'name' => $adgroup->name )->type('');
     }
 
     # status
-    if ( defined $adgroup->status ) {
+    if ( defined $adgroup->status )
+    {
         push @adgroup_params,
             SOAP::Data->name( 'status' => $adgroup->status )->type('');
     }
 
     # maxContentCpc
-    if ( defined $adgroup->maxContentCpc ) {
+    if ( defined $adgroup->maxContentCpc )
+    {
         push @adgroup_params,
             SOAP::Data->name( 'maxContentCpc' => $adgroup->maxContentCpc )
             ->type('');
     }
 
     # maxCpc
-    if ( defined $adgroup->maxCpc ) {
+    if ( defined $adgroup->maxCpc )
+    {
         push @adgroup_params,
             SOAP::Data->name( 'maxCpc' => $adgroup->maxCpc )->type('');
     }
 
     # maxCpm
-    if ( defined $adgroup->maxCpm ) {
+    if ( defined $adgroup->maxCpm )
+    {
         push @adgroup_params,
             SOAP::Data->name( 'maxCpm' => $adgroup->maxCpm )->type('');
     }
@@ -115,12 +122,15 @@ sub addAdGroupList
     my ( $self, $campaignId, $adgroups_to_add_ref ) = @_;
 
     # campaignId should be present
-    if ( not defined $campaignId ) {
+    if ( not defined $campaignId )
+    {
         die "campaignId should be set.";
     }
 
-    for ( @{$adgroups_to_add_ref} ) {
-        if ( ( not defined $_->maxCpc ) and ( not defined $_->maxCpm ) ) {
+    for ( @{$adgroups_to_add_ref} )
+    {
+        if ( ( not defined $_->maxCpc ) and ( not defined $_->maxCpm ) )
+        {
             die "adgroup must have either maxCpm or maxCpc set.";
         }
     }
@@ -129,36 +139,42 @@ sub addAdGroupList
     push @params,
         SOAP::Data->name('campaignID')->value($campaignId)->type('');
 
-    for my $adgroup ( @{$adgroups_to_add_ref} ) {
+    for my $adgroup ( @{$adgroups_to_add_ref} )
+    {
         my @adgroup_params;
 
         # adgroup name
-        if ( defined $adgroup->name ) {
+        if ( defined $adgroup->name )
+        {
             push @adgroup_params,
                 SOAP::Data->name( 'name' => $adgroup->name )->type('');
         }
 
         # status
-        if ( defined $adgroup->status ) {
+        if ( defined $adgroup->status )
+        {
             push @adgroup_params,
                 SOAP::Data->name( 'status' => $adgroup->status )->type('');
         }
 
         # maxContentCpc
-        if ( defined $adgroup->maxContentCpc ) {
+        if ( defined $adgroup->maxContentCpc )
+        {
             push @adgroup_params,
                 SOAP::Data->name( 'maxContentCpc' => $adgroup->maxContentCpc )
                 ->type('');
         }
 
         # maxCpc
-        if ( defined $adgroup->maxCpc ) {
+        if ( defined $adgroup->maxCpc )
+        {
             push @adgroup_params,
                 SOAP::Data->name( 'maxCpc' => $adgroup->maxCpc )->type('');
         }
 
         # maxCpm
-        if ( defined $adgroup->maxCpm ) {
+        if ( defined $adgroup->maxCpm )
+        {
             push @adgroup_params,
                 SOAP::Data->name( 'maxCpm' => $adgroup->maxCpm )->type('');
         }
@@ -273,7 +289,8 @@ sub getAllAdGroups
 {
     my ( $self, $id ) = @_;
 
-    if ( not defined $id ) {
+    if ( not defined $id )
+    {
         die "must give a campaignId.";
     }
 
@@ -366,10 +383,12 @@ sub updateAdGroup
 {
     my ( $self, $adgroup ) = @_;
 
-    if ( not defined $adgroup ) {
+    if ( not defined $adgroup )
+    {
         die "adgroup object must be specified.";
     }
-    if ( not defined $adgroup->id ) {
+    if ( not defined $adgroup->id )
+    {
         die "adgroup id must be specified.";
     }
 
@@ -379,25 +398,37 @@ sub updateAdGroup
     push @adgroup_params, SOAP::Data->name( 'id' => $adgroup->id )->type('');
 
     # adgroup name
-    if ( defined $adgroup->name ) {
+    if ( defined $adgroup->name )
+    {
         push @adgroup_params,
             SOAP::Data->name( 'name' => $adgroup->name )->type('');
     }
 
     # status
-    if ( defined $adgroup->status ) {
+    if ( defined $adgroup->status )
+    {
         push @adgroup_params,
             SOAP::Data->name( 'status' => $adgroup->status )->type('');
     }
 
     # maxCpc
-    if ( defined $adgroup->maxCpc ) {
+    if ( defined $adgroup->maxCpc )
+    {
         push @adgroup_params,
             SOAP::Data->name( 'maxCpc' => $adgroup->maxCpc )->type('');
     }
 
+    # maxContentCpc
+    if ( defined $adgroup->maxContentCpc )
+    {
+        push @adgroup_params,
+            SOAP::Data->name( 'maxContentCpc' => $adgroup->maxContentCpc )
+            ->type('');
+    }
+
     # maxCpm
-    if ( defined $adgroup->maxCpm ) {
+    if ( defined $adgroup->maxCpm )
+    {
         push @adgroup_params,
             SOAP::Data->name( 'maxCpm' => $adgroup->maxCpm )->type('');
     }
@@ -433,15 +464,18 @@ sub updateAdGroupList
     my ( $self, @adgroups ) = @_;
 
     # check that ids are specified
-    for (@adgroups) {
-        if ( not defined $_->id ) {
+    for (@adgroups)
+    {
+        if ( not defined $_->id )
+        {
             die "adgroup id must be specified.";
         }
     }
 
     my @params;
 
-    for my $adgroup (@adgroups) {
+    for my $adgroup (@adgroups)
+    {
 
         my @adgroup_params;
 
@@ -450,32 +484,36 @@ sub updateAdGroupList
             SOAP::Data->name( 'id' => $adgroup->id )->type('');
 
         # adgroup name
-        if ( defined $adgroup->name ) {
+        if ( defined $adgroup->name )
+        {
             push @adgroup_params,
                 SOAP::Data->name( 'name' => $adgroup->name )->type('');
         }
 
         # status
-        if ( defined $adgroup->status ) {
+        if ( defined $adgroup->status )
+        {
             push @adgroup_params,
                 SOAP::Data->name( 'status' => $adgroup->status )->type('');
         }
 
         # maxCpc
-        if ( defined $adgroup->maxCpc ) {
+        if ( defined $adgroup->maxCpc )
+        {
             push @adgroup_params,
                 SOAP::Data->name( 'maxCpc' => $adgroup->maxCpc )->type('');
         }
 
         # maxCpm
-        if ( defined $adgroup->maxCpm ) {
+        if ( defined $adgroup->maxCpm )
+        {
             push @adgroup_params,
                 SOAP::Data->name( 'maxCpm' => $adgroup->maxCpm )->type('');
         }
 
         push @params, SOAP::Data->name(
             'changedData' => \SOAP::Data->value(@adgroup_params) )->type('');
-    } # end for my $adgroup (@adgroups)
+    } # end for my $adgroup (@adgroups...
 
     # create the SOAP service
     my $result = $self->_create_service_and_call(

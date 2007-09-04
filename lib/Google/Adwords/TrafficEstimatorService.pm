@@ -10,6 +10,11 @@ use base 'Google::Adwords::Service';
 use Google::Adwords::KeywordEstimate;
 use Google::Adwords::AdGroupEstimate;
 use Google::Adwords::CampaignEstimate;
+use Google::Adwords::GeoTarget;
+use Google::Adwords::CityTargets;
+use Google::Adwords::CountryTargets;
+use Google::Adwords::MetroTargets;
+use Google::Adwords::RegionTargets;
 
 ### INSTANCE METHOD ################################################
 # Usage      :
@@ -26,25 +31,32 @@ sub estimateAdGroupList
     my ( $self, @adgrouprequest ) = @_;
 
     my @params;
-    for (@adgrouprequest) {
+    for (@adgrouprequest)
+    {
         my @adgrouprequest_params;
-        if ( defined $_->id ) {
+        if ( defined $_->id )
+        {
             push @adgrouprequest_params,
                 SOAP::Data->name( 'id' => $_->id )->type('');
         }
-        if ( defined $_->maxCpc ) {
+        if ( defined $_->maxCpc )
+        {
             push @adgrouprequest_params,
                 SOAP::Data->name( 'maxCpc' => $_->maxCpc )->type('');
         }
-        if ( defined $_->keywordRequests ) {
+        if ( defined $_->keywordRequests )
+        {
             my @p =
                 ( ref( $_->keywordRequests ) eq 'ARRAY' )
                 ? @{ $_->keywordRequests }
                 : $_->keywordRequests;
-            foreach my $kwreq (@p) {
+            foreach my $kwreq (@p)
+            {
                 my @keywordrequest_params;
-                foreach my $field (qw/ id maxCpc negative text type /) {
-                    if ( defined $kwreq->$field ) {
+                foreach my $field (qw/ id maxCpc negative text type /)
+                {
+                    if ( defined $kwreq->$field )
+                    {
                         push @keywordrequest_params,
                             SOAP::Data->name( $field => $kwreq->$field )
                             ->type('');
@@ -55,7 +67,7 @@ sub estimateAdGroupList
                         \SOAP::Data->value(@keywordrequest_params) )
                     ->type('');
             }
-        } # end if ( defined $_->keywordRequests)
+        } # end if ( defined $_->keywordRequests...
         push @params,
             SOAP::Data->name(
             'adGroupRequests' => \SOAP::Data->value(@adgrouprequest_params) )
@@ -82,7 +94,8 @@ sub estimateAdGroupList
             ( ref( $c->{keywordEstimates} ) eq 'ARRAY' )
             ? $c->{keywordEstimates}
             : [ $c->{keywordEstimates} ];
-        for ( @{$ra_keywordestimate} ) {
+        for ( @{$ra_keywordestimate} )
+        {
             push @keywordestimate,
                 $self->_create_object_from_hash( $_,
                 'Google::Adwords::KeywordEstimate' );
@@ -111,36 +124,73 @@ sub estimateCampaignList
     my ( $self, @campaignrequest ) = @_;
 
     my @params;
-    foreach my $campaign (@campaignrequest) {
+    foreach my $campaign (@campaignrequest)
+    {
         my @campaignrequest_params;
-        if ( defined $campaign->id ) {
+        if ( defined $campaign->id )
+        {
             push @campaignrequest_params,
                 SOAP::Data->name( 'id' => $campaign->id )->type('');
         }
 
-        # geoTargeting
-        if ( defined $campaign->geoTargeting ) {
-            my $geo_ref = $campaign->geoTargeting;
+        # geo_targeting
+        if ( defined $campaign->geoTargeting )
+        {
+            my $geo_obj = $campaign->geoTargeting;
+
+            #die ref $geo_obj;
             my @geo_data;
 
-            for (qw/countries cities metros regions/) {
-                if (    ( defined $geo_ref->{$_} )
-                    and ( scalar @{ $geo_ref->{$_} } > 0 ) )
-                {
-                    push @geo_data,
-                        SOAP::Data->name( $_ => @{ $geo_ref->{$_} } )
-                        ->type('');
-                }
+            if ( defined $geo_obj->targetAll )
+            {
+                push @geo_data,
+                    SOAP::Data->name( targetAll => $geo_obj->targetAll )
+                    ->type('');
             }
 
-            push @campaignrequest_params, SOAP::Data->name(
-                'geoTargeting' => \SOAP::Data->value(@geo_data), )->type('');
+            # hash to map API params
+            my %geo_target_params = (
+                'countryTargets' => 'countries',
+                'cityTargets'    => 'cities',
+                'metroTargets'   => 'metros',
+                'regionTargets'  => 'regions',
+            );
+
+            for ( keys %geo_target_params )
+            {
+                if ( defined $geo_obj->$_ )
+                {
+                    my $targets = $geo_obj->$_;
+                    my $key     = $geo_target_params{$_};
+
+                    if (    ( defined $targets->$key )
+                        and ( scalar @{ $targets->$key } > 0 ) )
+                    {
+                        push @geo_data,
+                            SOAP::Data->name(
+                            $_ => \SOAP::Data->name(
+                                $key => @{ $targets->$key }
+                                )->type('')
+                            )->type('');
+                    }
+                } # end if ( defined $geo_obj->$_...
+            } # end for ( keys %geo_target_params...
+
+            if ( scalar @geo_data > 0 )
+            {
+                push @campaignrequest_params,
+                    SOAP::Data->name(
+                    'geoTargeting' => \SOAP::Data->value(@geo_data), )
+                    ->type('');
+            }
         } # end if ( defined $campaign...
 
         # languageTargeting
-        if ( defined $campaign->languageTargeting ) {
+        if ( defined $campaign->languageTargeting )
+        {
             my $langs_ref = $campaign->languageTargeting;
-            if ( scalar @{ $langs_ref->{'languages'} } > 0 ) {
+            if ( scalar @{ $langs_ref->{'languages'} } > 0 )
+            {
                 push @campaignrequest_params,
                     SOAP::Data->name(
                     'languageTargeting' => \SOAP::Data->name(
@@ -151,9 +201,11 @@ sub estimateCampaignList
         }
 
         # networkTargeting
-        if ( defined $campaign->networkTargeting ) {
+        if ( defined $campaign->networkTargeting )
+        {
             my $network_ref = $campaign->networkTargeting;
-            if ( scalar @{ $network_ref->{'networkTypes'} } > 0 ) {
+            if ( scalar @{ $network_ref->{'networkTypes'} } > 0 )
+            {
                 push @campaignrequest_params,
                     SOAP::Data->name(
                     'networkTargeting' => \SOAP::Data->name(
@@ -171,10 +223,13 @@ sub estimateCampaignList
                 ( ref( $campaign->adGroupRequests ) eq 'ARRAY' )
                 ? @{ $campaign->adGroupRequests }
                 : $campaign->adGroupRequests;
-            foreach my $adgrpreq (@p) {
+            foreach my $adgrpreq (@p)
+            {
                 my @adgrouprequest_params;
-                foreach my $field (qw/ id maxCpc /) {
-                    if ( defined $adgrpreq->$field ) {
+                foreach my $field (qw/ id maxCpc /)
+                {
+                    if ( defined $adgrpreq->$field )
+                    {
                         push @adgrouprequest_params,
                             SOAP::Data->name( $field => $adgrpreq->$field )
                             ->type('');
@@ -182,16 +237,19 @@ sub estimateCampaignList
                 }
 
                 # keywordRequests
-                if ( defined $adgrpreq->keywordRequests ) {
+                if ( defined $adgrpreq->keywordRequests )
+                {
                     my @p =
                         ( ref( $adgrpreq->keywordRequests ) eq 'ARRAY' )
                         ? @{ $adgrpreq->keywordRequests }
                         : $adgrpreq->keywordRequests;
-                    foreach my $kwreq (@p) {
+                    foreach my $kwreq (@p)
+                    {
                         my @keywordrequest_params;
                         foreach my $field (qw/ id maxCpc negative text type /)
                         {
-                            if ( defined $kwreq->$field ) {
+                            if ( defined $kwreq->$field )
+                            {
                                 push @keywordrequest_params, SOAP::Data->name(
                                     $field => $kwreq->$field )->type('');
                             }
@@ -234,13 +292,15 @@ sub estimateCampaignList
             ( ref( $c->{adGroupEstimates} ) eq 'ARRAY' )
             ? $c->{adGroupEstimates}
             : [ $c->{adGroupEstimates} ];
-        foreach my $adgrpest ( @{$ra_adgroupestimate} ) {
+        foreach my $adgrpest ( @{$ra_adgroupestimate} )
+        {
             my @keywordestimate;
             my $ra_keywordestimate =
                 ( ref( $adgrpest->{keywordEstimates} ) eq 'ARRAY' )
                 ? $adgrpest->{keywordEstimates}
                 : [ $adgrpest->{keywordEstimates} ];
-            for ( @{$ra_keywordestimate} ) {
+            for ( @{$ra_keywordestimate} )
+            {
                 push @keywordestimate,
                     $self->_create_object_from_hash( $_,
                     'Google::Adwords::KeywordEstimate' );
@@ -274,10 +334,13 @@ sub estimateKeywordList
     my ( $self, @keywordrequest ) = @_;
 
     my @params;
-    for (@keywordrequest) {
+    for (@keywordrequest)
+    {
         my @keywordrequest_params;
-        foreach my $field (qw/ id maxCpc negative text type /) {
-            if ( defined $_->$field ) {
+        foreach my $field (qw/ id maxCpc negative text type /)
+        {
+            if ( defined $_->$field )
+            {
                 push @keywordrequest_params,
                     SOAP::Data->name( $field => $_->$field )->type('');
             }
@@ -286,7 +349,7 @@ sub estimateKeywordList
             SOAP::Data->name(
             'keywordRequests' => \SOAP::Data->value(@keywordrequest_params) )
             ->type('');
-    }
+    } # end for (@keywordrequest)
 
     my $result = $self->_create_service_and_call(
         {

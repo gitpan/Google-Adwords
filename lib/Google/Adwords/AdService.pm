@@ -2,7 +2,7 @@ package Google::Adwords::AdService;
 use strict;
 use warnings;
 
-use version; our $VERSION = qv('0.4');
+use version; our $VERSION = qv('0.5');
 
 use base 'Google::Adwords::Service';
 
@@ -10,12 +10,19 @@ use base 'Google::Adwords::Service';
 use Google::Adwords::Ad;
 use Google::Adwords::Business;
 use Google::Adwords::StatsRecord;
+use Google::Adwords::Image;
+use Google::Adwords::ApiError;
+use Google::Adwords::GeoTarget;
+use Google::Adwords::CityTargets;
+use Google::Adwords::CountryTargets;
+use Google::Adwords::MetroTargets;
+use Google::Adwords::RegionTargets;
 
 use HTML::Entities;
 
 ### INTERNAL UTILITY ###############################################
 # Usage      : @params = $self->_create_request_params($obj);
-# Purpose    : Create SOAP::Date params from the input object
+# Purpose    : Create SOAP::Data params from the input object
 # Returns    : ????
 # Parameters : ????
 # Throws     : no exceptions
@@ -30,8 +37,10 @@ sub _create_request_params
 
     # Get fields of the base Ad object
     my @fields_base_ad = Google::Adwords::Ad->get_fields();
-    for (@fields_base_ad) {
-        if ( defined $ad->$_ ) {
+    for (@fields_base_ad)
+    {
+        if ( defined $ad->$_ )
+        {
 
             # If this is an ImageAd
             if (
@@ -45,11 +54,14 @@ sub _create_request_params
                 my @image_params;
                 my @image_fields = Google::Adwords::Image->get_fields();
 
-                for (@image_fields) {
-                    if ( defined $image->$_ ) {
+                for (@image_fields)
+                {
+                    if ( defined $image->$_ )
+                    {
 
                       # for the data field, we need to set the type explicitly
-                        if ( $_ eq 'data' ) {
+                        if ( $_ eq 'data' )
+                        {
                             push @image_params,
                                 SOAP::Data->name(
                                 'data' => SOAP::Data->type(
@@ -57,18 +69,20 @@ sub _create_request_params
                                 )
                                 )->type('');
                         }
-                        else {
+                        else
+                        {
                             push @image_params,
                                 SOAP::Data->name( $_ => $image->$_ )
                                 ->type('');
                         }
-                    } # end if ( defined $image->$_)
+                    } # end if ( defined $image->$_...
                 } # end for (@image_fields)
 
                 push @params, SOAP::Data->name(
                     $_ => \SOAP::Data->value(@image_params) )->type('');
             } # end if ( ( $_ eq 'image' )...
-            else {
+            else
+            {
                 push @params, SOAP::Data->name( $_ => $ad->$_ )->type('');
             }
         } # end if ( defined $ad->$_ )
@@ -76,55 +90,6 @@ sub _create_request_params
 
     return @params;
 } # end sub _create_request_params
-
-### INSTANCE METHOD ################################################
-# Usage      :
-#   my @ads = $obj->addAds($ad1, $ad2);
-# Purpose    : Create a new batch of Ads
-# Returns    : List of created Ad objects
-# Parameters : A Google::Adwords::Creative object
-# Throws     : no exceptions
-# Comments   : none
-# See Also   : n/a
-#######################################################################
-sub addAds
-{
-    my ( $self, @ads ) = @_;
-
-    # for each ad, adGroupId must be filled in
-    for (@ads) {
-        if ( not defined $_->adGroupId ) {
-            die "adGroupId must be filled in for the Ad object\n";
-        }
-    }
-
-    my @ads_params;
-    foreach my $ad (@ads) {
-        my @ad_params = $self->_create_request_params($ad);
-        push @ads_params, @ad_params;
-    }
-
-    my @params;
-    push @params, SOAP::Data->name( 'ads' => \SOAP::Data->value(@ads_params) )
-        ->type('');
-
-    my $result = $self->_create_service_and_call(
-        {
-            service  => 'AdService',
-            method   => 'addAds',
-            params   => \@params,
-            with_uri => 1,
-        }
-    );
-
-    # Parse SOAP response
-    my @ret;
-    foreach my $r ( $result->valueof("//addAdsResponse/addAdsReturn") ) {
-        push @ret, $self->_parse_ad_response($r);
-    }
-
-    return @ret;
-} # end sub addAds
 
 ### INTERNAL UTILITY #####################################################
 # Usage      : $obj = $self->_parse_ad_response($ad_ref);
@@ -151,6 +116,59 @@ sub _parse_ad_response
     return $self->_create_object_from_hash( $r, 'Google::Adwords::Ad' );
 }
 
+### INSTANCE METHOD ################################################
+# Usage      :
+#   my @ads = $obj->addAds($ad1, $ad2);
+# Purpose    : Create a new batch of Ads
+# Returns    : List of created Ad objects
+# Parameters : A Google::Adwords::Creative object
+# Throws     : no exceptions
+# Comments   : none
+# See Also   : n/a
+#######################################################################
+sub addAds
+{
+    my ( $self, @ads ) = @_;
+
+    # for each ad, adGroupId must be filled in
+    for (@ads)
+    {
+        if ( not defined $_->adGroupId )
+        {
+            die "adGroupId must be filled in for the Ad object\n";
+        }
+    }
+
+    my @ads_params;
+    foreach my $ad (@ads)
+    {
+        my @ad_params = $self->_create_request_params($ad);
+        push @ads_params, @ad_params;
+    }
+
+    my @params;
+    push @params, SOAP::Data->name( 'ads' => \SOAP::Data->value(@ads_params) )
+        ->type('');
+
+    my $result = $self->_create_service_and_call(
+        {
+            service  => 'AdService',
+            method   => 'addAds',
+            params   => \@params,
+            with_uri => 1,
+        }
+    );
+
+    # Parse SOAP response
+    my @ret;
+    foreach my $r ( $result->valueof("//addAdsResponse/addAdsReturn") )
+    {
+        push @ret, $self->_parse_ad_response($r);
+    }
+
+    return @ret;
+} # end sub addAds
+
 ### INSTANCE METHOD ########################################################
 # Usage      :
 #
@@ -173,8 +191,10 @@ sub findBusinesses
 
     my @params;
 
-    for (qw/name address countryCode/) {
-        if ( not exists $args_ref->{$_} ) {
+    for (qw/name address countryCode/)
+    {
+        if ( not exists $args_ref->{$_} )
+        {
             die "$_ must be defined for the Business object\n";
         }
         push @params,
@@ -290,7 +310,8 @@ sub getAdStats
 {
     my ( $self, $args_ref ) = @_;
 
-    if ( not defined $args_ref->{adGroupId} ) {
+    if ( not defined $args_ref->{adGroupId} )
+    {
         die "adGroupId param must be provided to getAdStats\n";
     }
 
@@ -403,7 +424,7 @@ sub getMyBusinesses
 # Parameters :
 #   @ads => List of Ad objects
 # Throws     : no exceptions
-# Comments   : Only the status filed can be updated
+# Comments   : Only the status field can be updated
 # See Also   : n/a
 #######################################################################
 sub updateAds
@@ -412,17 +433,25 @@ sub updateAds
 
     my @params;
 
-    foreach my $ad (@ads) {
+    foreach my $ad (@ads)
+    {
         my @ad_params;
 
-        if ( not defined $ad->id ) {
+        if ( not defined $ad->id )
+        {
             die "id must be set for the Ad object\n";
         }
-        if ( not defined $ad->adGroupId ) {
+        if ( not defined $ad->adGroupId )
+        {
             die "adGroupId must be set for the Ad object\n";
         }
-        if ( not defined $ad->status ) {
+        if ( not defined $ad->status )
+        {
             die "status must be set for the Ad object\n";
+        }
+        if ( not defined $ad->adType )
+        {
+            die "adType must be set for the Ad object\n";
         }
 
         push @ad_params, SOAP::Data->name( 'id' => $ad->id )->type('');
@@ -449,6 +478,126 @@ sub updateAds
     return 1;
 } # end sub updateAds
 
+### INSTANCE METHOD #####################################################
+# Usage      :
+#   my @api_errors = $obj->checkAds({
+#       ads => \@ads,
+#       languageTarget => [ 'en', 'hi', ],
+#       geoTarget   => {
+#           countries => [ 'US', 'IN' ],
+#       },
+#   });
+# Purpose    : Check a batch of Ads for policy errors.
+# Returns    : A list of ApiError objects
+# Parameters : A hashref with following keys:
+#   ads => an arrayref of Ad objects
+#   languageTarget => an arrayref of language codes
+#   geoTarget => a hashref of geotargeting info
+# Throws     : no exceptions
+# Comments   : none
+# See Also   : n/a
+#######################################################################
+sub checkAds
+{
+    my ( $self, $args_ref ) = @_;
+
+    my @params;
+
+    # The Ads
+    foreach my $ad ( @{ $args_ref->{ads} } )
+    {
+        if ( not defined $ad->id )
+        {
+            die "id must be set for the Ad object\n";
+        }
+    }
+
+    my @ads_params;
+    foreach my $ad ( @{ $args_ref->{ads} } )
+    {
+        my @ad_params = $self->_create_request_params($ad);
+        push @ads_params, @ad_params;
+    }
+    push @params, SOAP::Data->name( 'ads' => \SOAP::Data->value(@ads_params) )
+        ->type('');
+
+    # languageTarget
+    if ( defined $args_ref->{languageTarget} )
+    {
+        push @params,
+            SOAP::Data->name(
+            'languageTarget' => \SOAP::Data->name(
+                'languages' => @{ $args_ref->{languageTarget} }
+                )->type('')
+            )->type('');
+    }
+
+    # geoTargeting
+    if ( defined $args_ref->{geoTarget} )
+    {
+        my $geo_obj = $args_ref->{geoTarget};
+
+        #die ref $geo_obj;
+        my @geo_data;
+
+        if ( defined $geo_obj->targetAll )
+        {
+            push @geo_data,
+                SOAP::Data->name( targetAll => $geo_obj->targetAll )
+                ->type('');
+        }
+
+        # hash to map API params
+        my %geo_target_params = (
+            'countryTargets' => 'countries',
+            'cityTargets'    => 'cities',
+            'metroTargets'   => 'metros',
+            'regionTargets'  => 'regions',
+        );
+
+        for ( keys %geo_target_params )
+        {
+            if ( defined $geo_obj->$_ )
+            {
+                my $targets = $geo_obj->$_;
+                my $key     = $geo_target_params{$_};
+
+                if (    ( defined $targets->$key )
+                    and ( scalar @{ $targets->$key } > 0 ) )
+                {
+                    push @geo_data,
+                        SOAP::Data->name(
+                        $_ => \SOAP::Data->name( $key => @{ $targets->$key } )
+                            ->type('') )->type('');
+                }
+            }
+        } # end for ( keys %geo_target_params...
+
+        if ( scalar @geo_data > 0 )
+        {
+            push @params, SOAP::Data->name(
+                'geoTarget' => \SOAP::Data->value(@geo_data), )->type('');
+        }
+    } # end if ( defined $args_ref...
+
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'AdService',
+            method  => 'checkAds',
+            params  => \@params,
+        }
+    );
+
+    my @data;
+    foreach my $c ( $result->valueof("//checkAdsResponse/checkAdsReturn") )
+    {
+        push @data, $self->_create_object_from_hash( $c,
+            'Google::Adwords::ApiError' );
+    }
+
+    return @data;
+} # end sub checkAds
+
 1;
 
 =pod
@@ -460,7 +609,7 @@ Google::Adwords::AdService - Interact with the Google Adwords AdService API call
  
 =head1 VERSION
  
-This documentation refers to Google::Adwords::AdService version 0.4
+This documentation refers to Google::Adwords::AdService version 0.5
  
  
 =head1 SYNOPSIS
@@ -553,6 +702,49 @@ A list of Google::Adwords::Ad objects to be added.
 =over 4
 
 A list of Google::Adwords::Ad objects just created with their IDs filled in.
+
+=back
+
+=head2 B<checkAds()>
+
+=head3 Description
+
+=over 4
+
+Check a batch of Ads for policy errors. The number of Ads in the batch is
+limited to the maximum number of Ads per adgroup.
+
+=back
+
+=head3 Usage
+
+    my @api_errors = $service->checkAds({
+        ads => \@ads,
+        languageTarget => [ 'en', 'hi', ],
+        geoTarget   => {
+            countries => [ 'US', 'IN' ],
+        },
+    });
+
+=head3 Parameters
+
+A hashref with following keys - 
+
+=over 4
+
+* ads => an arrayref of Ad objects
+
+* languageTarget => an arrayref of language codes
+
+* geoTarget => a hashref of geotargeting info
+
+=back
+
+=head3 Returns
+ 
+=over 4
+
+A list of Google::Adwords::ApiError objects
 
 =back
 

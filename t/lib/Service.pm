@@ -14,14 +14,16 @@ sub new
 
     my $self;
 
-    if ( exists $args_ref->{'sandbox'} ) {
+    if ( exists $args_ref->{'sandbox'} )
+    {
         my @params = %{$args_ref};
         return $class->SUPER::new(@params);
     }
-    else {
+    else
+    {
         return $class->SUPER::new( sandbox => 0 );
     }
-}
+} # end sub new
 
 sub startup : Test(startup => 2)
 {
@@ -44,7 +46,8 @@ sub accessors : Test(7)
     my $applicationToken = 'ZYXwvu-TSR123_456ABCDE';
     my $client_email     = 'client_1+' . $email;
 
-    if ( $self->{'sandbox'} ) {
+    if ( $self->{'sandbox'} )
+    {
         $email            = $self->{'email'};
         $password         = $self->{'password'};
         $developerToken   = $self->{'developerToken'};
@@ -63,7 +66,7 @@ sub accessors : Test(7)
         'applicationToken' );
     ok( $self->{'obj'}->use_sandbox == 1, 'use_sandbox' );
     ok( $self->{'obj'}->clientEmail eq $client_email, 'clientEmail' );
-    ok( $self->{obj}->api_version eq 'v9', 'api_version' );
+    ok( $self->{obj}->api_version eq 'v10', 'api_version' );
 } # end sub accessors :
 
 sub gen_full_response

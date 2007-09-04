@@ -35,11 +35,13 @@ sub addCreative : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         #my $adgroup_id = $self->_get_adgroup_id();
         my $adgroup_id = 20048;
@@ -61,8 +63,9 @@ sub addCreative : Test(no_plan)
         # save for further use
         $self->{_creative_id} = $creative_response->id;
 
-    } # end if ( $self->{sandbox} )
-    else {
+    } # end if ( $self->{sandbox} ...
+    else
+    {
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
             call => sub {
@@ -113,11 +116,13 @@ sub addCreative_Image : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my $adgroup_id = $self->_get_adgroup_id();
 
@@ -137,8 +142,9 @@ sub addCreative_Image : Test(no_plan)
         ok( $creative_response->id =~ /\d+/,
             'addCreative id: ' . $creative_response->id );
 
-    } # end if ( $self->{sandbox} )
-    else {
+    } # end if ( $self->{sandbox} ...
+    else
+    {
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
             call => sub {
@@ -198,11 +204,13 @@ sub addCreativeList : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my $adgroup_id = $self->_get_adgroup_id();
 
@@ -231,8 +239,9 @@ sub addCreativeList : Test(no_plan)
         ok( $creatives[1]->id =~ /\d+/,
             'addCreativeList id: ' . $creatives[1]->id );
 
-    } # end if ( $self->{sandbox} )
-    else {
+    } # end if ( $self->{sandbox} ...
+    else
+    {
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
             call => sub {
@@ -313,11 +322,13 @@ sub getActiveCreatives : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my $adgroup_id = $self->_get_adgroup_id();
 
@@ -326,12 +337,14 @@ sub getActiveCreatives : Test(no_plan)
         # should get three or more
         ok( scalar @creatives >= 3, 'getActiveCreatives' );
 
-        for (@creatives) {
+        for (@creatives)
+        {
             ok( $_->id =~ /\d+/, 'getActiveCreatives id: ' . $_->id );
         }
 
-    }
-    else {
+    } # end if ( $self->{sandbox} ...
+    else
+    {
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
             call => sub {
@@ -395,11 +408,13 @@ sub getAllCreatives : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my $adgroup_id = $self->_get_adgroup_id();
 
@@ -408,12 +423,14 @@ sub getAllCreatives : Test(no_plan)
         # should get three or more
         ok( scalar @creatives >= 3, 'getAllCreatives' );
 
-        for (@creatives) {
+        for (@creatives)
+        {
             ok( $_->id =~ /\d+/, 'getAllCreatives id: ' . $_->id );
         }
 
-    }
-    else {
+    } # end if ( $self->{sandbox} ...
+    else
+    {
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
             call => sub {
@@ -476,11 +493,13 @@ sub getCreative : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my $adgroup_id  = $self->_get_adgroup_id();
         my $creative_id = $self->{_creative_id};
@@ -491,7 +510,8 @@ sub getCreative : Test(no_plan)
         ok( $creative->id eq $self->{_creative_id}, 'getCreative' );
 
     }
-    else {
+    else
+    {
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
             call => sub {
@@ -541,11 +561,13 @@ sub getCreativeStats : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my $adgroup_id = $self->_get_adgroup_id();
 
@@ -561,8 +583,9 @@ sub getCreativeStats : Test(no_plan)
 
         ok( $stats[0]->id == $self->{_creative_id}, 'getCreativeStats' );
 
-    } # end if ( $self->{sandbox} )
-    else {
+    } # end if ( $self->{sandbox} ...
+    else
+    {
 
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
@@ -624,11 +647,13 @@ sub updateCreatives : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my $adgroup_id = $self->_get_adgroup_id();
 
@@ -647,8 +672,9 @@ sub updateCreatives : Test(no_plan)
         $ret = $self->{obj}->updateCreatives($creative1);
         ok( $ret == 1, 'updateCreatives' );
 
-    } # end if ( $self->{sandbox} )
-    else {
+    } # end if ( $self->{sandbox} ...
+    else
+    {
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
             call => sub {

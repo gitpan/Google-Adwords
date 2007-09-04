@@ -30,11 +30,13 @@ sub getKeywordsFromSite : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my $url                  = 'http://aarohan.biz';
         my $include_linked_pages = 0;
@@ -55,8 +57,9 @@ sub getKeywordsFromSite : Test(no_plan)
         my $keywords_ref = $site_keyword_groups->keywords;
         ok( ref $keywords_ref->[0] eq 'Google::Adwords::SiteKeyword',
             'getKeywordsFromSite (keywords)' );
-    } # end if ( $self->{sandbox} )
-    else {
+    } # end if ( $self->{sandbox} ...
+    else
+    {
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
             call => sub {
@@ -533,11 +536,13 @@ sub getKeywordVariations : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my $seed_keyword1 = Google::Adwords::SeedKeyword->new;
         $seed_keyword1->negative(0);
@@ -556,8 +561,9 @@ sub getKeywordVariations : Test(no_plan)
         ok( scalar @{ $keyword_variations->moreSpecific } > 0,
             'getKeywordVariations' );
 
-    } # end if ( $self->{sandbox} )
-    else {
+    } # end if ( $self->{sandbox} ...
+    else
+    {
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
             call => sub {

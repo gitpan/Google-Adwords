@@ -235,7 +235,8 @@ sub getUnitCountForClients
     if (   ( exists $args_ref->{'clientEmails'} )
         && ( scalar @{ $args_ref->{'clientEmails'} } > 0 ) )
     {
-        for ( @{ $args_ref->{'clientEmails'} } ) {
+        for ( @{ $args_ref->{'clientEmails'} } )
+        {
             push @client_emails, $_;
         }
     }

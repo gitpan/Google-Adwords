@@ -2,14 +2,14 @@ package Google::Adwords::Service;
 use strict;
 use warnings;
 
-use version; our $VERSION = qv('0.8.1');
+use version; our $VERSION = qv('0.10');
 
 use base qw/ Class::Accessor::Chained Google::Adwords /;
 use SOAP::Lite;
 use Readonly;
 
-Readonly my $default_api_version => 'v9';
-Readonly my $user_agent          => "Google::Adwords v1.3.1";
+Readonly my $default_api_version => 'v10';
+Readonly my $user_agent          => "Google::Adwords v1.5";
 Readonly my $endpoint            => 'https://adwords.google.com/api/adwords';
 Readonly my $endpoint_sandbox    => 'https://sandbox.google.com/api/adwords';
 Readonly my $default_timeout => 35;    # HTTP timeout in seconds
@@ -92,14 +92,16 @@ sub _get_soap_headers
     );
 
     # check for clientEmail header
-    if ( defined $self->clientEmail ) {
+    if ( defined $self->clientEmail )
+    {
         push @headers,
             SOAP::Header->name("clientEmail")->value( $self->clientEmail )
             ->type('');
     }
 
     # or the clientCustomerId header
-    if ( defined $self->clientCustomerId ) {
+    if ( defined $self->clientCustomerId )
+    {
         push @headers, SOAP::Header->name("clientCustomerId")
             ->value( $self->clientCustomerId )->type('');
     }
@@ -120,10 +122,12 @@ sub _endpoint
 {
     my ($self) = @_;
 
-    if ( $self->use_sandbox ) {
+    if ( $self->use_sandbox )
+    {
         return $endpoint_sandbox . '/' . $self->api_version;
     }
-    else {
+    else
+    {
         return $endpoint . '/' . $self->api_version;
     }
 }
@@ -147,7 +151,8 @@ sub _create_soap_service
     my $endpoint = $self->_endpoint . '/' . $args_ref->{'service'};
     my $service = SOAP::Lite->proxy( $endpoint, timeout => $self->timeout );
 
-    if ( $self->debug ) {
+    if ( $self->debug )
+    {
         SOAP::Lite->import( +trace => 'debug' );
     }
 
@@ -198,14 +203,16 @@ sub _call
             @{ $args_ref->{'params'} },
         );
     };
-    if ($@) {
+    if ($@)
+    {
 
         # TODO: return an error object
         die "Error: $@\n";
     }
 
     # check for SOAP faults
-    if ( $result->fault ) {
+    if ( $result->fault )
+    {
         die "Fault Code: "
             . $result->faultcode . "\n"
             . "Fault Description: "
@@ -213,7 +220,8 @@ sub _call
     }
 
     # get the SOAP response headers
-    for (qw/requestId responseTime operations units/) {
+    for (qw/requestId responseTime operations units/)
+    {
         $self->$_( $result->headerof("//$_")->value );
     }
 
@@ -283,7 +291,7 @@ Google::Adwords::Service - Base class for the Service modules
  
 =head1 VERSION
  
-This documentation refers to Google::Adwords::Service version 0.8.1
+This documentation refers to Google::Adwords::Service version 0.10
  
  
 =head1 DESCRIPTION

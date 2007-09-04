@@ -12,7 +12,7 @@ my %tests = (
     getMethodCost              => 1,
     getOperationCount          => 1,
     getUnitCount               => 1,
-    getUnitCountForClients     => 1,
+    getUnitCountForClients     => 0,
     getUnitCountForMethod      => 1,
     getUsageQuotaThisMonth     => 1,
 );
@@ -31,17 +31,20 @@ sub getUsageQuotaThisMonth : Test(1)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{'sandbox'} ) {
+    if ( $self->{'sandbox'} )
+    {
 
         my $expected = '9223372036854775807';
         my $got      = $self->{'obj'}->getUsageQuotaThisMonth();
         is( $got, $expected, 'getUsageQuotaThisMonth' );
     }
-    else {
+    else
+    {
 
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
@@ -71,16 +74,19 @@ sub getFreeUsageQuotaThisMonth : Test(1)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{'sandbox'} ) {
+    if ( $self->{'sandbox'} )
+    {
         my $expected = '9223372036854775807';
         my $got      = $self->{'obj'}->getFreeUsageQuotaThisMonth();
         is( $got, $expected, 'getFreeUsageQuotaThisMonth' );
     }
-    else {
+    else
+    {
 
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
@@ -109,11 +115,13 @@ sub getMethodCost : Test(1)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{'sandbox'} ) {
+    if ( $self->{'sandbox'} )
+    {
         my $expected = '1';
         my $got      = $self->{'obj'}->getMethodCost(
             {
@@ -124,7 +132,8 @@ sub getMethodCost : Test(1)
         );
         is( $got, $expected, 'getMethodCost' );
     }
-    else {
+    else
+    {
 
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
@@ -159,11 +168,13 @@ sub getOperationCount : Test(1)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{'sandbox'} ) {
+    if ( $self->{'sandbox'} )
+    {
         my $expected = '0';
         my $got      = $self->{'obj'}->getOperationCount(
             {
@@ -173,7 +184,8 @@ sub getOperationCount : Test(1)
         );
         is( $got, $expected, 'getOperationCount' );
     }
-    else {
+    else
+    {
 
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
@@ -207,11 +219,13 @@ sub getUnitCount : Test(1)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{'sandbox'} ) {
+    if ( $self->{'sandbox'} )
+    {
         my $expected = '0';
         my $got      = $self->{'obj'}->getUnitCount(
             {
@@ -221,7 +235,8 @@ sub getUnitCount : Test(1)
         );
         is( $got, $expected, 'getUnitCount' );
     }
-    else {
+    else
+    {
 
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
@@ -255,11 +270,13 @@ sub getUnitCountForMethod : Test(1)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{'sandbox'} ) {
+    if ( $self->{'sandbox'} )
+    {
         my $expected = '0';
         my $got      = $self->{'obj'}->getUnitCountForMethod(
             {
@@ -271,7 +288,8 @@ sub getUnitCountForMethod : Test(1)
         );
         is( $got, $expected, 'getUnitCountForMethod' );
     }
-    else {
+    else
+    {
 
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(
@@ -307,11 +325,13 @@ sub getUnitCountForClients : Test(no_plan)
 
     $sub_name = ( caller 0 )[3];
     $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} ) {
+    if ( not $tests{$sub_name} )
+    {
         return;
     }
 
-    if ( $self->{sandbox} ) {
+    if ( $self->{sandbox} )
+    {
 
         my @usage = $self->{obj}->getUnitCountForClients(
             {
@@ -323,7 +343,8 @@ sub getUnitCountForClients : Test(no_plan)
 
         ok( $usage[0]->quotaUnits == 0, 'getUnitCountForClients' );
     }
-    else {
+    else
+    {
 
         my $soap = Test::MockModule->new('SOAP::Lite');
         $soap->mock(

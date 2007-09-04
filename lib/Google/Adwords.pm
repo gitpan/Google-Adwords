@@ -2,7 +2,7 @@ package Google::Adwords;
 use strict;
 use warnings;
 
-use version; our $VERSION = qv('1.3.1');
+use version; our $VERSION = qv('1.5');
 
 1;
 
@@ -15,17 +15,15 @@ Google::Adwords - an interface which abstracts the Google Adwords SOAP API
  
 =head1 VERSION
  
-This documentation refers to Google::Adwords version 1.3.1
+This documentation refers to Google::Adwords version 1.5
  
 
 =head1 API VERSION
 
-Google::Adwords currently uses version 9 (v9) of the Adwords API which is the
-default. You can also opt to use version 8 if you wish. Just set the api_version() in
-your *Service objects to 'v8'. 
-
-    # use v8 of the Adwords API
-    $campaign_service->api_version('v8');
+Google::Adwords currently uses version 10 (v10) of the Adwords API. As such,
+this version of Google::Adwords does not support earlier API versions. If you
+have a need to use earlier API versions, please use the corresponding earlier
+version of Google::Adwords
 
  
 =head1 SYNOPSIS
@@ -46,9 +44,6 @@ your *Service objects to 'v8'.
     #$service->clientEmail('clientemail@domain.com');
     # or (but not both)
     #$service->clientCustomerId('xxx-xxx-xxxx');
-
-    # To use an earlier version of the Adwords API
-    #$service->api_version('v8');
 
     # if you want SOAP trace output
     #$service->debug(1);
@@ -119,6 +114,16 @@ B<Many services need to deal with complex data types which are available as obje
 =over
 
 * Campaign                  -   L<Google::Adwords::Campaign>
+
+* GeoTarget                 -   L<Google::Adwords::GeoTarget>
+
+* CountryTargets            -   L<Google::Adwords::CountryTargets>
+
+* CityTargets               -   L<Google::Adwords::CityTargets>
+
+* MetroTargets              -   L<Google::Adwords::MetroTargets>
+
+* RegionTargets             -   L<Google::Adwords::RegionTargets>
 
 * AdSchedule                -   L<Google::Adwords::AdSchedule>
 
@@ -204,7 +209,7 @@ Mathieu Jondet <mathieu@eulerian.com>
  
 =head1 LICENSE AND COPYRIGHT
  
-Copyright (c) 2006 Rohan Almeida <rohan@almeida.in>. All rights
+Copyright (c) 2006,2007 Rohan Almeida <rohan@almeida.in>. All rights
 reserved.
 
 This module is free software; you can redistribute it and/or

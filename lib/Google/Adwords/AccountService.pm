@@ -42,7 +42,8 @@ sub getAccountInfo
         'Google::Adwords::AccountInfo' );
 
     # primaryAddress
-    if ( defined $account_info->primaryAddress ) {
+    if ( defined $account_info->primaryAddress )
+    {
         $account_info->primaryAddress(
             $self->_create_object_from_hash(
                 $data->{primaryAddress},
@@ -52,7 +53,8 @@ sub getAccountInfo
     }
 
     # billingAddress
-    if ( defined $account_info->billingAddress ) {
+    if ( defined $account_info->billingAddress )
+    {
         $account_info->billingAddress(
             $self->_create_object_from_hash(
                 $data->{billingAddress},
@@ -62,7 +64,8 @@ sub getAccountInfo
     }
 
     # defaultAdsCoverage
-    if ( defined $account_info->defaultAdsCoverage ) {
+    if ( defined $account_info->defaultAdsCoverage )
+    {
         $account_info->defaultAdsCoverage(
             $self->_create_object_from_hash(
                 $data->{defaultAdsCoverage},
@@ -72,7 +75,8 @@ sub getAccountInfo
     }
 
     # emailPromotionsPreferences
-    if ( defined $account_info->emailPromotionsPreferences ) {
+    if ( defined $account_info->emailPromotionsPreferences )
+    {
         $account_info->emailPromotionsPreferences(
             $self->_create_object_from_hash(
                 $data->{emailPromotionsPreferences},
@@ -129,7 +133,8 @@ sub updateAccountInfo
 {
     my ( $self, $account ) = @_;
 
-    if ( not defined $account ) {
+    if ( not defined $account )
+    {
         die "Must provide a account info object.";
     }
 
@@ -137,7 +142,8 @@ sub updateAccountInfo
     my @account_params;
 
     # billingAddress
-    if ( defined $account->billingAddress ) {
+    if ( defined $account->billingAddress )
+    {
         my @billing_address;
         my $billing_address = $account->billingAddress;
         for (
@@ -145,7 +151,8 @@ sub updateAccountInfo
             emailAddress faxNumber name phoneNumber postalCode state /
             )
         {
-            if ( defined $billing_address->$_ ) {
+            if ( defined $billing_address->$_ )
+            {
                 push @billing_address,
                     SOAP::Data->name( $_ => $billing_address->$_ )->type('');
             }
@@ -154,28 +161,33 @@ sub updateAccountInfo
             SOAP::Data->name(
             'billingAddress' => \SOAP::Data->value(@billing_address) )
             ->type('');
-    } # end if ( defined $account->billingAddress)
+    } # end if ( defined $account->billingAddress...
 
     # currencyCode
-    if ( defined $account->currencyCode ) {
+    if ( defined $account->currencyCode )
+    {
         push @account_params,
             SOAP::Data->name( 'currencyCode' => $account->currencyCode )
             ->type('');
     }
 
     # customerId
-    if ( defined $account->customerId ) {
+    if ( defined $account->customerId )
+    {
         push @account_params,
             SOAP::Data->name( 'customerId' => $account->customerId )
             ->type('');
     }
 
     # defaultAdsCoverage
-    if ( defined $account->defaultAdsCoverage ) {
+    if ( defined $account->defaultAdsCoverage )
+    {
         my @coveragetype_params;
         my $coveragetype = $account->defaultAdsCoverage;
-        for (qw/ optInContentNetwork optInSearchNetwork /) {
-            if ( defined $coveragetype->$_ ) {
+        for (qw/ optInContentNetwork optInSearchNetwork /)
+        {
+            if ( defined $coveragetype->$_ )
+            {
                 push @coveragetype_params,
                     SOAP::Data->name(
                     $_ => ( $coveragetype->$_ ) ? 'true' : 'false' )
@@ -186,22 +198,25 @@ sub updateAccountInfo
             SOAP::Data->name(
             'defaultAdsCoverage' => \SOAP::Data->value(@coveragetype_params) )
             ->type('');
-    } # end if ( defined $account->defaultAdsCoverage)
+    } # end if ( defined $account->defaultAdsCoverage...
 
     # descriptiveName
-    if ( defined $account->descriptiveName ) {
+    if ( defined $account->descriptiveName )
+    {
         push @account_params,
             SOAP::Data->name( 'descriptiveName' => $account->descriptiveName )
             ->type('');
     }
 
     # emailPromotionsPreferences
-    if ( defined $account->emailPromotionsPreferences ) {
+    if ( defined $account->emailPromotionsPreferences )
+    {
         my @emailpromprefs_params;
         my $emailpromprefs = $account->emailPromotionsPreferences;
         for (qw/ marketResearchEnabled newsletterEnabled promotionsEnabled /)
         {
-            if ( defined $emailpromprefs->$_ ) {
+            if ( defined $emailpromprefs->$_ )
+            {
                 push @emailpromprefs_params,
                     SOAP::Data->name(
                     $_ => ( $emailpromprefs->$_ ) ? 'true' : 'false' )
@@ -211,16 +226,18 @@ sub updateAccountInfo
         push @account_params,
             SOAP::Data->name( 'emailPromotionsPreferences' =>
                 \SOAP::Data->value(@emailpromprefs_params) )->type('');
-    } # end if ( defined $account->emailPromotionsPreferences)
+    } # end if ( defined $account->emailPromotionsPreferences...
 
     # languagePreference
-    if ( defined $account->languagePreference ) {
+    if ( defined $account->languagePreference )
+    {
         push @account_params, SOAP::Data->name(
             'languagePreference' => $account->languagePreference )->type('');
     }
 
     # primaryAddress
-    if ( defined $account->primaryAddress ) {
+    if ( defined $account->primaryAddress )
+    {
         my @primary_address;
         my $primary_address = $account->primaryAddress;
         for (
@@ -228,7 +245,8 @@ sub updateAccountInfo
             emailAddress faxNumber name phoneNumber postalCode state /
             )
         {
-            if ( defined $primary_address->$_ ) {
+            if ( defined $primary_address->$_ )
+            {
                 push @primary_address,
                     SOAP::Data->name( $_ => $primary_address->$_ )->type('');
             }
@@ -237,10 +255,11 @@ sub updateAccountInfo
             SOAP::Data->name(
             'primaryAddress' => \SOAP::Data->value(@primary_address) )
             ->type('');
-    } # end if ( defined $account->primaryAddress)
+    } # end if ( defined $account->primaryAddress...
 
     # primaryBusinessCategory
-    if ( defined $account->primaryBusinessCategory ) {
+    if ( defined $account->primaryBusinessCategory )
+    {
         push @account_params,
             SOAP::Data->name(
             'primaryBusinessCategory' => $account->primaryBusinessCategory )

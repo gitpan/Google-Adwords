@@ -24,7 +24,8 @@ sub deleteReport
     my ( $self, $id ) = @_;
 
     # id should be present
-    if ( not defined $id ) {
+    if ( not defined $id )
+    {
         die "id must be set.";
     }
 
@@ -183,61 +184,73 @@ sub scheduleReportJob
 {
     my ( $self, $type, $job ) = @_;
 
-    if ( not defined $type ) {
+    if ( not defined $type )
+    {
         die "type must be defined.";
     }
 
-    if ( not defined $job ) {
+    if ( not defined $job )
+    {
         die "job object must be defined.";
     }
 
     my @job_params;
 
-    if ( defined $job->aggregationType ) {
+    if ( defined $job->aggregationType )
+    {
         push @job_params,
             SOAP::Data->name( 'aggregationType' => $job->aggregationType )
             ->type('');
     }
-    if ( defined $job->clientEmails ) {
+    if ( defined $job->clientEmails )
+    {
         my @p =
             ( ref( $job->clientEmails ) eq 'ARRAY' )
             ? @{ $job->clientEmails }
             : $job->clientEmails;
         push @job_params, SOAP::Data->name( 'clientEmails' => @p )->type('');
     }
-    if ( defined $job->crossClient ) {
+    if ( defined $job->crossClient )
+    {
         push @job_params,
             SOAP::Data->name( 'crossClient' => $job->crossClient )->type('');
     }
-    if ( defined $job->endDay ) {
+    if ( defined $job->endDay )
+    {
         push @job_params,
             SOAP::Data->name( 'endDay' => $job->endDay )->type('');
     }
-    if ( defined $job->id ) {
+    if ( defined $job->id )
+    {
         push @job_params, SOAP::Data->name( 'id' => $job->id )->type('');
     }
-    if ( defined $job->name ) {
+    if ( defined $job->name )
+    {
         push @job_params, SOAP::Data->name( 'name' => $job->name )->type('');
     }
-    if ( defined $job->startDay ) {
+    if ( defined $job->startDay )
+    {
         push @job_params,
             SOAP::Data->name( 'startDay' => $job->startDay )->type('');
     }
-    if ( defined $job->adWordsType ) {
+    if ( defined $job->adWordsType )
+    {
         my @p =
             ( ref( $job->adWordsType ) eq 'ARRAY' )
             ? @{ $job->adWordsType }
             : $job->adWordsType;
         push @job_params, SOAP::Data->name( 'adWordsType' => @p )->type('');
     }
-    if ( defined $job->campaigns ) {
+    if ( defined $job->campaigns )
+    {
         my @p =
             ( ref( $job->campaigns ) eq 'ARRAY' )
             ? @{ $job->campaigns }
             : $job->campaigns;
         push @job_params, SOAP::Data->name( 'campaigns' => @p )->type('');
     }
-    if ( defined $job->campaignStatuses ) {
+    if ( defined $job->campaignStatuses )
+    {
         my @p =
             ( ref( $job->campaignStatuses ) eq 'ARRAY' )
             ? @{ $job->campaignStatuses }
@@ -245,14 +258,16 @@ sub scheduleReportJob
         push @job_params,
             SOAP::Data->name( 'campaignStatuses' => @p )->type('');
     }
-    if ( defined $job->adGroups ) {
+    if ( defined $job->adGroups )
+    {
         my @p =
             ( ref( $job->adGroup ) eq 'ARRAY' )
             ? @{ $job->adGroup }
             : $job->adGroup;
         push @job_params, SOAP::Data->name( 'adGroups' => @p )->type('');
     }
-    if ( defined $job->adGroupStatuses ) {
+    if ( defined $job->adGroupStatuses )
+    {
         my @p =
             ( ref( $job->adGroupStatuses ) eq 'ARRAY' )
             ? @{ $job->adGroupStatuses }
@@ -260,14 +275,16 @@ sub scheduleReportJob
         push @job_params,
             SOAP::Data->name( 'adGroupStatuses' => @p )->type('');
     }
-    if ( defined $job->keywords ) {
+    if ( defined $job->keywords )
+    {
         my @p =
             ( ref( $job->keywords ) eq 'ARRAY' )
             ? @{ $job->keywords }
             : $job->keywords;
         push @job_params, SOAP::Data->name( 'keywords' => @p )->type('');
     }
-    if ( defined $job->keywordStatuses ) {
+    if ( defined $job->keywordStatuses )
+    {
         my @p =
             ( ref( $job->keywordStatuses ) eq 'ARRAY' )
             ? @{ $job->keywordStatuses }
@@ -275,21 +292,24 @@ sub scheduleReportJob
         push @job_params,
             SOAP::Data->name( 'keywordStatuses' => @p )->type('');
     }
-    if ( defined $job->keywordType ) {
+    if ( defined $job->keywordType )
+    {
         my @p =
             ( ref( $job->keywordType ) eq 'ARRAY' )
             ? @{ $job->keywordType }
             : $job->keywordType;
         push @job_params, SOAP::Data->name( 'keywordType' => @p )->type('');
     }
-    if ( defined $job->customOptions ) {
+    if ( defined $job->customOptions )
+    {
         my @p =
             ( ref( $job->customOptions ) eq 'ARRAY' )
             ? @{ $job->customOptions }
             : $job->customOptions;
         push @job_params, SOAP::Data->name( 'customOptions' => @p )->type('');
     }
-    if ( defined $job->includeZeroImpression ) {
+    if ( defined $job->includeZeroImpression )
+    {
         push @job_params,
             SOAP::Data->name(
             'includeZeroImpression' => $job->includeZeroImpression )
