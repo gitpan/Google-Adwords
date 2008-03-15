@@ -7,11 +7,61 @@ use version; our $VERSION = qv('0.0.1');
 use base 'Google::Adwords::Data';
 
 my @fields = qw/
-    intervals
+    _intervals
     status
     /;
 
 __PACKAGE__->mk_accessors(@fields);
+
+sub new
+{
+    my $proto = shift;
+
+    my $class = ref $proto || $proto;
+
+    if (@_)
+    {
+        my $obj     = $class->SUPER::new();
+        my $hashref = shift;
+        for ( keys %{$hashref} )
+        {
+            $obj->$_( $hashref->{$_} );
+        }
+        return $obj;
+    }
+    else
+    {
+        return $class->SUPER::new();
+    }
+} # end sub new
+
+# intervals should always return an array ref
+sub intervals
+{
+    my $self = shift;
+
+    # if its a put
+    if (@_)
+    {
+        my $put_ref = [];
+
+        for (@_)
+        {
+            if ( ref $_ ne 'ARRAY' )
+            {
+                push @{$put_ref}, $_;
+            }
+            else
+            {
+                push @{$put_ref}, @{$_};
+            }
+        }
+
+        $self->set( '_intervals', $put_ref );
+    } # end if (@_)
+
+    return $self->get('_intervals');
+} # end sub intervals
 
 1;
 

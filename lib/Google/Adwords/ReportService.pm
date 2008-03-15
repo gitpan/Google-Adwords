@@ -2,12 +2,41 @@ package Google::Adwords::ReportService;
 use strict;
 use warnings;
 
-use version; our $VERSION = qv('0.0.1');
+use version; our $VERSION = qv('0.2');
 
 use base 'Google::Adwords::Service';
 
 # Data types
 use Google::Adwords::ReportJob;
+
+### CLASS METHOD/INSTANCE METHOD/INTERFACE SUB/INTERNAL UTILITY ###
+# Usage      : ????
+# Purpose    : ????
+# Returns    : ????
+# Parameters : ????
+# Throws     : no exceptions
+# Comments   : none
+# See Also   : n/a
+#######################################################################
+sub _parse_report
+{
+    my ( $self, $r ) = @_;
+
+    my @fields = Google::Adwords::ReportJob->get_fields();
+
+    my $report_ref;
+
+    for (@fields)
+    {
+        if ( exists $r->{$_} )
+        {
+            $report_ref->{$_} = $r->{$_};
+        }
+    }
+
+    return $self->_create_object_from_hash( $report_ref,
+        'Google::Adwords::ReportJob' );
+} # end sub _parse_report
 
 ### INSTANCE METHOD ################################################
 # Usage      :
@@ -69,9 +98,7 @@ sub getAllJobs
     foreach
         my $c ( $result->valueof("//getAllJobsResponse/getAllJobsReturn") )
     {
-        push @data,
-            $self->_create_object_from_hash( $c,
-            'Google::Adwords::ReportJob' );
+        push @data, $self->_parse_report($c);
     }
 
     return @data;
@@ -172,6 +199,68 @@ sub getReportJobStatus
 
 ### INSTANCE METHOD ################################################
 # Usage      :
+#   $obj->validateReportJob($type, $job);
+# Purpose    : Schedule a report
+# Returns    : A job request id
+# Parameters : The type of the report (see doc) and a ReportJob object
+# Throws     : no exceptions
+# Comments   : none
+# See Also   : n/a
+#######################################################################
+sub validateReportJob
+{
+    my ( $self, $job ) = @_;
+
+    if ( not defined $job->selectedReportType )
+    {
+        die "selectedReportType must be set for the job object";
+    }
+
+    my @job_params;
+
+    # accessors
+    for (
+        qw/ selectedReportType aggregationTypes selectedColumns
+        adWordsType keywordType
+        crossClient endDay id includeZeroImpression name
+        startDay status adGroups adGroupStatuses
+        campaigns campaignStatuses keywords keywordStatuses
+        clientEmails /
+        )
+    {
+        if ( defined $job->$_ )
+        {
+            if ( ref $job->$_ eq 'ARRAY' )
+            {
+                push @job_params,
+                    SOAP::Data->name( $_ => @{ $job->$_ } )->type('');
+            }
+            else
+            {
+                push @job_params,
+                    SOAP::Data->name( $_ => $job->$_ )->type('');
+            }
+        }
+    } # end for ( qw/ selectedReportType aggregationTypes selectedColumns...
+
+    my @params;
+    push @params, SOAP::Data->name( 'job' => \SOAP::Data->value(@job_params) )
+        ->attr( { 'xsi:type' => 'DefinedReportJob' } )->type('');
+
+    my $result = $self->_create_service_and_call(
+        {
+            service  => 'ReportService',
+            method   => 'validateReportJob',
+            with_uri => 1,
+            params   => \@params,
+        }
+    );
+
+    return 1;
+} # end sub validateReportJob
+
+### INSTANCE METHOD ################################################
+# Usage      :
 #   my $jobid = $obj->scheduleReportJob($type, $job);
 # Purpose    : Schedule a report
 # Returns    : A job request id
@@ -182,143 +271,43 @@ sub getReportJobStatus
 #######################################################################
 sub scheduleReportJob
 {
-    my ( $self, $type, $job ) = @_;
+    my ( $self, $job ) = @_;
 
-    if ( not defined $type )
+    if ( not defined $job->selectedReportType )
     {
-        die "type must be defined.";
-    }
-
-    if ( not defined $job )
-    {
-        die "job object must be defined.";
+        die "selectedReportType must be set for the job object";
     }
 
     my @job_params;
 
-    if ( defined $job->aggregationType )
+    # accessors
+    for (
+        qw/ selectedReportType aggregationTypes selectedColumns
+        adWordsType keywordType
+        crossClient endDay id includeZeroImpression name
+        startDay status adGroups adGroupStatuses
+        campaigns campaignStatuses keywords keywordStatuses
+        clientEmails /
+        )
     {
-        push @job_params,
-            SOAP::Data->name( 'aggregationType' => $job->aggregationType )
-            ->type('');
-    }
-    if ( defined $job->clientEmails )
-    {
-        my @p =
-            ( ref( $job->clientEmails ) eq 'ARRAY' )
-            ? @{ $job->clientEmails }
-            : $job->clientEmails;
-        push @job_params, SOAP::Data->name( 'clientEmails' => @p )->type('');
-    }
-    if ( defined $job->crossClient )
-    {
-        push @job_params,
-            SOAP::Data->name( 'crossClient' => $job->crossClient )->type('');
-    }
-    if ( defined $job->endDay )
-    {
-        push @job_params,
-            SOAP::Data->name( 'endDay' => $job->endDay )->type('');
-    }
-    if ( defined $job->id )
-    {
-        push @job_params, SOAP::Data->name( 'id' => $job->id )->type('');
-    }
-    if ( defined $job->name )
-    {
-        push @job_params, SOAP::Data->name( 'name' => $job->name )->type('');
-    }
-    if ( defined $job->startDay )
-    {
-        push @job_params,
-            SOAP::Data->name( 'startDay' => $job->startDay )->type('');
-    }
-    if ( defined $job->adWordsType )
-    {
-        my @p =
-            ( ref( $job->adWordsType ) eq 'ARRAY' )
-            ? @{ $job->adWordsType }
-            : $job->adWordsType;
-        push @job_params, SOAP::Data->name( 'adWordsType' => @p )->type('');
-    }
-    if ( defined $job->campaigns )
-    {
-        my @p =
-            ( ref( $job->campaigns ) eq 'ARRAY' )
-            ? @{ $job->campaigns }
-            : $job->campaigns;
-        push @job_params, SOAP::Data->name( 'campaigns' => @p )->type('');
-    }
-    if ( defined $job->campaignStatuses )
-    {
-        my @p =
-            ( ref( $job->campaignStatuses ) eq 'ARRAY' )
-            ? @{ $job->campaignStatuses }
-            : $job->campaignStatuses;
-        push @job_params,
-            SOAP::Data->name( 'campaignStatuses' => @p )->type('');
-    }
-    if ( defined $job->adGroups )
-    {
-        my @p =
-            ( ref( $job->adGroup ) eq 'ARRAY' )
-            ? @{ $job->adGroup }
-            : $job->adGroup;
-        push @job_params, SOAP::Data->name( 'adGroups' => @p )->type('');
-    }
-    if ( defined $job->adGroupStatuses )
-    {
-        my @p =
-            ( ref( $job->adGroupStatuses ) eq 'ARRAY' )
-            ? @{ $job->adGroupStatuses }
-            : $job->adGroupStatuses;
-        push @job_params,
-            SOAP::Data->name( 'adGroupStatuses' => @p )->type('');
-    }
-    if ( defined $job->keywords )
-    {
-        my @p =
-            ( ref( $job->keywords ) eq 'ARRAY' )
-            ? @{ $job->keywords }
-            : $job->keywords;
-        push @job_params, SOAP::Data->name( 'keywords' => @p )->type('');
-    }
-    if ( defined $job->keywordStatuses )
-    {
-        my @p =
-            ( ref( $job->keywordStatuses ) eq 'ARRAY' )
-            ? @{ $job->keywordStatuses }
-            : $job->keywordStatuses;
-        push @job_params,
-            SOAP::Data->name( 'keywordStatuses' => @p )->type('');
-    }
-    if ( defined $job->keywordType )
-    {
-        my @p =
-            ( ref( $job->keywordType ) eq 'ARRAY' )
-            ? @{ $job->keywordType }
-            : $job->keywordType;
-        push @job_params, SOAP::Data->name( 'keywordType' => @p )->type('');
-    }
-    if ( defined $job->customOptions )
-    {
-        my @p =
-            ( ref( $job->customOptions ) eq 'ARRAY' )
-            ? @{ $job->customOptions }
-            : $job->customOptions;
-        push @job_params, SOAP::Data->name( 'customOptions' => @p )->type('');
-    }
-    if ( defined $job->includeZeroImpression )
-    {
-        push @job_params,
-            SOAP::Data->name(
-            'includeZeroImpression' => $job->includeZeroImpression )
-            ->type('');
-    }
+        if ( defined $job->$_ )
+        {
+            if ( ref $job->$_ eq 'ARRAY' )
+            {
+                push @job_params,
+                    SOAP::Data->name( $_ => @{ $job->$_ } )->type('');
+            }
+            else
+            {
+                push @job_params,
+                    SOAP::Data->name( $_ => $job->$_ )->type('');
+            }
+        }
+    } # end for ( qw/ selectedReportType aggregationTypes selectedColumns...
 
     my @params;
     push @params, SOAP::Data->name( 'job' => \SOAP::Data->value(@job_params) )
-        ->attr( { 'xsi:type' => $type } )->type('');
+        ->attr( { 'xsi:type' => 'DefinedReportJob' } )->type('');
 
     my $result = $self->_create_service_and_call(
         {

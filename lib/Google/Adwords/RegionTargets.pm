@@ -7,10 +7,60 @@ use version; our $VERSION = qv('0.0.1');
 use base 'Google::Adwords::Data';
 
 my @fields = qw/
-    regions
+    _regions
     /;
 
 __PACKAGE__->mk_accessors(@fields);
+
+sub new
+{
+    my $proto = shift;
+
+    my $class = ref $proto || $proto;
+
+    if (@_)
+    {
+        my $obj     = $class->SUPER::new();
+        my $hashref = shift;
+        for ( keys %{$hashref} )
+        {
+            $obj->$_( $hashref->{$_} );
+        }
+        return $obj;
+    }
+    else
+    {
+        return $class->SUPER::new();
+    }
+} # end sub new
+
+# regions should always return an array ref
+sub regions
+{
+    my $self = shift;
+
+    # if its a put
+    if (@_)
+    {
+        my $put_ref = [];
+
+        for (@_)
+        {
+            if ( ref $_ ne 'ARRAY' )
+            {
+                push @{$put_ref}, $_;
+            }
+            else
+            {
+                push @{$put_ref}, @{$_};
+            }
+        }
+
+        $self->set( '_regions', $put_ref );
+    } # end if (@_)
+
+    return $self->get('_regions');
+} # end sub regions
 
 1;
 

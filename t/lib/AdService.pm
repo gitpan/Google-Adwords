@@ -81,7 +81,7 @@ sub addAds : Test(no_plan)
                 my $xml .= <<'EOF';
 <addAdsResponse xmlns="">
    <ns1:addAdsReturn xsi:type="ns1:TextAd"
-xmlns:ns1="https://adwords.google.com/api/adwords/v8">
+xmlns:ns1="https://adwords.google.com/api/adwords/v11">
     <ns1:adGroupId>20048</ns1:adGroupId>
     <ns1:adType>TextAd</ns1:adType>
     <ns1:destinationUrl>http://aarohan.biz</ns1:destinationUrl>
@@ -674,9 +674,10 @@ EOF
 
         my $ret = $self->{obj}->checkAds(
             {
-                ads            => [$ad1],
-                languageTarget => ['hi'],
-                geoTarget      => $geo_target,
+                ads => [$ad1],
+
+                #languageTarget => ['hi'],
+                geoTarget => $geo_target,
             }
         );
 

@@ -6,40 +6,40 @@ use version; our $VERSION = qv('0.0.1');
 
 use base 'Google::Adwords::Data';
 
-my @fields = qw/
-    adGroupId
-    adType
-    destinationUrl
-    disapproved
-    displayUrl
-    exemptionRequest
-    id
-    status
-    description1
-    description2
-    headline
-    image
-    address
-    businessImage
-    businessKey
-    businessName
-    city
-    countryCode
-    customIcon
-    customIconId
-    phoneNumber
-    postalCode
-    region
-    stockIcon
-    targetRadiusInKm
-    description
-    markupLanguages
-    mobileCarriers
-    postPriceAnnotation
-    prePriceAnnotation
-    priceString
-    productImage
-    /;
+my @fields = (
+    qw/
+        adGroupId
+        adType
+        destinationUrl
+        disapproved
+        displayUrl
+        exemptionRequest
+        id
+        status
+        image
+        address
+        businessImage
+        businessKey
+        businessName
+        city
+        countryCode
+        customIcon
+        customIconId
+        phoneNumber
+        postalCode
+        region
+        stockIcon
+        targetRadiusInKm
+        description
+        headline
+        markupLanguages
+        mobileCarriers
+        description1
+        description2
+        name
+        video
+        /
+);
 
 __PACKAGE__->mk_accessors(@fields);
 

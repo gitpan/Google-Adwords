@@ -127,7 +127,7 @@ sub getMethodCost : Test(1)
             {
                 service => 'InfoService',
                 method  => 'getMethodCost',
-                date    => '2007-04-15',
+                date    => '2008-02-15T00:00:00',
             }
         );
         is( $got, $expected, 'getMethodCost' );
@@ -155,7 +155,7 @@ EOF
             {
                 service => 'InfoService',
                 method  => 'getMethodCost',
-                date    => '2006-08-02T00:00:00',
+                date    => '2008-02-02T00:00:00',
             }
         );
         ok( $got == $expected, 'getMethodCost' );
@@ -178,8 +178,8 @@ sub getOperationCount : Test(1)
         my $expected = '0';
         my $got      = $self->{'obj'}->getOperationCount(
             {
-                startDate => '2007-04-01',
-                endDate   => '2007-04-15',
+                startDate => '2008-02-01',
+                endDate   => '2008-02-15',
             }
         );
         is( $got, $expected, 'getOperationCount' );
@@ -229,8 +229,8 @@ sub getUnitCount : Test(1)
         my $expected = '0';
         my $got      = $self->{'obj'}->getUnitCount(
             {
-                startDate => '2007-04-01',
-                endDate   => '2007-04-15',
+                startDate => '2008-02-01',
+                endDate   => '2008-02-15',
             }
         );
         is( $got, $expected, 'getUnitCount' );
@@ -282,8 +282,8 @@ sub getUnitCountForMethod : Test(1)
             {
                 service   => 'InfoService',
                 method    => 'getUnitCountForMethod',
-                startDate => '2007-04-01',
-                endDate   => '2007-04-15',
+                startDate => '2008-02-01',
+                endDate   => '2008-02-15',
             }
         );
         is( $got, $expected, 'getUnitCountForMethod' );
@@ -336,8 +336,8 @@ sub getUnitCountForClients : Test(no_plan)
         my @usage = $self->{obj}->getUnitCountForClients(
             {
                 clientEmails => ['client_1+rohan.almeida@gmail.com'],
-                startDate    => '2007-04-01',
-                endDate      => '2007-04-15',
+                startDate    => '2008-02-01',
+                endDate      => '2008-02-15',
             }
         );
 

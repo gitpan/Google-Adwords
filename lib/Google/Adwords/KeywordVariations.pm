@@ -7,11 +7,89 @@ use version; our $VERSION = qv('0.0.1');
 use base 'Google::Adwords::Data';
 
 my @fields = qw/
-    additionalToConsider
-    moreSpecific
+    _additionalToConsider
+    _moreSpecific
     /;
 
 __PACKAGE__->mk_accessors(@fields);
+
+sub new
+{
+    my $proto = shift;
+
+    my $class = ref $proto || $proto;
+
+    if (@_)
+    {
+        my $obj     = $class->SUPER::new();
+        my $hashref = shift;
+        for ( keys %{$hashref} )
+        {
+            $obj->$_( $hashref->{$_} );
+        }
+        return $obj;
+    }
+    else
+    {
+        return $class->SUPER::new();
+    }
+} # end sub new
+
+# additionalToConsider should always return an array ref
+sub additionalToConsider
+{
+    my $self = shift;
+
+    # if its a put
+    if (@_)
+    {
+        my $put_ref = [];
+
+        for (@_)
+        {
+            if ( ref $_ ne 'ARRAY' )
+            {
+                push @{$put_ref}, $_;
+            }
+            else
+            {
+                push @{$put_ref}, @{$_};
+            }
+        }
+
+        $self->set( '_additionalToConsider', $put_ref );
+    } # end if (@_)
+
+    return $self->get('_additionalToConsider');
+} # end sub additionalToConsider
+
+# moreSpecific should always return an array ref
+sub moreSpecific
+{
+    my $self = shift;
+
+    # if its a put
+    if (@_)
+    {
+        my $put_ref = [];
+
+        for (@_)
+        {
+            if ( ref $_ ne 'ARRAY' )
+            {
+                push @{$put_ref}, $_;
+            }
+            else
+            {
+                push @{$put_ref}, @{$_};
+            }
+        }
+
+        $self->set( '_moreSpecific', $put_ref );
+    } # end if (@_)
+
+    return $self->get('_moreSpecific');
+} # end sub moreSpecific
 
 1;
 

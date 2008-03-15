@@ -5,27 +5,320 @@ use warnings;
 use base 'Google::Adwords::Data';
 
 my @fields = qw/
-    adGroups
-    adGroupStatuses
+    _adGroups
+    _adGroupStatuses
     adWordsType
-    aggregationType
-    campaigns
-    campaignStatuses
-    clientEmails
+    _aggregationTypes
+    _campaigns
+    _campaignStatuses
+    _keywords
+    _keywordStatuses
+    keywordType
+    _selectedColumns
+    selectedReportType
+    _clientEmails
     crossClient
-    customOptions
     endDay
     id
     includeZeroImpression
-    keywords
-    keywordStatuses
-    keywordType
     name
     startDay
     status
     /;
 
 __PACKAGE__->mk_accessors(@fields);
+
+sub get_fields
+{
+    return (
+        qw/
+            adGroups
+            adGroupStatuses
+            adWordsType
+            aggregationTypes
+            campaigns
+            campaignStatuses
+            keywords
+            keywordStatuses
+            keywordType
+            selectedColumns
+            selectedReportType
+            clientEmails
+            crossClient
+            endDay
+            id
+            includeZeroImpression
+            name
+            startDay
+            status
+            /
+    );
+} # end sub get_fields
+
+sub new
+{
+    my $proto = shift;
+
+    my $class = ref $proto || $proto;
+
+    if (@_)
+    {
+        my $obj     = $class->SUPER::new();
+        my $hashref = shift;
+        for ( keys %{$hashref} )
+        {
+            $obj->$_( $hashref->{$_} );
+        }
+        return $obj;
+    }
+    else
+    {
+        return $class->SUPER::new();
+    }
+} # end sub new
+
+sub adGroups
+{
+    my $self = shift;
+
+    # if its a put
+    if (@_)
+    {
+        my $put_ref = [];
+
+        for (@_)
+        {
+            if ( ref $_ ne 'ARRAY' )
+            {
+                push @{$put_ref}, $_;
+            }
+            else
+            {
+                push @{$put_ref}, @{$_};
+            }
+        }
+
+        $self->set( '_adGroups', $put_ref );
+    } # end if (@_)
+
+    return $self->get('_adGroups');
+} # end sub adGroups
+
+sub adGroupStatuses
+{
+    my $self = shift;
+
+    # if its a put
+    if (@_)
+    {
+        my $put_ref = [];
+
+        for (@_)
+        {
+            if ( ref $_ ne 'ARRAY' )
+            {
+                push @{$put_ref}, $_;
+            }
+            else
+            {
+                push @{$put_ref}, @{$_};
+            }
+        }
+
+        $self->set( '_adGroupStatuses', $put_ref );
+    } # end if (@_)
+
+    return $self->get('_adGroupStatuses');
+} # end sub adGroupStatuses
+
+sub aggregationTypes
+{
+    my $self = shift;
+
+    # if its a put
+    if (@_)
+    {
+        my $put_ref = [];
+
+        for (@_)
+        {
+            if ( ref $_ ne 'ARRAY' )
+            {
+                push @{$put_ref}, $_;
+            }
+            else
+            {
+                push @{$put_ref}, @{$_};
+            }
+        }
+
+        $self->set( '_aggregationTypes', $put_ref );
+    } # end if (@_)
+
+    return $self->get('_aggregationTypes');
+} # end sub aggregationTypes
+
+sub campaigns
+{
+    my $self = shift;
+
+    # if its a put
+    if (@_)
+    {
+        my $put_ref = [];
+
+        for (@_)
+        {
+            if ( ref $_ ne 'ARRAY' )
+            {
+                push @{$put_ref}, $_;
+            }
+            else
+            {
+                push @{$put_ref}, @{$_};
+            }
+        }
+
+        $self->set( '_campaigns', $put_ref );
+    } # end if (@_)
+
+    return $self->get('_campaigns');
+} # end sub campaigns
+
+sub campaignStatuses
+{
+    my $self = shift;
+
+    # if its a put
+    if (@_)
+    {
+        my $put_ref = [];
+
+        for (@_)
+        {
+            if ( ref $_ ne 'ARRAY' )
+            {
+                push @{$put_ref}, $_;
+            }
+            else
+            {
+                push @{$put_ref}, @{$_};
+            }
+        }
+
+        $self->set( '_campaignStatuses', $put_ref );
+    } # end if (@_)
+
+    return $self->get('_campaignStatuses');
+} # end sub campaignStatuses
+
+sub clientEmails
+{
+    my $self = shift;
+
+    # if its a put
+    if (@_)
+    {
+        my $put_ref = [];
+
+        for (@_)
+        {
+            if ( ref $_ ne 'ARRAY' )
+            {
+                push @{$put_ref}, $_;
+            }
+            else
+            {
+                push @{$put_ref}, @{$_};
+            }
+        }
+
+        $self->set( '_clientEmails', $put_ref );
+    } # end if (@_)
+
+    return $self->get('_clientEmails');
+} # end sub clientEmails
+
+sub keywords
+{
+    my $self = shift;
+
+    # if its a put
+    if (@_)
+    {
+        my $put_ref = [];
+
+        for (@_)
+        {
+            if ( ref $_ ne 'ARRAY' )
+            {
+                push @{$put_ref}, $_;
+            }
+            else
+            {
+                push @{$put_ref}, @{$_};
+            }
+        }
+
+        $self->set( '_keywords', $put_ref );
+    } # end if (@_)
+
+    return $self->get('_keywords');
+} # end sub keywords
+
+sub keywordStatuses
+{
+    my $self = shift;
+
+    # if its a put
+    if (@_)
+    {
+        my $put_ref = [];
+
+        for (@_)
+        {
+            if ( ref $_ ne 'ARRAY' )
+            {
+                push @{$put_ref}, $_;
+            }
+            else
+            {
+                push @{$put_ref}, @{$_};
+            }
+        }
+
+        $self->set( '_keywordStatuses', $put_ref );
+    } # end if (@_)
+
+    return $self->get('_keywordStatuses');
+} # end sub keywordStatuses
+
+sub selectedColumns
+{
+    my $self = shift;
+
+    # if its a put
+    if (@_)
+    {
+        my $put_ref = [];
+
+        for (@_)
+        {
+            if ( ref $_ ne 'ARRAY' )
+            {
+                push @{$put_ref}, $_;
+            }
+            else
+            {
+                push @{$put_ref}, @{$_};
+            }
+        }
+
+        $self->set( '_selectedColumns', $put_ref );
+    } # end if (@_)
+
+    return $self->get('_selectedColumns');
+} # end sub selectedColumns
 
 1;
 

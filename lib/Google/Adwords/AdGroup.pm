@@ -9,11 +9,11 @@ use base 'Google::Adwords::Data';
 my @fields = qw/
     campaignId
     id
-    maxContentCpc
-    maxCpc
-    maxCpm
+    keywordContentMaxCpc
+    keywordMaxCpc
     name
-    proxyMaxCpc
+    proxyKeywordMaxCpc
+    siteMaxCpm
     status
     /;
 

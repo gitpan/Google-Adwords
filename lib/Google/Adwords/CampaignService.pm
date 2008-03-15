@@ -13,11 +13,13 @@ use Google::Adwords::GeoTarget;
 use Google::Adwords::CityTargets;
 use Google::Adwords::CountryTargets;
 use Google::Adwords::MetroTargets;
+use Google::Adwords::ProximityTargets;
 use Google::Adwords::RegionTargets;
 use Google::Adwords::StatsRecord;
 use Google::Adwords::AdSchedule;
 use Google::Adwords::SchedulingInterval;
 use Google::Adwords::BudgetOptimizerSettings;
+use Google::Adwords::NetworkTarget;
 
 ### INTERNAL UTILITY ################################################
 # Usage      : @campaign_params = _create_campaign_params($campaign);
@@ -33,75 +35,9 @@ sub _create_campaign_params
     my $campaign = shift;
     my @campaign_params;
 
-    # dailyBudget
-    push @campaign_params,
-        SOAP::Data->name( 'dailyBudget' => $campaign->dailyBudget )->type('');
-
-    # campaign name
-    if ( defined $campaign->name )
-    {
-        push @campaign_params,
-            SOAP::Data->name( 'name' => $campaign->name )->type('');
-    }
-
-    # status
-    if ( defined $campaign->status )
-    {
-        push @campaign_params,
-            SOAP::Data->name( 'status' => $campaign->status )->type('');
-    }
-
-    # start_day
-    if ( defined $campaign->startDay )
-    {
-        push @campaign_params,
-            SOAP::Data->name( 'startDay' => $campaign->startDay )->type('');
-    }
-
-    # end_day
-    if ( defined $campaign->endDay )
-    {
-        push @campaign_params,
-            SOAP::Data->name( 'endDay' => $campaign->endDay )->type('');
-    }
-
-    # Ad schedule
-    if ( defined $campaign->schedule )
-    {
-
-        my @schedule_params;
-
-        # status
-        push @schedule_params,
-            SOAP::Data->name( 'status' => $campaign->schedule->status )
-            ->type('');
-
-        # intervals
-        foreach my $interval ( @{ $campaign->schedule->intervals } )
-        {
-            my @interval_params;
-            for (qw/day endHour endMinute multiplier startHour startMinute/)
-            {
-                if ( defined $interval->$_ )
-                {
-                    push @interval_params,
-                        SOAP::Data->name( $_ => $interval->$_ )->type('');
-                }
-            }
-            push @schedule_params,
-                SOAP::Data->name(
-                'intervals' => \SOAP::Data->value(@interval_params) )
-                ->type('');
-        }
-
-        push @campaign_params, SOAP::Data->name(
-            'schedule' => \SOAP::Data->value(@schedule_params) )->type('');
-    } # end if ( defined $campaign...
-
     # budget optimizer settings
     if ( defined $campaign->budgetOptimizerSettings )
     {
-
         my @budget_params;
         my $budget = $campaign->budgetOptimizerSettings;
 
@@ -121,29 +57,30 @@ sub _create_campaign_params
 
     } # end if ( defined $campaign...
 
-    # language_targeting
-    if (   ( defined $campaign->languageTargeting )
-        && ( ref $campaign->languageTargeting eq 'HASH' ) )
+    # dailyBudget
+    push @campaign_params,
+        SOAP::Data->name( 'dailyBudget' => $campaign->dailyBudget )->type('');
+
+    # enableSeparateContentBids
+    if ( defined $campaign->enableSeparateContentBids )
     {
-        my $langs_ref = $campaign->languageTargeting;
-        if (   ( exists $langs_ref->{'languages'} )
-            && ( scalar @{ $langs_ref->{'languages'} } > 0 ) )
-        {
-            push @campaign_params,
-                SOAP::Data->name(
-                'languageTargeting' => \SOAP::Data->name(
-                    'languages' => @{ $langs_ref->{'languages'} }
-                    )->type('')
-                )->type('');
-        }
-    } # end if ( ( defined $campaign...
+        push @campaign_params,
+            SOAP::Data->name( 'enableSeparateContentBids' =>
+                $campaign->enableSeparateContentBids )->type('');
+    }
+
+    # end_day
+    if ( defined $campaign->endDay )
+    {
+        push @campaign_params,
+            SOAP::Data->name( 'endDay' => $campaign->endDay )->type('');
+    }
 
     # geo_targeting
     if ( defined $campaign->geoTargeting )
     {
         my $geo_obj = $campaign->geoTargeting;
 
-        #die ref $geo_obj;
         my @geo_data;
 
         if ( defined $geo_obj->targetAll )
@@ -179,6 +116,38 @@ sub _create_campaign_params
             }
         } # end for ( keys %geo_target_params...
 
+        # proximityTargets
+        if ( defined $geo_obj->proximityTargets )
+        {
+            my @proximity_soap;
+            my $circles = $geo_obj->proximityTargets->circles;
+
+            foreach my $circle_ref ( @{$circles} )
+            {
+                my @circles_soap;
+                for (
+                    qw/latitudeMicroDegrees longitudeMicroDegrees
+                    radiusMeters/
+                    )
+                {
+                    if ( defined $circle_ref->$_ )
+                    {
+                        push @circles_soap,
+                            SOAP::Data->name( $_ => $circle_ref->$_ )
+                            ->type('');
+                    }
+                }
+                push @proximity_soap, SOAP::Data->name(
+                    circles => \SOAP::Data->value(@circles_soap) )->type('');
+
+            }
+
+            push @geo_data,
+                SOAP::Data->name(
+                proximityTargets => \SOAP::Data->value(@proximity_soap) )
+                ->type('');
+        } # end if ( defined $geo_obj->proximityTargets...
+
         if ( scalar @geo_data > 0 )
         {
             push @campaign_params, SOAP::Data->name(
@@ -186,22 +155,87 @@ sub _create_campaign_params
         }
     } # end if ( defined $campaign...
 
-    # network_targeting
-    if (   ( defined $campaign->networkTargeting )
-        && ( ref $campaign->networkTargeting eq 'HASH' ) )
+    # language_targeting
+    if ( defined $campaign->languageTargeting )
     {
-        my $network_ref = $campaign->networkTargeting;
-        if (   ( exists $network_ref->{networkTypes} )
-            && ( scalar @{ $network_ref->{'networkTypes'} } > 0 ) )
+        my $langs_ref = $campaign->languageTargeting->languages;
+
+        if ( scalar @{$langs_ref} > 0 )
         {
             push @campaign_params,
-                SOAP::Data->name(
-                'networkTargeting' => \SOAP::Data->name(
-                    'networkTypes' => @{ $network_ref->{'networkTypes'} }
-                    )->type('')
-                )->type('');
+                SOAP::Data->name( 'languageTargeting' =>
+                    \SOAP::Data->name( 'languages' => @{$langs_ref} )
+                    ->type('') )->type('');
         }
-    } # end if ( ( defined $campaign...
+    }
+
+    # campaign name
+    if ( defined $campaign->name )
+    {
+        push @campaign_params,
+            SOAP::Data->name( 'name' => $campaign->name )->type('');
+    }
+
+    # network_targeting
+    if ( defined $campaign->networkTargeting )
+    {
+        my $network_ref = $campaign->networkTargeting->networkTypes;
+
+        if ( scalar @{$network_ref} > 0 )
+        {
+            push @campaign_params,
+                SOAP::Data->name( 'networkTargeting' =>
+                    \SOAP::Data->name( 'networkTypes' => @{$network_ref} )
+                    ->type('') )->type('');
+        }
+    }
+
+    # Ad schedule
+    if ( defined $campaign->schedule )
+    {
+
+        my @schedule_params;
+
+        # status
+        push @schedule_params,
+            SOAP::Data->name( 'status' => $campaign->schedule->status )
+            ->type('');
+
+        # intervals
+        foreach my $interval ( @{ $campaign->schedule->intervals } )
+        {
+            my @interval_params;
+            for (qw/day endHour endMinute multiplier startHour startMinute/)
+            {
+                if ( defined $interval->$_ )
+                {
+                    push @interval_params,
+                        SOAP::Data->name( $_ => $interval->$_ )->type('');
+                }
+            }
+            push @schedule_params,
+                SOAP::Data->name(
+                'intervals' => \SOAP::Data->value(@interval_params) )
+                ->type('');
+        }
+
+        push @campaign_params, SOAP::Data->name(
+            'schedule' => \SOAP::Data->value(@schedule_params) )->type('');
+    } # end if ( defined $campaign...
+
+    # start_day
+    if ( defined $campaign->startDay )
+    {
+        push @campaign_params,
+            SOAP::Data->name( 'startDay' => $campaign->startDay )->type('');
+    }
+
+    # status
+    if ( defined $campaign->status )
+    {
+        push @campaign_params,
+            SOAP::Data->name( 'status' => $campaign->status )->type('');
+    }
 
     return @campaign_params;
 } # end sub _create_campaign_params
@@ -219,9 +253,8 @@ sub _create_campaign_object
 {
     my ( $self, $data ) = @_;
 
-    #use Data::Dumper;
-    #die Dumper $data;
     # format dates
+    Date_Init("TZ=EST5EDT");
     $data->{'startDay'}
         = UnixDate( ParseDate( $data->{'startDay'} ), "%Y-%m-%d %H:%M:%S" );
     $data->{'endDay'}
@@ -233,6 +266,64 @@ sub _create_campaign_object
         $data->{budgetOptimizerSettings} = $self->_create_object_from_hash(
             $data->{budgetOptimizerSettings},
             'Google::Adwords::BudgetOptimizerSettings' );
+    }
+
+    # geoTargeting
+    if ( exists $data->{geoTargeting} )
+    {
+
+        for ( keys %{ $data->{geoTargeting} } )
+        {
+            next if ( $_ eq 'targetAll' || $_ eq 'proximityTargets' );
+
+            my $geo_ref = $data->{geoTargeting};
+            if ( defined $geo_ref->{$_} )
+            {
+                my $target_obj
+                    = $self->_create_object_from_hash( $geo_ref->{$_},
+                    "Google::Adwords::" . ucfirst $_ );
+                $data->{geoTargeting}{$_} = $target_obj;
+            }
+
+        }
+
+        # proximityTargets
+        if ( defined $data->{geoTargeting}{proximityTargets} )
+        {
+            my $proxi_ref = $data->{geoTargeting}{proximityTargets};
+            if ( defined $proxi_ref->{circles} )
+            {
+                my $circle_obj
+                    = $self->_create_object_from_hash( $proxi_ref->{circles},
+                    "Google::Adwords::Circle" );
+                $proxi_ref->{circles} = $circle_obj;
+            }
+            $data->{geoTargeting}{proximityTargets}
+                = $self->_create_object_from_hash(
+                $data->{geoTargeting}{proximityTargets},
+                "Google::Adwords::ProximityTargets"
+                );
+        } # end if ( defined $data->{geoTargeting...
+
+        $data->{geoTargeting}
+            = $self->_create_object_from_hash( $data->{geoTargeting},
+            'Google::Adwords::GeoTarget' );
+    } # end if ( exists $data->{geoTargeting...
+
+    # languageTargeting
+    if ( exists $data->{languageTargeting} )
+    {
+        $data->{languageTargeting}
+            = $self->_create_object_from_hash( $data->{languageTargeting},
+            "Google::Adwords::LanguageTarget" );
+    }
+
+    # networkTargeting
+    if ( exists $data->{networkTargeting} )
+    {
+        $data->{networkTargeting}
+            = $self->_create_object_from_hash( $data->{networkTargeting},
+            "Google::Adwords::NetworkTarget" );
     }
 
     # ad schedule
@@ -259,6 +350,7 @@ sub _create_campaign_object
                 "Google::Adwords::SchedulingInterval" );
         }
     } # end if ( exists $data->{schedule...
+
     if ( scalar @intervals > 0 )
     {
         $data->{schedule}{intervals} = \@intervals;
@@ -267,33 +359,6 @@ sub _create_campaign_object
         "Google::Adwords::AdSchedule" );
 
     $data->{schedule} = $ad_schedule;
-
-    # geoTargeting
-    if ( exists $data->{geoTargeting} )
-    {
-
-        #use Data::Dumper;
-        #die Dumper $data->{geoTargeting};
-
-        for ( keys %{ $data->{geoTargeting} } )
-        {
-            next if ( $_ eq 'targetAll' );
-
-            my $geo_ref = $data->{geoTargeting};
-            if ( defined $geo_ref->{$_} )
-            {
-                my $target_obj
-                    = $self->_create_object_from_hash( $geo_ref->{$_},
-                    "Google::Adwords::" . ucfirst $_ );
-                $data->{geoTargeting}{$_} = $target_obj;
-            }
-
-        }
-
-        $data->{geoTargeting}
-            = $self->_create_object_from_hash( $data->{geoTargeting},
-            'Google::Adwords::GeoTarget' );
-    } # end if ( exists $data->{geoTargeting...
 
     # get campaign object
     my $campaign_response = $self->_create_object_from_hash( $data,

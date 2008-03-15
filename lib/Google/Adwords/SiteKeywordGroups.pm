@@ -7,11 +7,89 @@ use version; our $VERSION = qv('0.0.1');
 use base 'Google::Adwords::Data';
 
 my @fields = qw/
-    groups
-    keywords
+    _groups
+    _keywords
     /;
 
 __PACKAGE__->mk_accessors(@fields);
+
+sub new
+{
+    my $proto = shift;
+
+    my $class = ref $proto || $proto;
+
+    if (@_)
+    {
+        my $obj     = $class->SUPER::new();
+        my $hashref = shift;
+        for ( keys %{$hashref} )
+        {
+            $obj->$_( $hashref->{$_} );
+        }
+        return $obj;
+    }
+    else
+    {
+        return $class->SUPER::new();
+    }
+} # end sub new
+
+# groups should always return an array ref
+sub groups
+{
+    my $self = shift;
+
+    # if its a put
+    if (@_)
+    {
+        my $put_ref = [];
+
+        for (@_)
+        {
+            if ( ref $_ ne 'ARRAY' )
+            {
+                push @{$put_ref}, $_;
+            }
+            else
+            {
+                push @{$put_ref}, @{$_};
+            }
+        }
+
+        $self->set( '_groups', $put_ref );
+    } # end if (@_)
+
+    return $self->get('_groups');
+} # end sub groups
+
+# keywords should always return an array ref
+sub keywords
+{
+    my $self = shift;
+
+    # if its a put
+    if (@_)
+    {
+        my $put_ref = [];
+
+        for (@_)
+        {
+            if ( ref $_ ne 'ARRAY' )
+            {
+                push @{$put_ref}, $_;
+            }
+            else
+            {
+                push @{$put_ref}, @{$_};
+            }
+        }
+
+        $self->set( '_keywords', $put_ref );
+    } # end if (@_)
+
+    return $self->get('_keywords');
+} # end sub keywords
 
 1;
 

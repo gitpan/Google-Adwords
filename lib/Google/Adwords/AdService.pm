@@ -17,6 +17,7 @@ use Google::Adwords::CityTargets;
 use Google::Adwords::CountryTargets;
 use Google::Adwords::MetroTargets;
 use Google::Adwords::RegionTargets;
+use Google::Adwords::ProximityTargets;
 
 use HTML::Entities;
 
@@ -104,17 +105,32 @@ sub _parse_ad_response
 {
     my ( $self, $r ) = @_;
 
-    if (   ( exists $r->{image} )
-        or ( exists $r->{businessImage} )
-        or ( exists $r->{customIcon} )
-        or ( exists $r->{productImage} ) )
-    {
-        $r->{image} = $self->_create_object_from_hash( $r->{image},
-            'Google::Adwords::Image' );
-    }
+    # get the type of Ad
+    my $ad_type = ref $r;
 
-    return $self->_create_object_from_hash( $r, 'Google::Adwords::Ad' );
-}
+    my $ad_ref;
+    $ad_ref->{adType} = $ad_type;
+
+    my @ad_fields = Google::Adwords::Ad->get_fields();
+
+    for (@ad_fields)
+    {
+        if (   $_ eq 'image'
+            || $_ eq 'businessImage'
+            || $_ eq 'customIcon'
+            || $_ eq 'productImage' )
+        {
+            $ad_ref->{$_} = $self->_create_object_from_hash( $r->{$_},
+                'Google::Adwords::Image' );
+        }
+        else
+        {
+            $ad_ref->{$_} = $r->{$_};
+        }
+    } # end for (@ad_fields)
+
+    return $self->_create_object_from_hash( $ad_ref, 'Google::Adwords::Ad' );
+} # end sub _parse_ad_response
 
 ### INSTANCE METHOD ################################################
 # Usage      :
@@ -522,18 +538,17 @@ sub checkAds
         ->type('');
 
     # languageTarget
-    if ( defined $args_ref->{languageTarget} )
+    if ( exists $args_ref->{languageTarget} )
     {
+        my $languages_ref = $args_ref->{languageTarget}->languages;
         push @params,
-            SOAP::Data->name(
-            'languageTarget' => \SOAP::Data->name(
-                'languages' => @{ $args_ref->{languageTarget} }
-                )->type('')
-            )->type('');
+            SOAP::Data->name( 'languageTarget' =>
+                \SOAP::Data->name( 'languages' => @{$languages_ref} )
+                ->type('') )->type('');
     }
 
     # geoTargeting
-    if ( defined $args_ref->{geoTarget} )
+    if ( exists $args_ref->{geoTarget} )
     {
         my $geo_obj = $args_ref->{geoTarget};
 
@@ -573,12 +588,44 @@ sub checkAds
             }
         } # end for ( keys %geo_target_params...
 
+        # proximityTargets
+        if ( defined $geo_obj->proximityTargets )
+        {
+            my @proximity_soap;
+            my $circles = $geo_obj->proximityTargets->circles;
+
+            foreach my $circle_ref ( @{$circles} )
+            {
+                my @circles_soap;
+                for (
+                    qw/latitudeMicroDegrees longitudeMicroDegrees
+                    radiusMeters/
+                    )
+                {
+                    if ( defined $circle_ref->$_ )
+                    {
+                        push @circles_soap,
+                            SOAP::Data->name( $_ => $circle_ref->$_ )
+                            ->type('');
+                    }
+                }
+                push @proximity_soap, SOAP::Data->name(
+                    circles => \SOAP::Data->value(@circles_soap) )->type('');
+
+            }
+
+            push @geo_data,
+                SOAP::Data->name(
+                proximityTargets => \SOAP::Data->value(@proximity_soap) )
+                ->type('');
+        } # end if ( defined $geo_obj->proximityTargets...
+
         if ( scalar @geo_data > 0 )
         {
             push @params, SOAP::Data->name(
                 'geoTarget' => \SOAP::Data->value(@geo_data), )->type('');
         }
-    } # end if ( defined $args_ref...
+    } # end if ( exists $args_ref->...
 
     my $result = $self->_create_service_and_call(
         {

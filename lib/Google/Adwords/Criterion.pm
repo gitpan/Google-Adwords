@@ -27,6 +27,11 @@ my @fields = qw/
 
 __PACKAGE__->mk_accessors(@fields);
 
+sub get_fields
+{
+    return @fields;
+}
+
 1;
 
 =pod

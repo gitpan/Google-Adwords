@@ -15,6 +15,7 @@ use ReportService;
 use TrafficEstimatorService;
 use CriterionService;
 use KeywordToolService;
+use NetworkTarget;
 
 Test::Class->runtests();
 

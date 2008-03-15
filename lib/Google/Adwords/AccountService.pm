@@ -2,7 +2,7 @@ package Google::Adwords::AccountService;
 use strict;
 use warnings;
 
-use version; our $VERSION = qv('0.3');
+use version; our $VERSION = qv('0.4');
 
 use base 'Google::Adwords::Service';
 
@@ -12,6 +12,7 @@ use Google::Adwords::EmailPromotionsPreferences;
 use Google::Adwords::Address;
 use Google::Adwords::CoverageType;
 use Google::Adwords::CreditCard;
+use Google::Adwords::NetworkTarget;
 
 ### INSTANCE METHOD ################################################
 # Usage      :
@@ -63,17 +64,6 @@ sub getAccountInfo
         );
     }
 
-    # defaultAdsCoverage
-    if ( defined $account_info->defaultAdsCoverage )
-    {
-        $account_info->defaultAdsCoverage(
-            $self->_create_object_from_hash(
-                $data->{defaultAdsCoverage},
-                'Google::Adwords::CoverageType'
-            )
-        );
-    }
-
     # emailPromotionsPreferences
     if ( defined $account_info->emailPromotionsPreferences )
     {
@@ -81,6 +71,19 @@ sub getAccountInfo
             $self->_create_object_from_hash(
                 $data->{emailPromotionsPreferences},
                 'Google::Adwords::EmailPromotionsPreferences'
+            )
+        );
+    }
+
+    # defaultNetworkTargeting
+    if ( defined $account_info->defaultNetworkTargeting )
+    {
+
+        #print Dumper $data->{defaultNetworkTargeting};
+        $account_info->defaultNetworkTargeting(
+            $self->_create_object_from_hash(
+                $data->{defaultNetworkTargeting},
+                'Google::Adwords::NetworkTarget',
             )
         );
     }
@@ -179,26 +182,25 @@ sub updateAccountInfo
             ->type('');
     }
 
-    # defaultAdsCoverage
-    if ( defined $account->defaultAdsCoverage )
+    # defaultNetworkTargeting
+    if ( defined $account->defaultNetworkTargeting )
     {
-        my @coveragetype_params;
-        my $coveragetype = $account->defaultAdsCoverage;
-        for (qw/ optInContentNetwork optInSearchNetwork /)
+        my @def_targeting;
+        my $def_net_targeting = $account->defaultNetworkTargeting;
+        if ( defined $def_net_targeting->networkTypes )
         {
-            if ( defined $coveragetype->$_ )
+            for ( @{ $def_net_targeting->networkTypes } )
             {
-                push @coveragetype_params,
-                    SOAP::Data->name(
-                    $_ => ( $coveragetype->$_ ) ? 'true' : 'false' )
-                    ->type('');
+                push @def_targeting,
+                    SOAP::Data->name( networkTypes => $_ )->type('');
             }
         }
+
         push @account_params,
             SOAP::Data->name(
-            'defaultAdsCoverage' => \SOAP::Data->value(@coveragetype_params) )
+            'defaultNetworkTargeting' => \SOAP::Data->value(@def_targeting) )
             ->type('');
-    } # end if ( defined $account->defaultAdsCoverage...
+    } # end if ( defined $account->defaultNetworkTargeting...
 
     # descriptiveName
     if ( defined $account->descriptiveName )
@@ -213,14 +215,15 @@ sub updateAccountInfo
     {
         my @emailpromprefs_params;
         my $emailpromprefs = $account->emailPromotionsPreferences;
-        for (qw/ marketResearchEnabled newsletterEnabled promotionsEnabled /)
+        for (
+            qw/ accountPerformanceEnabled disapprovedAdsEnabled
+            marketResearchEnabled newsletterEnabled promotionsEnabled /
+            )
         {
             if ( defined $emailpromprefs->$_ )
             {
                 push @emailpromprefs_params,
-                    SOAP::Data->name(
-                    $_ => ( $emailpromprefs->$_ ) ? 'true' : 'false' )
-                    ->type('');
+                    SOAP::Data->name( $_ => $emailpromprefs->$_ )->type('');
             }
         }
         push @account_params,

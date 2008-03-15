@@ -2,7 +2,7 @@ package Google::Adwords::AccountInfo;
 use strict;
 use warnings;
 
-use version; our $VERSION = qv('0.0.1');
+use version; our $VERSION = qv('0.2');
 
 use base 'Google::Adwords::Data';
 
@@ -10,13 +10,12 @@ my @fields = qw/
     billingAddress
     currencyCode
     customerId
-    defaultAdsCoverage
+    defaultNetworkTargeting
     descriptiveName
     emailPromotionsPreferences
     languagePreference
     primaryAddress
     primaryBusinessCategory
-    termsAndConditions
     timeZoneEffectiveDate
     timeZoneId
     /;

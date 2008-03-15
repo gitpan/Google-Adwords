@@ -5,7 +5,6 @@ use warnings;
 use version; our $VERSION = qv('0.2');
 
 use base 'Google::Adwords::Service';
-use Date::Manip;
 
 use Google::Adwords::AdGroup;
 use Google::Adwords::StatsRecord;
@@ -35,48 +34,21 @@ sub addAdGroup
     {
         die "adgroup object must be specified.";
     }
-    if (    ( not defined $adgroup->maxCpc )
-        and ( not defined $adgroup->maxCpm ) )
-    {
-        die "adgroup must have either maxCpm or maxCpc set.";
-    }
 
     my @adgroup_params;
 
-    # adgroup name
-    if ( defined $adgroup->name )
+    for (
+        qw/
+        keywordContentMaxCpc keywordMaxCpc name siteMaxCpm
+        status
+        /
+        )
     {
-        push @adgroup_params,
-            SOAP::Data->name( 'name' => $adgroup->name )->type('');
-    }
-
-    # status
-    if ( defined $adgroup->status )
-    {
-        push @adgroup_params,
-            SOAP::Data->name( 'status' => $adgroup->status )->type('');
-    }
-
-    # maxContentCpc
-    if ( defined $adgroup->maxContentCpc )
-    {
-        push @adgroup_params,
-            SOAP::Data->name( 'maxContentCpc' => $adgroup->maxContentCpc )
-            ->type('');
-    }
-
-    # maxCpc
-    if ( defined $adgroup->maxCpc )
-    {
-        push @adgroup_params,
-            SOAP::Data->name( 'maxCpc' => $adgroup->maxCpc )->type('');
-    }
-
-    # maxCpm
-    if ( defined $adgroup->maxCpm )
-    {
-        push @adgroup_params,
-            SOAP::Data->name( 'maxCpm' => $adgroup->maxCpm )->type('');
+        if ( defined $adgroup->$_ )
+        {
+            push @adgroup_params,
+                SOAP::Data->name( $_ => $adgroup->$_ )->type('');
+        }
     }
 
     my @params;
@@ -127,56 +99,26 @@ sub addAdGroupList
         die "campaignId should be set.";
     }
 
-    for ( @{$adgroups_to_add_ref} )
-    {
-        if ( ( not defined $_->maxCpc ) and ( not defined $_->maxCpm ) )
-        {
-            die "adgroup must have either maxCpm or maxCpc set.";
-        }
-    }
-
     my @params;
     push @params,
         SOAP::Data->name('campaignID')->value($campaignId)->type('');
 
-    for my $adgroup ( @{$adgroups_to_add_ref} )
+    foreach my $adgroup ( @{$adgroups_to_add_ref} )
     {
         my @adgroup_params;
 
-        # adgroup name
-        if ( defined $adgroup->name )
+        for (
+            qw/
+            keywordContentMaxCpc keywordMaxCpc name siteMaxCpm
+            status
+            /
+            )
         {
-            push @adgroup_params,
-                SOAP::Data->name( 'name' => $adgroup->name )->type('');
-        }
-
-        # status
-        if ( defined $adgroup->status )
-        {
-            push @adgroup_params,
-                SOAP::Data->name( 'status' => $adgroup->status )->type('');
-        }
-
-        # maxContentCpc
-        if ( defined $adgroup->maxContentCpc )
-        {
-            push @adgroup_params,
-                SOAP::Data->name( 'maxContentCpc' => $adgroup->maxContentCpc )
-                ->type('');
-        }
-
-        # maxCpc
-        if ( defined $adgroup->maxCpc )
-        {
-            push @adgroup_params,
-                SOAP::Data->name( 'maxCpc' => $adgroup->maxCpc )->type('');
-        }
-
-        # maxCpm
-        if ( defined $adgroup->maxCpm )
-        {
-            push @adgroup_params,
-                SOAP::Data->name( 'maxCpm' => $adgroup->maxCpm )->type('');
+            if ( defined $adgroup->$_ )
+            {
+                push @adgroup_params,
+                    SOAP::Data->name( $_ => $adgroup->$_ )->type('');
+            }
         }
 
         push @params,
@@ -397,40 +339,18 @@ sub updateAdGroup
     # adgroup id
     push @adgroup_params, SOAP::Data->name( 'id' => $adgroup->id )->type('');
 
-    # adgroup name
-    if ( defined $adgroup->name )
+    for (
+        qw/
+        keywordContentMaxCpc keywordMaxCpc name siteMaxCpm
+        status
+        /
+        )
     {
-        push @adgroup_params,
-            SOAP::Data->name( 'name' => $adgroup->name )->type('');
-    }
-
-    # status
-    if ( defined $adgroup->status )
-    {
-        push @adgroup_params,
-            SOAP::Data->name( 'status' => $adgroup->status )->type('');
-    }
-
-    # maxCpc
-    if ( defined $adgroup->maxCpc )
-    {
-        push @adgroup_params,
-            SOAP::Data->name( 'maxCpc' => $adgroup->maxCpc )->type('');
-    }
-
-    # maxContentCpc
-    if ( defined $adgroup->maxContentCpc )
-    {
-        push @adgroup_params,
-            SOAP::Data->name( 'maxContentCpc' => $adgroup->maxContentCpc )
-            ->type('');
-    }
-
-    # maxCpm
-    if ( defined $adgroup->maxCpm )
-    {
-        push @adgroup_params,
-            SOAP::Data->name( 'maxCpm' => $adgroup->maxCpm )->type('');
+        if ( defined $adgroup->$_ )
+        {
+            push @adgroup_params,
+                SOAP::Data->name( $_ => $adgroup->$_ )->type('');
+        }
     }
 
     my @params;
@@ -474,7 +394,7 @@ sub updateAdGroupList
 
     my @params;
 
-    for my $adgroup (@adgroups)
+    foreach my $adgroup (@adgroups)
     {
 
         my @adgroup_params;
@@ -483,32 +403,18 @@ sub updateAdGroupList
         push @adgroup_params,
             SOAP::Data->name( 'id' => $adgroup->id )->type('');
 
-        # adgroup name
-        if ( defined $adgroup->name )
+        for (
+            qw/
+            keywordContentMaxCpc keywordMaxCpc name siteMaxCpm
+            status
+            /
+            )
         {
-            push @adgroup_params,
-                SOAP::Data->name( 'name' => $adgroup->name )->type('');
-        }
-
-        # status
-        if ( defined $adgroup->status )
-        {
-            push @adgroup_params,
-                SOAP::Data->name( 'status' => $adgroup->status )->type('');
-        }
-
-        # maxCpc
-        if ( defined $adgroup->maxCpc )
-        {
-            push @adgroup_params,
-                SOAP::Data->name( 'maxCpc' => $adgroup->maxCpc )->type('');
-        }
-
-        # maxCpm
-        if ( defined $adgroup->maxCpm )
-        {
-            push @adgroup_params,
-                SOAP::Data->name( 'maxCpm' => $adgroup->maxCpm )->type('');
+            if ( defined $adgroup->$_ )
+            {
+                push @adgroup_params,
+                    SOAP::Data->name( $_ => $adgroup->$_ )->type('');
+            }
         }
 
         push @params, SOAP::Data->name(

@@ -2,11 +2,13 @@ package Google::Adwords::EmailPromotionsPreferences;
 use strict;
 use warnings;
 
-use version; our $VERSION = qv('0.0.1');
+use version; our $VERSION = qv('0.2');
 
 use base 'Google::Adwords::Data';
 
 my @fields = qw/
+    accountPerformanceEnabled
+    disapprovedAdsEnabled
     marketResearchEnabled
     newsletterEnabled
     promotionsEnabled

@@ -1,13 +1,13 @@
-package Google::Adwords::CityTargets;
+package Google::Adwords::ProximityTargets;
 use strict;
 use warnings;
 
-use version; our $VERSION = qv('0.0.1');
+use version; our $VERSION = qv('0.1');
 
 use base 'Google::Adwords::Data';
 
 my @fields = qw/
-    _cities
+    _circles
     /;
 
 __PACKAGE__->mk_accessors(@fields);
@@ -34,8 +34,8 @@ sub new
     }
 } # end sub new
 
-# cities should always return an array ref
-sub cities
+# circles should always return an array ref
+sub circles
 {
     my $self = shift;
 
@@ -56,11 +56,11 @@ sub cities
             }
         }
 
-        $self->set( '_cities', $put_ref );
+        $self->set( '_circles', $put_ref );
     } # end if (@_)
 
-    return $self->get('_cities');
-} # end sub cities
+    return $self->get('_circles');
+} # end sub circles
 
 1;
 
@@ -68,21 +68,23 @@ sub cities
 
 =head1 NAME
  
-Google::Adwords::CityTargets - Contains city targets
+Google::Adwords::CountryTargets - Contains country targets
+ 
  
 =head1 SYNOPSIS
  
-    use Google::Adwords::CityTargets;
+    use Google::Adwords::CountryTargets;
 
-    my $targets = Google::Adwords::CityTargets->new();
-    $targets->cities([ 'Adelaide, SA AU' ]);
+    my $targets = Google::Adwords::CountryTargets->new();
+    $targets->countries([ 'US', 'IN' ]);
 
 
 =head1 METHODS 
  
 B<Mutators (read/write)>
 
-* cities
+* countries
+
 
 =head1 SEE ALSO
 

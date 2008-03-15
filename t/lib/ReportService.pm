@@ -15,6 +15,7 @@ my %tests = (
     z3_getGzipReportDownloadUrl => 0,
     z2_getReportJobStatus       => 1,
     z0_scheduleReportJob        => 1,
+    z0_validateReportJob        => 0,
 );
 
 sub start_of_each_test : Test(setup)
@@ -234,16 +235,19 @@ sub z0_scheduleReportJob : Test(no_plan)
     if ( $self->{sandbox} )
     {
 
-        my $job = Google::Adwords::ReportJob->new->startDay('2007-02-25')
-            ->endDay('2007-02-27')->name('test')->aggregationType('Summary');
+        my $job = Google::Adwords::ReportJob->new();
 
-        my $job_id
-            = $self->{obj}->scheduleReportJob( 'AccountReportJob', $job );
+        $job->selectedReportType('Keyword');
+        $job->aggregationTypes(qw/Summary/);
+        $job->selectedColumns(qw/Campaign AdGroup Keyword/);
+        $job->keywordType('Broad');
+
+        my $job_id = $self->{obj}->scheduleReportJob($job);
         ok( $job_id =~ /\d+/, 'scheduleReportJob id: ' . $job_id );
 
         # save for further use
         $self->{_job_id} = $job_id;
-    }
+    } # end if ( $self->{sandbox} ...
     else
     {
         my $soap = Test::MockModule->new('SOAP::Lite');
@@ -262,16 +266,75 @@ EOF
             }
         );
 
-        my $job = Google::Adwords::ReportJob->new->startDay('2006-08-01')
-            ->endDay('2006-08-01')->name('test')->aggregationType('Summary');
+        my $job = Google::Adwords::ReportJob->new();
 
-        my $job_id
-            = $self->{obj}->scheduleReportJob( 'AccountReportJob', $job );
+        $job->selectedReportType('Keyword');
+        $job->aggregationTypes(qw/Summary/);
+        $job->selectedColumns(qw/Campaign AdGroup Keyword/);
+        $job->keywordType('Broad');
+
+        my $job_id = $self->{obj}->scheduleReportJob($job);
         ok( $job_id eq '1935158656', 'scheduleReportJob' );
 
     }
 
 } # end sub z0_scheduleReportJob :
 
+sub z0_validateReportJob : Test(no_plan)
+{
+    my $self = shift;
+
+    $sub_name = ( caller 0 )[3];
+    $sub_name =~ s/^.+:://;
+    if ( not $tests{$sub_name} )
+    {
+        return;
+    }
+
+    if ( $self->{sandbox} )
+    {
+
+        my $job = Google::Adwords::ReportJob->new();
+
+        $job->selectedReportType('Keyword');
+        $job->aggregationTypes(qw/Summary/);
+        $job->selectedColumns(qw/Campaign AdGroup Keyword/);
+        $job->keywordType('Broad');
+
+        my $job_id = $self->{obj}->validateReportJob($job);
+
+    }
+    else
+    {
+        my $soap = Test::MockModule->new('SOAP::Lite');
+        $soap->mock(
+            call => sub {
+                my $xml .= <<'EOF';
+  <validateReportJobResponse
+xmlns="https://adwords.google.com/api/adwords/v6">
+   <validateReportJobReturn></validateReportJobReturn>
+  </validateReportJobResponse>
+EOF
+
+                $xml = $self->gen_full_response($xml);
+                my $env = SOAP::Deserializer->deserialize($xml);
+                return $env;
+            }
+        );
+
+        my $job = Google::Adwords::ReportJob->new();
+
+        $job->selectedReportType('Keyword');
+        $job->aggregationTypes(qw/Summary/);
+        $job->selectedColumns(qw/Campaign AdGroup Keyword/);
+        $job->keywordType('Broad');
+
+        my $job_id = $self->{obj}->validateReportJob($job);
+
+        #ok( $job_id eq '1935158656', 'scheduleReportJob' );
+
+    }
+
+} # end sub z0_validateReportJob :
 1;
 

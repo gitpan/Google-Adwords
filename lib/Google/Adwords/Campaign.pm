@@ -10,104 +10,18 @@ my @fields = qw/
     budgetOptimizerSettings
     dailyBudget
     enableSeparateContentBids
-    id
-    name
-    status
-    startDay
     endDay
-    languageTargeting
     geoTargeting
+    id
+    languageTargeting
+    name
     networkTargeting
     schedule
+    startDay
+    status
     /;
 
 __PACKAGE__->mk_accessors(@fields);
-
-sub new
-{
-    my $proto = shift;
-
-    my $class = ref $proto || $proto;
-
-    if (@_)
-    {
-        my $obj     = $class->SUPER::new();
-        my $hashref = shift;
-        for ( keys %{$hashref} )
-        {
-            $obj->$_( $hashref->{$_} );
-        }
-        return $obj;
-    }
-    else
-    {
-        return $class->SUPER::new();
-    }
-} # end sub new
-
-sub languageTargeting
-{
-    my $self = shift;
-
-    my $sub_name = ( caller 0 )[3];
-
-    # if its a get
-    if ( not @_ )
-    {
-        my $lang_ref = $self->get($sub_name);
-
-        # check if not array ref
-        for ( keys %{$lang_ref} )
-        {
-            if ( ( ref $lang_ref->{$_} ) ne 'ARRAY' )
-            {
-
-                #my @langs = split /, ?/, $lang_ref->{$_};
-                $lang_ref->{$_} = [ $lang_ref->{$_} ];
-            }
-        }
-        return $lang_ref;
-    } # end if ( not @_ )
-    else
-    {
-
-        # set
-        $self->set( $sub_name, @_ );
-        return $self;
-    }
-} # end sub languageTargeting
-
-sub networkTargeting
-{
-    my $self = shift;
-
-    my $sub_name = ( caller 0 )[3];
-
-    # if its a get
-    if ( not @_ )
-    {
-        my $lang_ref = $self->get($sub_name);
-
-        # check if not array ref
-        for ( keys %{$lang_ref} )
-        {
-            if ( ( ref $lang_ref->{$_} ) ne 'ARRAY' )
-            {
-
-                #my @langs = split /, ?/, $lang_ref->{$_};
-                $lang_ref->{$_} = [ $lang_ref->{$_} ];
-            }
-        }
-        return $lang_ref;
-    } # end if ( not @_ )
-    else
-    {
-
-        # set
-        $self->set( $sub_name, @_ );
-        return $self;
-    }
-} # end sub networkTargeting
 
 1;
 

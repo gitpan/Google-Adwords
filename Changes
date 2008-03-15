@@ -1,5 +1,19 @@
 Revision history for Perl module Google::Adwords
 
+v1.8    Sat Mar 15 19:02:47 IST 2008
+    - works only with version v11 of the Adwords API 
+    - All data object methods now return an array ref where expected. You can
+      set the data using an array or array ref but the method will always
+      return an array ref
+    - Google::Adwords::LanguageTarget and *::NetworkTarget added
+    - Google::Adwords::ProximityTargets and *::Circle added
+    - changed accessor names for Google::Adwords::AdGroup
+    - ReportService will always use the DefinedReportJob type
+    - TrafficEstimatorService.checkKeywordTraffic() method added
+    - ReportService.validateReportJob() added
+    - Google::Adwords::KeywordTrafficRequest added
+    - Removed CreativeService.pm and Creative.pm 
+
 v1.5    Tue Sep  4 18:01:04 IST 2007
     - support for v10 of the Adwords API
     - All methods which use geoTargeting now use the

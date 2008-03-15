@@ -9,6 +9,11 @@ use Google::Adwords::CityTargets;
 use Google::Adwords::CountryTargets;
 use Google::Adwords::AdSchedule;
 use Google::Adwords::SchedulingInterval;
+use Google::Adwords::BudgetOptimizerSettings;
+use Google::Adwords::ProximityTargets;
+use Google::Adwords::Circle;
+use Google::Adwords::LanguageTarget;
+use Google::Adwords::NetworkTarget;
 
 use Data::Dumper;
 
@@ -17,7 +22,6 @@ sub test_class { return "Google::Adwords::CampaignService"; }
 # tests to be run
 my %tests = (
     addCampaign            => 1,
-    addCampaign_schedule   => 1,
     addCampaignList        => 1,
     getAllAdWordsCampaigns => 1,
     getCampaign            => 1,
@@ -52,6 +56,13 @@ sub addCampaign : Test(no_plan)
 
     #$campaign->name('Rohan Campaign');
     $campaign->dailyBudget(100000);
+    $campaign->enableSeparateContentBids('true');
+
+    # budget optimizer
+    my $budget_optimizer = Google::Adwords::BudgetOptimizerSettings->new();
+    $budget_optimizer->bidCeiling(1200);
+    $campaign->budgetOptimizerSettings($budget_optimizer);
+
     $campaign->languageTargeting( { languages => 'en', } );
 
     # geoTargeting
@@ -59,116 +70,30 @@ sub addCampaign : Test(no_plan)
     my $country_targets = Google::Adwords::CountryTargets->new();
     $country_targets->countries( [ 'US', 'IN' ] );
     $geo_target->countryTargets($country_targets);
+
+    # proximitytargets
+    my $proximity_targets = Google::Adwords::ProximityTargets->new();
+    my $circle            = Google::Adwords::Circle->new();
+    $circle->latitudeMicroDegrees(20);
+    $circle->longitudeMicroDegrees(40);
+    $circle->radiusMeters(1000);
+    $proximity_targets->circles($circle);
+    $geo_target->proximityTargets($proximity_targets);
+
+    # set the geo Target now
     $campaign->geoTargeting($geo_target);
 
-    #$campaign->network_targeting({
-    #    network_types => [ 'GoogleSearch' ],
-    #});
+    # languageTargeting
+    my $language_targets = Google::Adwords::LanguageTarget->new();
+    $language_targets->languages(qw/en fr/);
+    $campaign->languageTargeting($language_targets);
 
-    if ( $self->{'sandbox'} )
-    {
-        my $camp = $self->{'obj'}->addCampaign($campaign);
-        ok( $camp->dailyBudget == 100000, 'addCampaign' );
-        ok( $camp->id =~ /\d+/, 'addCampaign - id: ' . $camp->id );
+    # networkTargeting
+    my $network_targets = Google::Adwords::NetworkTarget->new();
+    $network_targets->networkTypes('GoogleSearch');
+    $campaign->networkTargeting($network_targets);
 
-        # save campaign id
-        $self->{_campaign_id} = $camp->id;
-
-        # save it for other test modules
-        $self->_set_campaign_id( $camp->id );
-    }
-
-    else
-    {
-
-        my $soap = Test::MockModule->new('SOAP::Lite');
-        $soap->mock(
-            call => sub {
-                my $xml .= <<'EOF';
-<addCampaignResponse xmlns="">
-   <ns1:addCampaignReturn xmlns:ns1="https://adwords.google.com/api/adwords/v4">
-    <ns1:dailyBudget>100000</ns1:dailyBudget>
-    <ns1:enableSeparateContentBids>false</ns1:enableSeparateContentBids>
-    <ns1:endDay>2011-01-01-05:00</ns1:endDay>
-    <ns1:geoTargeting xsi:nil="true"/>
-    <ns1:id>3987</ns1:id>
-    <ns1:languageTargeting>
-      <ns1:languages>en</ns1:languages>
-    </ns1:languageTargeting>
-    <ns1:name>Campaign #1</ns1:name>
-    <ns1:networkTargeting>
-     <ns1:networkTypes>SearchNetwork</ns1:networkTypes>
-     <ns1:networkTypes>ContentNetwork</ns1:networkTypes>
-    </ns1:networkTargeting>
-    <ns1:geoTargeting>
-     <ns1:targetAll>false</ns1:targetAll>
-     <ns1:countryTargets>
-      <ns1:countries>US</ns1:countries>
-     </ns1:countryTargets>
-     <ns1:regionTargets xsi:nil="true"/>
-     <ns1:metroTargets xsi:nil="true"/>
-     <ns1:cityTargets xsi:nil="true"/>
-     <ns1:proximityTargets xsi:nil="true"/>
-    </ns1:geoTargeting>
-    <ns1:schedule>
-      <ns1:status>Disabled</ns1:status>
-    </ns1:schedule>
-    <ns1:startDay>2006-08-20-04:00</ns1:startDay>
-    <ns1:status>Active</ns1:status>
-   </ns1:addCampaignReturn>
-  </addCampaignResponse>
-EOF
-
-                $xml = $self->gen_full_response($xml);
-                my $env = SOAP::Deserializer->deserialize($xml);
-                return $env;
-            }
-        );
-
-        my $campaign_obj = $self->{'obj'}->addCampaign($campaign);
-        ok( $campaign_obj->id == 3987, 'campaign id' );
-        ok( $campaign_obj->name eq 'Campaign #1', 'campaign name' );
-        ok( $campaign_obj->enableSeparateContentBids eq 'false',
-            'enableSeparateContentBids' );
-        ok( $campaign_obj->dailyBudget == 100000, 'dailyBudget' );
-
-        my $lang_ref = $campaign_obj->languageTargeting;
-        ok( $lang_ref->{languages}[0] eq 'en', 'languageTargeting' );
-
-        ok( $campaign_obj->schedule->status eq 'Disabled',
-            'ad schedule disabled' );
-
-        my $geo_target = $campaign_obj->geoTargeting();
-
-        #die Dumper $geo_target;
-        ok( $geo_target->targetAll eq 'false', 'geoTarget targetAll' );
-        isa_ok( $geo_target->countryTargets,
-            'Google::Adwords::CountryTargets' );
-
-        #ok (ref $geo_target->countryTargets->countries eq 'ARRAY',
-        #'geoTarget (countries)');
-
-    }
-
-} # end sub addCampaign :
-
-sub addCampaign_schedule : Test(no_plan)
-{
-    my $self = shift;
-
-    $sub_name = ( caller 0 )[3];
-    $sub_name =~ s/^.+:://;
-    if ( not $tests{$sub_name} )
-    {
-        return;
-    }
-
-    my $campaign = Google::Adwords::Campaign->new();
-
-    #$campaign->name('Rohan Campaign');
-    $campaign->dailyBudget(100000);
-    $campaign->languageTargeting( { languages => 'en', } );
-
+    # ad schedule
     # ad schedule
     my $schedule1 = Google::Adwords::SchedulingInterval->new();
     $schedule1->day('Monday')->startHour(1)->endHour(10)->multiplier(1);
@@ -176,7 +101,6 @@ sub addCampaign_schedule : Test(no_plan)
     my $ad_schedule = Google::Adwords::AdSchedule->new();
     $ad_schedule->status('Enabled');
     $ad_schedule->intervals( \@intervals );
-
     $campaign->schedule($ad_schedule);
 
     if ( $self->{'sandbox'} )
@@ -200,16 +124,39 @@ sub addCampaign_schedule : Test(no_plan)
             call => sub {
                 my $xml .= <<'EOF';
 <addCampaignResponse xmlns="">
-   <ns1:addCampaignReturn xmlns:ns1="https://adwords.google.com/api/adwords/v4">
+   <ns1:addCampaignReturn xmlns:ns1="https://adwords.google.com/api/adwords/v11">
+    <ns1:budgetOptimizerSettings>
+     <ns1:enabled>false</ns1:enabled>
+    </ns1:budgetOptimizerSettings>
     <ns1:dailyBudget>100000</ns1:dailyBudget>
-    <ns1:enableSeparateContentBids>false</ns1:enableSeparateContentBids>
-    <ns1:endDay>2011-01-01-05:00</ns1:endDay>
-    <ns1:geoTargeting xsi:nil="true"/>
-    <ns1:id>3987</ns1:id>
+    <ns1:enableSeparateContentBids>true</ns1:enableSeparateContentBids>
+    <ns1:endDay>2037-12-30-05:00</ns1:endDay>
+    <ns1:geoTargeting>
+     <ns1:targetAll>false</ns1:targetAll>
+     <ns1:countryTargets>
+      <ns1:countries>US</ns1:countries>
+      <ns1:countries>IN</ns1:countries>
+     </ns1:countryTargets>
+     <ns1:regionTargets xsi:nil="true"/>
+     <ns1:metroTargets xsi:nil="true"/>
+     <ns1:cityTargets xsi:nil="true"/>
+     <ns1:proximityTargets>
+      <ns1:circles>
+       <ns1:longitudeMicroDegrees>40</ns1:longitudeMicroDegrees>
+       <ns1:latitudeMicroDegrees>20</ns1:latitudeMicroDegrees>
+       <ns1:radiusMeters>1000</ns1:radiusMeters>
+      </ns1:circles>
+     </ns1:proximityTargets>
+    </ns1:geoTargeting>
+    <ns1:id>4143</ns1:id>
     <ns1:languageTargeting>
-      <ns1:languages>en</ns1:languages>
+     <ns1:languages>en</ns1:languages>
+     <ns1:languages>fr</ns1:languages>
     </ns1:languageTargeting>
-    <ns1:name>Campaign #1</ns1:name>
+    <ns1:name>Campaign #5</ns1:name>
+    <ns1:networkTargeting>
+     <ns1:networkTypes>GoogleSearch</ns1:networkTypes>
+    </ns1:networkTargeting>
     <ns1:schedule>
      <ns1:intervals>
       <ns1:day>Monday</ns1:day>
@@ -221,11 +168,7 @@ sub addCampaign_schedule : Test(no_plan)
      </ns1:intervals>
      <ns1:status>Enabled</ns1:status>
     </ns1:schedule>
-    <ns1:networkTargeting>
-     <ns1:networkTypes>SearchNetwork</ns1:networkTypes>
-     <ns1:networkTypes>ContentNetwork</ns1:networkTypes>
-    </ns1:networkTargeting>
-    <ns1:startDay>2006-08-20-04:00</ns1:startDay>
+    <ns1:startDay>2008-03-14-04:00</ns1:startDay>
     <ns1:status>Active</ns1:status>
    </ns1:addCampaignReturn>
   </addCampaignResponse>
@@ -238,26 +181,40 @@ EOF
         );
 
         my $campaign_obj = $self->{'obj'}->addCampaign($campaign);
-        ok( $campaign_obj->id == 3987, 'campaign id' );
-        ok( $campaign_obj->name eq 'Campaign #1', 'campaign name' );
-        ok( $campaign_obj->enableSeparateContentBids eq 'false',
-            'enableSeparateContentBids' );
-        ok( $campaign_obj->dailyBudget == 100000, 'dailyBudget' );
 
-        # Ad Schedule
+        ok( $campaign_obj->budgetOptimizerSettings->enabled eq 'false',
+            'addCampaign, budgetOptimizerSettings' );
+
+        ok(
+            $campaign_obj->geoTargeting->countryTargets->countries->[0] eq
+                'US',
+            'addCampaign geoTargeting, countryTargets'
+        );
+
+        ok(
+            $campaign_obj->geoTargeting->proximityTargets->circles->[0]
+                ->radiusMeters eq '1000',
+            'addCampaign geoTargeting, proximityTargets'
+        );
+
+        ok( $campaign_obj->languageTargeting->languages->[0] eq 'en',
+            'addCampaign languageTargeting' );
+
+        ok(
+            $campaign_obj->networkTargeting->networkTypes->[0] eq
+                'GoogleSearch',
+            'addCampaign networkTargeting'
+        );
+
         ok( $campaign_obj->schedule->status eq 'Enabled',
-            'schedule status Enabled' );
-        my $intervals_ref = $campaign_obj->schedule->intervals;
+            'addCampaign, schedule' );
 
-        #die Dumper $intervals_ref;
-        ok( $intervals_ref->[0]->day eq 'Monday', 'interval' );
-
-        my $lang_ref = $campaign_obj->languageTargeting;
-        ok( $lang_ref->{languages}[0] eq 'en', 'languageTargeting' );
+        ok( $campaign_obj->schedule->intervals->[0]->day eq 'Monday',
+            'addCampaign, schedule, intervals, day' );
 
     }
 
-} # end sub addCampaign_schedule :
+} # end sub addCampaign :
 
 sub getAllAdWordsCampaigns : Test(no_plan)
 {
@@ -354,6 +311,8 @@ sub getCampaign : Test(no_plan)
 
     if ( $self->{sandbox} )
     {
+
+        #my $campaign = $self->{obj}->getCampaign( 4127 );
         my $campaign = $self->{obj}->getCampaign( $self->{_campaign_id} );
         ok(
             $campaign->id == $self->{_campaign_id},

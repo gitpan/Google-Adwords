@@ -15,6 +15,68 @@ use Google::Adwords::CityTargets;
 use Google::Adwords::CountryTargets;
 use Google::Adwords::MetroTargets;
 use Google::Adwords::RegionTargets;
+use Google::Adwords::KeywordTrafficRequest;
+
+### CLASS METHOD/INSTANCE METHOD/INTERFACE SUB/INTERNAL UTILITY ###
+# Usage      : ????
+# Purpose    : ????
+# Returns    : ????
+# Parameters : ????
+# Throws     : no exceptions
+# Comments   : none
+# See Also   : n/a
+#######################################################################
+sub checkKeywordTraffic
+{
+    my ( $self, @k_t_reqs ) = @_;
+
+    my @params;
+
+    for (@k_t_reqs)
+    {
+        my @request_params;
+        if ( defined $_->keywordText )
+        {
+            push @request_params,
+                SOAP::Data->name( 'keywordText' => $_->keywordText )
+                ->type('');
+        }
+        if ( defined $_->keywordType )
+        {
+            push @request_params,
+                SOAP::Data->name( 'keywordType' => $_->keywordType )
+                ->type('');
+        }
+        if ( defined $_->language )
+        {
+            push @request_params,
+                SOAP::Data->name( 'language' => $_->language )->type('');
+        }
+
+        push @params, SOAP::Data->name(
+            'requests' => \SOAP::Data->value(@request_params) )->type('');
+    } # end for (@k_t_reqs)
+
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'TrafficEstimatorService',
+            method  => 'checkKeywordTraffic',
+            params  => \@params,
+        }
+    );
+
+    # get response data in a hash
+    my @data;
+    foreach my $c (
+        $result->valueof(
+            "//checkKeywordTrafficResponse/checkKeywordTrafficReturn")
+        )
+    {
+        push @data, $c;
+    }
+
+    return @data;
+} # end sub checkKeywordTraffic
 
 ### INSTANCE METHOD ################################################
 # Usage      :

@@ -10,11 +10,13 @@ use Google::Adwords::CampaignRequest;
 use Google::Adwords::GeoTarget;
 use Google::Adwords::CityTargets;
 use Google::Adwords::CountryTargets;
+use Google::Adwords::KeywordTrafficRequest;
 
 sub test_class { return "Google::Adwords::TrafficEstimatorService"; }
 
 # tests to run
 my %tests = (
+    checkKeywordTraffic  => 1,
     estimateAdGroupList  => 1,
     estimateCampaignList => 1,
     estimateKeywordList  => 1,
@@ -27,6 +29,59 @@ sub start_of_each_test : Test(setup)
     # set debug to whatever was passed in as param
     $self->{obj}->debug( $self->{debug} );
 }
+
+sub checkKeywordTraffic : Test(no_plan)
+{
+    my $self = shift;
+
+    $sub_name = ( caller 0 )[3];
+    $sub_name =~ s/^.+:://;
+    if ( not $tests{$sub_name} )
+    {
+        return;
+    }
+
+    my $k_t_req = Google::Adwords::KeywordTrafficRequest->new();
+    $k_t_req->keywordText('proxy server');
+    $k_t_req->keywordType('Broad');
+
+    if ( $self->{sandbox} )
+    {
+
+        my @ret = $self->{obj}->checkKeywordTraffic($k_t_req);
+        for (@ret)
+        {
+            ok( $_ =~ /\w+/, 'checkKeywordTraffic' );
+        }
+
+    }
+    else
+    {
+        my $soap = Test::MockModule->new('SOAP::Lite');
+        $soap->mock(
+            call => sub {
+                my $xml .= <<'EOF';
+<checkKeywordTrafficResponse xmlns="">
+   <ns1:checkKeywordTrafficReturn
+   xmlns:ns1="https://adwords.google.com/api/adwords/v11">HasTraffic</ns1:checkKeywordTrafficReturn>
+     </checkKeywordTrafficResponse>
+EOF
+
+                $xml = $self->gen_full_response($xml);
+                my $env = SOAP::Deserializer->deserialize($xml);
+                return $env;
+            }
+        );
+
+        my @ret = $self->{obj}->checkKeywordTraffic($k_t_req);
+        for (@ret)
+        {
+            ok( $_ =~ /\w+/, 'checkKeywordTraffic' );
+        }
+
+    }
+
+} # end sub checkKeywordTraffic :
 
 sub estimateAdGroupList : Test(no_plan)
 {

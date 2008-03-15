@@ -1,4 +1,4 @@
-Google-Adwords version 1.5
+Google-Adwords version 1.8
 ==========================
 
 This module provides an interface to the Google Adwords SOAP API.
@@ -35,7 +35,7 @@ AUTHORS
 
 COPYRIGHT AND LICENSE
 
-Copyright (C) 2006,2007 by Rohan Almeida <rohan@almeida.in>
+Copyright (C) 2006-2008 by Rohan Almeida <rohan@almeida.in>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

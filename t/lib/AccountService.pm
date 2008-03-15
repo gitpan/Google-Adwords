@@ -7,6 +7,7 @@ use Test::MockModule;
 use Google::Adwords::EmailPromotionsPreferences;
 use Google::Adwords::CreditCard;
 use Google::Adwords::Address;
+use Google::Adwords::NetworkTarget;
 use Data::Dumper;
 
 sub test_class { return "Google::Adwords::AccountService"; }
@@ -14,8 +15,8 @@ sub test_class { return "Google::Adwords::AccountService"; }
 # tests to run
 my %tests = (
     getAccountInfo    => 1,
-    getClientAccounts => 1,
-    updateAccountInfo => 1,
+    getClientAccounts => 0,
+    updateAccountInfo => 0,
 );
 
 sub start_of_each_test : Test(setup)
@@ -47,8 +48,24 @@ sub getAccountInfo : Test(no_plan)
                 $self->{obj}->clientEmail,
             'getAccountInfo'
         );
+        ok(
+            ref $account_info->defaultNetworkTargeting->networkTypes eq
+                'ARRAY',
+            'defaultNetworkTargeting'
+        );
+        ok(
+            $account_info->defaultNetworkTargeting->networkTypes->[0] eq
+                'GoogleSearch',
+            'defaultNetworkTargeting'
+        );
 
-    }
+        ok(
+            $account_info->emailPromotionsPreferences
+                ->accountPerformanceEnabled eq 'false',
+            'emailPromotionsPreferences'
+        );
+
+    } # end if ( $self->{sandbox} ...
     else
     {
 
@@ -56,17 +73,17 @@ sub getAccountInfo : Test(no_plan)
         $soap->mock(
             call => sub {
                 my $xml .= <<'EOF';
-  <getAccountInfoResponse xmlns="">
-   <ns1:getAccountInfoReturn
-xmlns:ns1="https://adwords.google.com/api/adwords/v6">
+<getAccountInfoResponse xmlns="">
+   <ns1:getAccountInfoReturn xmlns:ns1="https://adwords.google.com/api/adwords/v11">
     <ns1:currencyCode>INR</ns1:currencyCode>
-    <ns1:customerId>1133</ns1:customerId>
-    <ns1:defaultAdsCoverage>
-     <ns1:optInContentNetwork>true</ns1:optInContentNetwork>
-     <ns1:optInSearchNetwork>true</ns1:optInSearchNetwork>
-    </ns1:defaultAdsCoverage>
+    <ns1:customerId>2019</ns1:customerId>
+    <ns1:defaultNetworkTargeting>
+     <ns1:networkTypes>ContentNetwork</ns1:networkTypes>
+    </ns1:defaultNetworkTargeting>
     <ns1:descriptiveName></ns1:descriptiveName>
     <ns1:emailPromotionsPreferences>
+     <ns1:accountPerformanceEnabled>false</ns1:accountPerformanceEnabled>
+     <ns1:disapprovedAdsEnabled>false</ns1:disapprovedAdsEnabled>
      <ns1:marketResearchEnabled>false</ns1:marketResearchEnabled>
      <ns1:newsletterEnabled>false</ns1:newsletterEnabled>
      <ns1:promotionsEnabled>false</ns1:promotionsEnabled>
@@ -85,8 +102,7 @@ xmlns:ns1="https://adwords.google.com/api/adwords/v6">
      <ns1:postalCode></ns1:postalCode>
      <ns1:state></ns1:state>
     </ns1:primaryAddress>
-    <ns1:termsAndConditions>http://www.google.com/apis/adwords/terms.html</ns1:termsAndConditions>
-    <ns1:timeZoneEffectiveDate>1158321517000</ns1:timeZoneEffectiveDate>
+    <ns1:timeZoneEffectiveDate>1205415885000</ns1:timeZoneEffectiveDate>
     <ns1:timeZoneId>America/New_York</ns1:timeZoneId>
    </ns1:getAccountInfoReturn>
   </getAccountInfoResponse>
@@ -101,9 +117,7 @@ EOF
         my $account_info = $self->{obj}->getAccountInfo();
 
         ok( $account_info->currencyCode eq 'INR', 'getAccountInfo' );
-        ok( $account_info->customerId == 1133, 'getAccountInfo' );
-        ok( $account_info->defaultAdsCoverage->optInSearchNetwork eq 'true',
-            'getAccountInfo' );
+        ok( $account_info->customerId == 2019, 'getAccountInfo' );
         ok(
             $account_info->emailPromotionsPreferences->newsletterEnabled eq
                 'false',
@@ -113,6 +127,11 @@ EOF
             $account_info->primaryAddress->emailAddress eq
                 'client_1+rohan.almeida@gmail.com',
             'getAccountInfo'
+        );
+        ok(
+            ref $account_info->defaultNetworkTargeting->networkTypes eq
+                'ARRAY',
+            'defaultNetworkTargeting'
         );
 
     }
@@ -133,7 +152,7 @@ sub getClientAccounts : Test(no_plan)
     if ( $self->{sandbox} )
     {
 
-        #my @emails = $self->{obj}->getClientAccounts();
+        my @emails = $self->{obj}->getClientAccounts();
 
         return;
     }
@@ -180,9 +199,17 @@ sub updateAccountInfo : Test(no_plan)
         $billing_address->addressLine1('Flat No');
         $billing_address->city('Mumbai');
 
-        $account_info->billingAddress($billing_address);
+        my $net_target = Google::Adwords::NetworkTarget->new();
+        $net_target->networkTypes( [qw/ GoogleSearch ContentNetwork /] );
 
-        #my $ret = $self->{obj}->updateAccountInfo($account_info);
+        #$account_info->billingAddress($billing_address);
+        my $email_promo = Google::Adwords::EmailPromotionsPreferences->new();
+        $email_promo->accountPerformanceEnabled('false');
+
+        $account_info->emailPromotionsPreferences($email_promo);
+        $account_info->defaultNetworkTargeting($net_target);
+
+        my $ret = $self->{obj}->updateAccountInfo($account_info);
 
         return;
 

@@ -34,7 +34,7 @@ sub addAdGroup : Test(no_plan)
     {
 
         my $adgroup = Google::Adwords::AdGroup->new();
-        $adgroup->maxCpc(100000);
+        $adgroup->keywordMaxCpc(100000);
         my $campaign_id = $self->_get_campaign_id();
         if ( not defined $campaign_id )
         {
@@ -81,7 +81,7 @@ EOF
         );
 
         my $adgroup = Google::Adwords::AdGroup->new();
-        $adgroup->maxCpc(100000);
+        $adgroup->keywordMaxCpc(100000);
         my $campaign_id = 4937;
 
         my $adgroup_response
@@ -126,9 +126,9 @@ sub addAdGroupList : Test(no_plan)
         my @adgroups_to_add;
 
         my $adgroup1 = Google::Adwords::AdGroup->new;
-        $adgroup1->maxCpc(300000);
+        $adgroup1->keywordMaxCpc(300000);
         my $adgroup2 = Google::Adwords::AdGroup->new;
-        $adgroup2->maxCpc(400000);
+        $adgroup2->keywordMaxCpc(400000);
 
         push @adgroups_to_add, $adgroup1, $adgroup2;
 
@@ -183,9 +183,9 @@ EOF
         my @adgroups_to_add;
 
         my $adgroup1 = Google::Adwords::AdGroup->new;
-        $adgroup1->maxCpc(300000);
+        $adgroup1->keywordMaxCpc(300000);
         my $adgroup2 = Google::Adwords::AdGroup->new;
-        $adgroup2->maxCpc(400000);
+        $adgroup2->keywordMaxCpc(400000);
 
         push @adgroups_to_add, $adgroup1, $adgroup2;
 
@@ -405,8 +405,8 @@ sub getAdGroupStats : Test(no_plan)
                 campaignId => $campaign_id,
                 adGroupIds =>
                     [ $self->{_adgroup_id_0}, $self->{_adgroup_id_1}, ],
-                startDay => '2006-12-01',
-                endDay   => '2006-12-15',
+                startDay => '2008-02-01',
+                endDay   => '2008-02-15',
                 inPST    => 1,
             }
         );
@@ -515,7 +515,7 @@ EOF
 
         my $adgroup = Google::Adwords::AdGroup->new;
         $adgroup->id(1001);
-        $adgroup->maxCpc(5000000);
+        $adgroup->keywordMaxCpc(5000000);
 
         my $ret = $self->{obj}->updateAdGroup($adgroup);
 
@@ -572,10 +572,10 @@ EOF
 
         my $adgroup1 = Google::Adwords::AdGroup->new;
         $adgroup1->id(1001);
-        $adgroup1->maxCpc(5000000);
+        $adgroup1->keywordMaxCpc(5000000);
         my $adgroup2 = Google::Adwords::AdGroup->new;
         $adgroup2->id(1002);
-        $adgroup2->maxCpc(5000000);
+        $adgroup2->keywordMaxCpc(5000000);
 
         my @adgroups;
         push @adgroups, $adgroup1, $adgroup2;

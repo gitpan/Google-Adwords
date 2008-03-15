@@ -12,10 +12,10 @@ sub test_class { return "Google::Adwords::CriterionService"; }
 my %tests = (
     addCriteria                 => 1,
     getAllCriteria              => 1,
-    getCampaignNegativeCriteria => 0,
+    getCampaignNegativeCriteria => 1,
     getCriteria                 => 1,
     getCriterionStats           => 1,
-    setCampaignNegativeCriteria => 0,
+    setCampaignNegativeCriteria => 1,
     updateCriteria              => 1,
 );
 
@@ -43,7 +43,7 @@ sub addCriteria : Test(no_plan)
 
         my $adgroup_id = $self->_get_adgroup_id();
 
-        #$adgroup_id = 3457;
+        #$adgroup_id = 10101;
 
         my $criterion1 = Google::Adwords::Criterion->new;
         $criterion1->adGroupId($adgroup_id);
