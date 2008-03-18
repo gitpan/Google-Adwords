@@ -2,7 +2,7 @@ package Google::Adwords;
 use strict;
 use warnings;
 
-use version; our $VERSION = qv('1.8');
+use version; our $VERSION = qv('1.8.1');
 
 1;
 
@@ -15,7 +15,7 @@ Google::Adwords - an interface which abstracts the Google Adwords SOAP API
  
 =head1 VERSION
  
-This documentation refers to Google::Adwords version 1.8
+This documentation refers to Google::Adwords version 1.8.1
  
 
 =head1 API VERSION
@@ -189,6 +189,14 @@ B<Many services need to deal with complex data types which are available as obje
  
 * SOAP::Lite
  
+* Crypt::SSLeay
+
+* Class::Accessor::Chained
+
+* Date::Manip
+
+* HTML::Entities
+
 =head1 THANKS
 
 * The Yahoo::Marketing module on which this module draws heavily from

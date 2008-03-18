@@ -29,30 +29,17 @@ my @modules = (
     { KeywordToolService      => 1, },
 );
 
-# check if user wants to run sandbox tests
-my $answer = prompt "Do you want to run the sandbox tests? (y/n): ";
+# skip the sandbox tests for "make test".
+# if you want to run the sandbox tests, comment out the following 
+# two lines, and fill in your login details below that
+ok( 1 == 1 );
+exit;
 
-if ( $answer ne 'y' ) {
-    ok( 1 == 1 );
-    exit;
-}
-
-my $email      = prompt "Your gmail address: ";
-my $password   = prompt "-e", '*', "Your password: ";
-my $currency   = prompt "Your currence code (3 digit): ";
-my $client_num = prompt "Which client email number to use (1,2,3,4,5): ";
-$email      = $email->{value};
-$password   = $password->{value};
-$currency   = $currency->{value};
-$client_num = $client_num->{value};
-
-=head1
 # test values during development
 my $email = '';
 my $password = '';
 my $currency = 'INR';
 my $client_num = '2';
-=cut
 
 my $params_ref = {
     sandbox        => 1,
