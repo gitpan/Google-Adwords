@@ -10,12 +10,15 @@ use Google::Adwords::Criterion;
 use Google::Adwords::StatsRecord;
 
 use Google::Adwords::ApiError;
+
+use Google::Adwords::LanguageTarget;
 use Google::Adwords::GeoTarget;
 use Google::Adwords::CityTargets;
 use Google::Adwords::CountryTargets;
 use Google::Adwords::MetroTargets;
 use Google::Adwords::RegionTargets;
 use Google::Adwords::ProximityTargets;
+use Google::Adwords::Circle;
 
 ### INTERNAL UTILITY ###############################################
 # Usage      : @params = $self->_create_request_params($obj);

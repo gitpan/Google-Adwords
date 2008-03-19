@@ -9,17 +9,19 @@ use Date::Manip;
 
 # data types
 use Google::Adwords::Campaign;
+use Google::Adwords::BudgetOptimizerSettings;
 use Google::Adwords::GeoTarget;
 use Google::Adwords::CityTargets;
 use Google::Adwords::CountryTargets;
 use Google::Adwords::MetroTargets;
 use Google::Adwords::ProximityTargets;
+use Google::Adwords::Circle;
 use Google::Adwords::RegionTargets;
-use Google::Adwords::StatsRecord;
+use Google::Adwords::LanguageTarget;
+use Google::Adwords::NetworkTarget;
 use Google::Adwords::AdSchedule;
 use Google::Adwords::SchedulingInterval;
-use Google::Adwords::BudgetOptimizerSettings;
-use Google::Adwords::NetworkTarget;
+use Google::Adwords::StatsRecord;
 
 ### INTERNAL UTILITY ################################################
 # Usage      : @campaign_params = _create_campaign_params($campaign);

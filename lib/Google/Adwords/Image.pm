@@ -12,6 +12,7 @@ my @fields = qw/
     imageUrl
     mimeType
     name
+    shrunkenUrl
     thumbnailUrl
     type
     width

@@ -13,7 +13,6 @@ WriteMakefile(
         'Date::Manip'   => 0,
         'Test::Class'   => 0,
         'Test::More'    => 0,
-        'IO::Prompt'    => 0,
         'Test::MockModule'    => 0,
         'HTML::Entities'    => 0,
     }, 

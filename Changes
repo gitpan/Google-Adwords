@@ -1,5 +1,10 @@
 Revision history for Perl module Google::Adwords
 
+v1.8.2  Wed Mar 19 13:00:30 IST 2008
+    - load the required data modules implicitly in the *Service modules
+    - added shrunkenUrl accessor to Google::Adwords::Image
+    - removed dependency for IO::Prompt
+
 v1.8.1  Tue Mar 18 11:23:11 IST 2008
     - added dependency for Crypt::SSLeay
     - the live sandbox tests don't run by default

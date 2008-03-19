@@ -7,11 +7,11 @@ use version; our $VERSION = qv('0.2');
 use base 'Google::Adwords::Service';
 
 # data types
-use Google::Adwords::KeywordVariation;
 use Google::Adwords::KeywordVariations;
+use Google::Adwords::KeywordVariation;
 use Google::Adwords::SeedKeyword;
-use Google::Adwords::SiteKeyword;
 use Google::Adwords::SiteKeywordGroups;
+use Google::Adwords::SiteKeyword;
 
 ### INSTANCE METHOD ################################################
 # Usage      :

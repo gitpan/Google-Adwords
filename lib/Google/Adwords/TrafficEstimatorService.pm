@@ -7,15 +7,24 @@ use version; our $VERSION = qv('0.1.2');
 use base 'Google::Adwords::Service';
 
 # data types
-use Google::Adwords::KeywordEstimate;
+use Google::Adwords::KeywordTrafficRequest;
+use Google::Adwords::AdGroupRequest;
+use Google::Adwords::KeywordRequest;
 use Google::Adwords::AdGroupEstimate;
-use Google::Adwords::CampaignEstimate;
+use Google::Adwords::KeywordEstimate;
+use Google::Adwords::CampaignRequest;
 use Google::Adwords::GeoTarget;
 use Google::Adwords::CityTargets;
 use Google::Adwords::CountryTargets;
 use Google::Adwords::MetroTargets;
 use Google::Adwords::RegionTargets;
-use Google::Adwords::KeywordTrafficRequest;
+use Google::Adwords::ProximityTargets;
+use Google::Adwords::Circle;
+use Google::Adwords::LanguageTarget;
+use Google::Adwords::NetworkTarget;
+use Google::Adwords::CampaignEstimate;
+use Google::Adwords::KeywordRequest;
+
 
 ### CLASS METHOD/INSTANCE METHOD/INTERFACE SUB/INTERNAL UTILITY ###
 # Usage      : ????

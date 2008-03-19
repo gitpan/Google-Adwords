@@ -3,7 +3,6 @@ use strict;
 use warnings;
 
 use Test::More qw/ no_plan /;
-use IO::Prompt;
 
 use lib 't/lib';
 use InfoService;
@@ -39,7 +38,7 @@ exit;
 my $email = '';
 my $password = '';
 my $currency = 'INR';
-my $client_num = '2';
+my $client_num = '1';
 
 my $params_ref = {
     sandbox        => 1,
