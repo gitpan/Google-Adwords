@@ -6,7 +6,7 @@ WriteMakefile(
     NAME              => 'Google::Adwords',
     VERSION_FROM      => 'lib/Google/Adwords.pm', # finds $VERSION
     PREREQ_PM         => {
-        'SOAP::Lite'    => 0,
+        'SOAP::Lite'    => '0.66',
         'Crypt::SSLeay' => 0,
         'version'       => 0,
         'Readonly'      => 0,

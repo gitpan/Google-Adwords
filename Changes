@@ -1,5 +1,8 @@
 Revision history for Perl module Google::Adwords
 
+v1.9.1  Wed Apr  2 00:09:04 IST 2008
+    - requires SOAP::Lite >= 0.66
+
 v1.9    Tue Apr  1 02:51:13 IST 2008
     - bugfix: chained set accessor calls now work for all objects
     - bugfix: AdService.checkAds() and CriterionService.checkCriteria() don't
