@@ -57,6 +57,7 @@ sub regions
         }
 
         $self->set( '_regions', $put_ref );
+        return $self;
     } # end if (@_)
 
     return $self->get('_regions');

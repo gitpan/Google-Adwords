@@ -57,6 +57,7 @@ sub metros
         }
 
         $self->set( '_metros', $put_ref );
+        return $self;
     } # end if (@_)
 
     return $self->get('_metros');

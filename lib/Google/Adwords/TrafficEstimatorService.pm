@@ -25,7 +25,6 @@ use Google::Adwords::NetworkTarget;
 use Google::Adwords::CampaignEstimate;
 use Google::Adwords::KeywordRequest;
 
-
 ### CLASS METHOD/INSTANCE METHOD/INTERFACE SUB/INTERNAL UTILITY ###
 # Usage      : ????
 # Purpose    : ????

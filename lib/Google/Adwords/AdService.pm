@@ -2,7 +2,7 @@ package Google::Adwords::AdService;
 use strict;
 use warnings;
 
-use version; our $VERSION = qv('0.5');
+use version; our $VERSION = qv('0.6');
 
 use base 'Google::Adwords::Service';
 
@@ -521,15 +521,6 @@ sub checkAds
     my ( $self, $args_ref ) = @_;
 
     my @params;
-
-    # The Ads
-    foreach my $ad ( @{ $args_ref->{ads} } )
-    {
-        if ( not defined $ad->id )
-        {
-            die "id must be set for the Ad object\n";
-        }
-    }
 
     my @ads_params;
     foreach my $ad ( @{ $args_ref->{ads} } )

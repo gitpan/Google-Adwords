@@ -58,6 +58,7 @@ sub intervals
         }
 
         $self->set( '_intervals', $put_ref );
+        return $self;
     } # end if (@_)
 
     return $self->get('_intervals');

@@ -37,7 +37,7 @@ exit;
 # test values during development
 my $email = '';
 my $password = '';
-my $currency = 'INR';
+my $currency = '';
 my $client_num = '1';
 
 my $params_ref = {

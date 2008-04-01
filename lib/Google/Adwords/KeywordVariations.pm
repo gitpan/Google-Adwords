@@ -58,6 +58,7 @@ sub additionalToConsider
         }
 
         $self->set( '_additionalToConsider', $put_ref );
+        return $self;
     } # end if (@_)
 
     return $self->get('_additionalToConsider');
@@ -86,6 +87,7 @@ sub moreSpecific
         }
 
         $self->set( '_moreSpecific', $put_ref );
+        return $self;
     } # end if (@_)
 
     return $self->get('_moreSpecific');

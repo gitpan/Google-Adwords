@@ -57,6 +57,7 @@ sub networkTypes
         }
 
         $self->set( '_networkTypes', $put_ref );
+        return $self;
     } # end if (@_)
 
     return $self->get('_networkTypes');

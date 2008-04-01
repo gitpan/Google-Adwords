@@ -1,3 +1,4 @@
+require 5.008;
 use ExtUtils::MakeMaker;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
@@ -9,6 +10,7 @@ WriteMakefile(
         'Crypt::SSLeay' => 0,
         'version'       => 0,
         'Readonly'      => 0,
+        'Class::Accessor'  => 0,
         'Class::Accessor::Chained'  => 0,
         'Date::Manip'   => 0,
         'Test::Class'   => 0,

@@ -99,6 +99,7 @@ sub adGroups
         }
 
         $self->set( '_adGroups', $put_ref );
+        return $self;
     } # end if (@_)
 
     return $self->get('_adGroups');
@@ -126,6 +127,7 @@ sub adGroupStatuses
         }
 
         $self->set( '_adGroupStatuses', $put_ref );
+        return $self;
     } # end if (@_)
 
     return $self->get('_adGroupStatuses');
@@ -153,6 +155,7 @@ sub aggregationTypes
         }
 
         $self->set( '_aggregationTypes', $put_ref );
+        return $self;
     } # end if (@_)
 
     return $self->get('_aggregationTypes');
@@ -180,6 +183,7 @@ sub campaigns
         }
 
         $self->set( '_campaigns', $put_ref );
+        return $self;
     } # end if (@_)
 
     return $self->get('_campaigns');
@@ -207,6 +211,7 @@ sub campaignStatuses
         }
 
         $self->set( '_campaignStatuses', $put_ref );
+        return $self;
     } # end if (@_)
 
     return $self->get('_campaignStatuses');
@@ -234,6 +239,7 @@ sub clientEmails
         }
 
         $self->set( '_clientEmails', $put_ref );
+        return $self;
     } # end if (@_)
 
     return $self->get('_clientEmails');
@@ -261,6 +267,7 @@ sub keywords
         }
 
         $self->set( '_keywords', $put_ref );
+        return $self;
     } # end if (@_)
 
     return $self->get('_keywords');
@@ -288,6 +295,7 @@ sub keywordStatuses
         }
 
         $self->set( '_keywordStatuses', $put_ref );
+        return $self;
     } # end if (@_)
 
     return $self->get('_keywordStatuses');
@@ -315,6 +323,7 @@ sub selectedColumns
         }
 
         $self->set( '_selectedColumns', $put_ref );
+        return $self;
     } # end if (@_)
 
     return $self->get('_selectedColumns');

@@ -58,6 +58,7 @@ sub groups
         }
 
         $self->set( '_groups', $put_ref );
+        return $self;
     } # end if (@_)
 
     return $self->get('_groups');
@@ -86,6 +87,7 @@ sub keywords
         }
 
         $self->set( '_keywords', $put_ref );
+        return $self;
     } # end if (@_)
 
     return $self->get('_keywords');

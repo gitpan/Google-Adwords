@@ -57,6 +57,7 @@ sub circles
         }
 
         $self->set( '_circles', $put_ref );
+        return $self;
     } # end if (@_)
 
     return $self->get('_circles');

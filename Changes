@@ -1,5 +1,14 @@
 Revision history for Perl module Google::Adwords
 
+v1.9    Tue Apr  1 02:51:13 IST 2008
+    - bugfix: chained set accessor calls now work for all objects
+    - bugfix: AdService.checkAds() and CriterionService.checkCriteria() don't
+      check for exisiting Ad/Criterion IDs in the request
+    - bugfix: In CampaignService, multiple circles can be returned for a
+      ProximityTarget. The code now handles this gracefully. Thanks to Rick
+      Morris for the patch
+    - will only work for perl >= 5.8
+
 v1.8.2  Wed Mar 19 13:00:30 IST 2008
     - load the required data modules implicitly in the *Service modules
     - added shrunkenUrl accessor to Google::Adwords::Image

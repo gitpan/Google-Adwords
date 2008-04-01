@@ -57,6 +57,7 @@ sub countries
         }
 
         $self->set( '_countries', $put_ref );
+        return $self;
     } # end if (@_)
 
     return $self->get('_countries');

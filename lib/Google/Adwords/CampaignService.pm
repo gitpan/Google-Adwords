@@ -2,7 +2,7 @@ package Google::Adwords::CampaignService;
 use strict;
 use warnings;
 
-use version; our $VERSION = qv('0.8');
+use version; our $VERSION = qv('0.9');
 
 use base 'Google::Adwords::Service';
 use Date::Manip;
@@ -295,11 +295,24 @@ sub _create_campaign_object
             my $proxi_ref = $data->{geoTargeting}{proximityTargets};
             if ( defined $proxi_ref->{circles} )
             {
-                my $circle_obj
-                    = $self->_create_object_from_hash( $proxi_ref->{circles},
-                    "Google::Adwords::Circle" );
-                $proxi_ref->{circles} = $circle_obj;
-            }
+                my @circles;
+                if ( ref $proxi_ref->{circles} eq 'ARRAY' )
+                {
+                    for ( @{ $proxi_ref->{circles} } )
+                    {
+                        push @circles,
+                            $self->_create_object_from_hash( $_,
+                            "Google::Adwords::Circle" );
+                    }
+                }
+                else
+                {    # just a single circle
+                    push @circles,
+                        $self->_create_object_from_hash(
+                        $proxi_ref->{circles}, "Google::Adwords::Circle" );
+                }
+                $proxi_ref->{circles} = \@circles;
+            } # end if ( defined $proxi_ref...
             $data->{geoTargeting}{proximityTargets}
                 = $self->_create_object_from_hash(
                 $data->{geoTargeting}{proximityTargets},

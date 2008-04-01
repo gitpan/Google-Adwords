@@ -57,6 +57,7 @@ sub languages
         }
 
         $self->set( '_languages', $put_ref );
+        return $self;
     } # end if (@_)
 
     return $self->get('_languages');

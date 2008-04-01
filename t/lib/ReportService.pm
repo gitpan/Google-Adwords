@@ -268,10 +268,9 @@ EOF
 
         my $job = Google::Adwords::ReportJob->new();
 
-        $job->selectedReportType('Keyword');
-        $job->aggregationTypes(qw/Summary/);
-        $job->selectedColumns(qw/Campaign AdGroup Keyword/);
-        $job->keywordType('Broad');
+        $job->selectedReportType('Keyword')->aggregationTypes(qw/Summary/)
+            ->selectedColumns(qw/Campaign AdGroup Keyword/)
+            ->keywordType('Broad');
 
         my $job_id = $self->{obj}->scheduleReportJob($job);
         ok( $job_id eq '1935158656', 'scheduleReportJob' );

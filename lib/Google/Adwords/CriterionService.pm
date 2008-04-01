@@ -2,7 +2,7 @@ package Google::Adwords::CriterionService;
 use strict;
 use warnings;
 
-use version; our $VERSION = qv('0.4');
+use version; our $VERSION = qv('0.5');
 
 use base 'Google::Adwords::Service';
 
@@ -137,7 +137,7 @@ sub addCriteria
 
 ### INSTANCE METHOD #####################################################
 # Usage      :
-#   my @api_errors = $obj->checkAds({
+#   my @api_errors = $obj->checkCriteria({
 #       ads => \@ads,
 #       languageTarget => [ 'en', 'hi', ],
 #       geoTarget   => {
@@ -159,15 +159,6 @@ sub checkCriteria
     my ( $self, $args_ref ) = @_;
 
     my @params;
-
-    # The Ads
-    foreach my $ad ( @{ $args_ref->{criteria} } )
-    {
-        if ( not defined $ad->id )
-        {
-            die "id must be set for the Critrion object\n";
-        }
-    }
 
     my @ads_params;
     foreach my $ad ( @{ $args_ref->{criteria} } )

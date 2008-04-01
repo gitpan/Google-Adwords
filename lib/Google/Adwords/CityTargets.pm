@@ -57,6 +57,7 @@ sub cities
         }
 
         $self->set( '_cities', $put_ref );
+        return $self;
     } # end if (@_)
 
     return $self->get('_cities');
