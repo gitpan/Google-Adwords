@@ -177,26 +177,46 @@ sub getKeywordVariations
     my @additionalToConsider;
     if ( $data->{additionalToConsider} )
     {
-        for ( @{ $data->{additionalToConsider} } )
+        if ( ref $data->{additionalToConsider} eq 'ARRAY' )
+        {
+            for ( @{ $data->{additionalToConsider} } )
+            {
+                push @additionalToConsider,
+                    $self->_create_object_from_hash( $_,
+                    'Google::Adwords::KeywordVariation' );
+            }
+        }
+        else
         {
             push @additionalToConsider,
-                $self->_create_object_from_hash( $_,
-                'Google::Adwords::KeywordVariation' );
+                $self->_create_object_from_hash(
+                $data->{additionalToConsider},
+                'Google::Adwords::KeywordVariation'
+                );
         }
         $keyword_variations->additionalToConsider(@additionalToConsider);
-    }
+    } # end if ( $data->{additionalToConsider...
 
     my @moreSpecific;
     if ( $data->{moreSpecific} )
     {
-        for ( @{ $data->{moreSpecific} } )
+        if ( ref $data->{moreSpecific} eq 'ARRAY' )
+        {
+            for ( @{ $data->{moreSpecific} } )
+            {
+                push @moreSpecific,
+                    $self->_create_object_from_hash( $_,
+                    'Google::Adwords::KeywordVariation' );
+            }
+        }
+        else
         {
             push @moreSpecific,
-                $self->_create_object_from_hash( $_,
+                $self->_create_object_from_hash( $data->{moreSpecific},
                 'Google::Adwords::KeywordVariation' );
         }
         $keyword_variations->moreSpecific(@moreSpecific);
-    }
+    } # end if ( $data->{moreSpecific...
 
     return $keyword_variations;
 } # end sub getKeywordVariations

@@ -124,11 +124,12 @@ sub _parse_ad_response
             || $_ eq 'productImage' )
         {
             $ad_ref->{$_} = $self->_create_object_from_hash( $r->{$_},
-                'Google::Adwords::Image' );
+                'Google::Adwords::Image' )
+                if ( $r->{$_} );
         }
         else
         {
-            $ad_ref->{$_} = $r->{$_};
+            $ad_ref->{$_} = $r->{$_} if ( $r->{$_} );
         }
     } # end for (@ad_fields)
 

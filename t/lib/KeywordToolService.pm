@@ -12,8 +12,9 @@ sub test_class { return "Google::Adwords::KeywordToolService"; }
 
 # tests to run
 my %tests = (
-    getKeywordsFromSite  => 1,
-    getKeywordVariations => 1,
+    getKeywordsFromSite    => 1,
+    getKeywordVariations   => 1,
+    getKeywordVariations_2 => 1,
 );
 
 sub start_of_each_test : Test(setup)
@@ -613,6 +614,67 @@ EOF
     }
 
 } # end sub getKeywordVariations :
+
+sub getKeywordVariations_2 : Test(no_plan)
+{
+    my $self = shift;
+
+    $sub_name = ( caller 0 )[3];
+    $sub_name =~ s/^.+:://;
+    if ( not $tests{$sub_name} )
+    {
+        return;
+    }
+
+    if ( $self->{sandbox} )
+    {
+
+    }
+    else
+    {
+        my $soap = Test::MockModule->new('SOAP::Lite');
+        $soap->mock(
+            call => sub {
+                my $xml .= <<'EOF';
+<getKeywordVariationsResponse xmlns="">
+   <ns1:getKeywordVariationsReturn xmlns:ns1="https://adwords.google.com/api/adwords/v8">
+    <ns1:moreSpecific>
+     <ns1:text>suggestion Linux Perl</ns1:text>
+     <ns1:language>en</ns1:language>
+     <ns1:advertiserCompetitionScale>1</ns1:advertiserCompetitionScale>
+     <ns1:searchVolumeScale>5</ns1:searchVolumeScale>
+    </ns1:moreSpecific>
+   </ns1:getKeywordVariationsReturn>
+  </getKeywordVariationsResponse>
+EOF
+
+                $xml = $self->gen_full_response($xml);
+                my $env = SOAP::Deserializer->deserialize($xml);
+                return $env;
+            }
+        );
+
+        my $seed_keyword1 = Google::Adwords::SeedKeyword->new;
+        $seed_keyword1->negative(0);
+        $seed_keyword1->text('Linux Perl');
+        $seed_keyword1->type('Broad');
+
+        my $keyword_variations = $self->{obj}->getKeywordVariations(
+            {
+                seedKeywords => [ $seed_keyword1, ],
+                useSynonyms  => 1,
+                languages    => [ 'en', ],
+                countries    => [ 'US', ],
+            }
+        );
+
+        my $more_specific_ref = $keyword_variations->moreSpecific;
+        ok( $more_specific_ref->[0]->text eq 'suggestion Linux Perl',
+            'getKeywordVariations' );
+
+    }
+
+} # end sub getKeywordVariations_2 :
 
 1;
 

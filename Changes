@@ -1,5 +1,11 @@
 Revision history for Perl module Google::Adwords
 
+v1.9.3  Tue Apr 22 17:33:00 IST 2008
+    - bugfix in KeywordToolService.pm; check for arrayref. Thanks 
+      to Tony Jewell for the bug report
+    - bugfix in AdService.pm; check for hash key before assigning. Thanks to
+      Eugene Toropov for the fix
+
 v1.9.1  Wed Apr  2 00:09:04 IST 2008
     - requires SOAP::Lite >= 0.66
 
