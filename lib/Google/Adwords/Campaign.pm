@@ -7,8 +7,11 @@ use version; our $VERSION = qv('0.4');
 use base 'Google::Adwords::Data';
 
 my @fields = qw/
+    budgetAmount
     budgetOptimizerSettings
-    dailyBudget
+    budgetPeriod
+    contentTargeting
+    conversionOptimizerSettings
     enableSeparateContentBids
     endDay
     geoTargeting

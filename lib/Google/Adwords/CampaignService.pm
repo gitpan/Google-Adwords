@@ -2,7 +2,7 @@ package Google::Adwords::CampaignService;
 use strict;
 use warnings;
 
-use version; our $VERSION = qv('0.9');
+use version; our $VERSION = qv('0.10');
 
 use base 'Google::Adwords::Service';
 use Date::Manip;
@@ -10,6 +10,7 @@ use Date::Manip;
 # data types
 use Google::Adwords::Campaign;
 use Google::Adwords::BudgetOptimizerSettings;
+use Google::Adwords::ConversionOptimizerSettings;
 use Google::Adwords::GeoTarget;
 use Google::Adwords::CityTargets;
 use Google::Adwords::CountryTargets;
@@ -37,6 +38,11 @@ sub _create_campaign_params
     my $campaign = shift;
     my @campaign_params;
 
+    # budgetAmount
+    push @campaign_params,
+        SOAP::Data->name( 'budgetAmount' => $campaign->budgetAmount )
+        ->type('');
+
     # budget optimizer settings
     if ( defined $campaign->budgetOptimizerSettings )
     {
@@ -59,9 +65,37 @@ sub _create_campaign_params
 
     } # end if ( defined $campaign...
 
-    # dailyBudget
+    # budgetPeriod
+    my $budget_period = $campaign->budgetPeriod || 'Daily';
     push @campaign_params,
-        SOAP::Data->name( 'dailyBudget' => $campaign->dailyBudget )->type('');
+        SOAP::Data->name( 'budgetPeriod' => $budget_period )->type('');
+
+    # contentTargeting
+    push @campaign_params,
+        SOAP::Data->name( 'contentTargeting' => $campaign->contentTargeting )
+        ->type('');
+
+    # conversion optimizer settings
+    if ( defined $campaign->conversionOptimizerSettings )
+    {
+        my @conv_params;
+        my $c_opt = $campaign->conversionOptimizerSettings;
+
+        for (qw/enabled maxCpaBidForAllAdGroups/)
+        {
+            if ( defined $c_opt->$_ )
+            {
+                push @conv_params,
+                    SOAP::Data->name( $_ => $c_opt->$_ )->type('');
+            }
+        }
+
+        push @campaign_params,
+            SOAP::Data->name(
+            'conversionOptimizerSettings' => \SOAP::Data->value(@conv_params)
+            )->type('');
+
+    } # end if ( defined $campaign...
 
     # enableSeparateContentBids
     if ( defined $campaign->enableSeparateContentBids )
@@ -270,6 +304,16 @@ sub _create_campaign_object
             'Google::Adwords::BudgetOptimizerSettings' );
     }
 
+    # conversionOptimizerSettings
+    if ( exists $data->{conversionOptimizerSettings} )
+    {
+        $data->{conversionOptimizerSettings}
+            = $self->_create_object_from_hash(
+            $data->{conversionOptimizerSettings},
+            'Google::Adwords::ConversionOptimizerSettings'
+            );
+    }
+
     # geoTargeting
     if ( exists $data->{geoTargeting} )
     {
@@ -396,10 +440,10 @@ sub addCampaign
 {
     my ( $self, $campaign ) = @_;
 
-    # daily_budget should be present
-    if ( not defined $campaign->dailyBudget )
+    # budgetAmount should be present
+    if ( not defined $campaign->budgetAmount )
     {
-        die "dailyBudget should be set for the campaign object";
+        die "budgetAmount should be set for the campaign object";
     }
 
     my @campaign_params = _create_campaign_params($campaign);
@@ -438,12 +482,12 @@ sub addCampaignList
 {
     my ( $self, @campaigns ) = @_;
 
-    # daily_budget should be present
+    # budgetAmount should be present
     for (@campaigns)
     {
-        if ( not defined $_->dailyBudget )
+        if ( not defined $_->budgetAmount )
         {
-            die "dailyBudget should be set for the campaign object";
+            die "budgetAmount should be set for the campaign object";
         }
     }
 
@@ -806,7 +850,7 @@ Google::Adwords::CampaignService - Interface to the Google Adwords CampaignServi
  
 =head1 VERSION
  
-This documentation refers to Google::Adwords::CampaignService version 0.6
+This documentation refers to Google::Adwords::CampaignService version 0.10
  
  
 =head1 SYNOPSIS
@@ -821,7 +865,7 @@ This documentation refers to Google::Adwords::CampaignService version 0.6
 
     # set values for the campaign object
     $campaign->name('My Final Try');
-    $campaign->dailyBudget(10000000);
+    $campaign->budgetAmount(10000000);
 
     # target a certain city in US
     my $geo_target = Google::Adwords::GeoTarget->new();

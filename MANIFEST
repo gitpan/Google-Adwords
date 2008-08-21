@@ -28,6 +28,7 @@ lib/Google/Adwords/CampaignService.pm
 lib/Google/Adwords/Circle.pm
 lib/Google/Adwords/CityTargets.pm
 lib/Google/Adwords/ClientUsageRecord.pm
+lib/Google/Adwords/ConversionOptimizerSettings.pm
 lib/Google/Adwords/CountryTargets.pm
 lib/Google/Adwords/CoverageType.pm
 lib/Google/Adwords/CreditCard.pm

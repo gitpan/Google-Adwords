@@ -66,7 +66,7 @@ sub accessors : Test(7)
         'applicationToken' );
     ok( $self->{'obj'}->use_sandbox == 1, 'use_sandbox' );
     ok( $self->{'obj'}->clientEmail eq $client_email, 'clientEmail' );
-    ok( $self->{obj}->api_version eq 'v11', 'api_version' );
+    ok( $self->{obj}->api_version eq 'v12', 'api_version' );
 } # end sub accessors :
 
 sub gen_full_response

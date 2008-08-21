@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                Google-Adwords
-version:             v1.9.3
+version:             v1.10.0
 abstract:            an interface which abstracts the Google Adwords SOAP API
 license:             ~
 generated_by:        ExtUtils::MakeMaker version 6.32

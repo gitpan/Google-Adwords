@@ -10,6 +10,7 @@ use Google::Adwords::CountryTargets;
 use Google::Adwords::AdSchedule;
 use Google::Adwords::SchedulingInterval;
 use Google::Adwords::BudgetOptimizerSettings;
+use Google::Adwords::ConversionOptimizerSettings;
 use Google::Adwords::ProximityTargets;
 use Google::Adwords::Circle;
 use Google::Adwords::LanguageTarget;
@@ -55,7 +56,7 @@ sub addCampaign : Test(no_plan)
     my $campaign = Google::Adwords::Campaign->new();
 
     #$campaign->name('Rohan Campaign');
-    $campaign->dailyBudget(100000);
+    $campaign->budgetAmount(100000);
     $campaign->enableSeparateContentBids('true');
 
     # budget optimizer
@@ -106,7 +107,7 @@ sub addCampaign : Test(no_plan)
     if ( $self->{'sandbox'} )
     {
         my $camp = $self->{'obj'}->addCampaign($campaign);
-        ok( $camp->dailyBudget == 100000, 'addCampaign' );
+        ok( $camp->budgetAmount == 100000, 'addCampaign' );
         ok( $camp->id =~ /\d+/, 'addCampaign - id: ' . $camp->id );
 
         # save campaign id
@@ -128,7 +129,7 @@ sub addCampaign : Test(no_plan)
     <ns1:budgetOptimizerSettings>
      <ns1:enabled>false</ns1:enabled>
     </ns1:budgetOptimizerSettings>
-    <ns1:dailyBudget>100000</ns1:dailyBudget>
+    <ns1:budgetAmount>100000</ns1:budgetAmount>
     <ns1:enableSeparateContentBids>true</ns1:enableSeparateContentBids>
     <ns1:endDay>2037-12-30-05:00</ns1:endDay>
     <ns1:geoTargeting>
@@ -250,7 +251,7 @@ sub getAllAdWordsCampaigns : Test(no_plan)
                 my $xml .= <<'EOF';
 <getAllAdWordsCampaignsResponse xmlns="">
    <ns1:getAllAdWordsCampaignsReturn xmlns:ns1="https://adwords.google.com/api/adwords/v4">
-    <ns1:dailyBudget>100000</ns1:dailyBudget>
+    <ns1:budgetAmount>100000</ns1:budgetAmount>
     <ns1:enableSeparateContentBids>false</ns1:enableSeparateContentBids>
     <ns1:endDay>2011-01-01-05:00</ns1:endDay>
     <ns1:geoTargeting xsi:nil="true"/>
@@ -329,7 +330,7 @@ sub getCampaign : Test(no_plan)
                 my $xml .= <<'EOF';
 <getCampaignResponse xmlns="">
    <ns1:getCampaignReturn xmlns:ns1="https://adwords.google.com/api/adwords/v4">
-    <ns1:dailyBudget>100000</ns1:dailyBudget>
+    <ns1:budgetAmount>100000</ns1:budgetAmount>
     <ns1:enableSeparateContentBids>false</ns1:enableSeparateContentBids>
     <ns1:endDay>2011-01-01-05:00</ns1:endDay>
     <ns1:geoTargeting xsi:nil="true"/>
@@ -466,19 +467,19 @@ sub addCampaignList : Test(no_plan)
 
         my @campaigns;
         my $campaign1 = Google::Adwords::Campaign->new();
-        $campaign1->dailyBudget(100000);
+        $campaign1->budgetAmount(100000);
         my $campaign2 = Google::Adwords::Campaign->new();
-        $campaign2->dailyBudget(200000);
+        $campaign2->budgetAmount(200000);
 
         push @campaigns, $campaign1, $campaign2;
 
         my @responses = $self->{obj}->addCampaignList(@campaigns);
 
         # check campaigns
-        ok( $responses[0]->dailyBudget == 100000, 'addCampaignList' );
+        ok( $responses[0]->budgetAmount == 100000, 'addCampaignList' );
         ok( $responses[0]->id =~ /\d+/,
             'addCampaignList id: ' . $responses[0]->id );
-        ok( $responses[1]->dailyBudget == 200000, 'addCampaignList' );
+        ok( $responses[1]->budgetAmount == 200000, 'addCampaignList' );
         ok( $responses[1]->id =~ /\d+/,
             'addCampaignList id: ' . $responses[1]->id );
 
@@ -496,7 +497,7 @@ sub addCampaignList : Test(no_plan)
                 my $xml .= <<'EOF';
 <addCampaignListResponse xmlns="">
    <ns1:addCampaignListReturn xmlns:ns1="https://adwords.google.com/api/adwords/v4">
-    <ns1:dailyBudget>100000</ns1:dailyBudget>
+    <ns1:budgetAmount>100000</ns1:budgetAmount>
     <ns1:enableSeparateContentBids>false</ns1:enableSeparateContentBids>
     <ns1:endDay>2011-01-01-05:00</ns1:endDay>
     <ns1:geoTargeting xsi:nil="true"/>
@@ -511,7 +512,7 @@ sub addCampaignList : Test(no_plan)
     <ns1:status>Active</ns1:status>
    </ns1:addCampaignListReturn>
    <ns1:addCampaignListReturn xmlns:ns1="https://adwords.google.com/api/adwords/v4">
-    <ns1:dailyBudget>200000</ns1:dailyBudget>
+    <ns1:budgetAmount>200000</ns1:budgetAmount>
     <ns1:enableSeparateContentBids>false</ns1:enableSeparateContentBids>
     <ns1:endDay>2011-01-01-05:00</ns1:endDay>
     <ns1:geoTargeting xsi:nil="true"/>
@@ -536,17 +537,17 @@ EOF
 
         my @campaigns;
         my $campaign1 = Google::Adwords::Campaign->new();
-        $campaign1->dailyBudget(100000);
+        $campaign1->budgetAmount(100000);
         my $campaign2 = Google::Adwords::Campaign->new();
-        $campaign2->dailyBudget(200000);
+        $campaign2->budgetAmount(200000);
 
         push @campaigns, $campaign1, $campaign2;
 
         my @responses = $self->{obj}->addCampaignList(@campaigns);
 
         # check first campaign
-        ok( $responses[0]->dailyBudget == 100000, 'addCampaignList' );
-        ok( $responses[1]->dailyBudget == 200000, 'addCampaignList' );
+        ok( $responses[0]->budgetAmount == 100000, 'addCampaignList' );
+        ok( $responses[1]->budgetAmount == 200000, 'addCampaignList' );
 
     }
 
@@ -587,7 +588,7 @@ sub getCampaignList : Test(no_plan)
                 my $xml .= <<'EOF';
 <getCampaignListResponse xmlns="">
    <ns1:getCampaignListReturn xmlns:ns1="https://adwords.google.com/api/adwords/v4">
-    <ns1:dailyBudget>100000</ns1:dailyBudget>
+    <ns1:budgetAmount>100000</ns1:budgetAmount>
     <ns1:enableSeparateContentBids>false</ns1:enableSeparateContentBids>
     <ns1:endDay>2011-01-01-05:00</ns1:endDay>
     <ns1:geoTargeting xsi:nil="true"/>
@@ -602,7 +603,7 @@ sub getCampaignList : Test(no_plan)
     <ns1:status>Active</ns1:status>
    </ns1:getCampaignListReturn>
    <ns1:getCampaignListReturn xmlns:ns1="https://adwords.google.com/api/adwords/v4">
-    <ns1:dailyBudget>200000</ns1:dailyBudget>
+    <ns1:budgetAmount>200000</ns1:budgetAmount>
     <ns1:enableSeparateContentBids>false</ns1:enableSeparateContentBids>
     <ns1:endDay>2011-01-01-05:00</ns1:endDay>
     <ns1:geoTargeting xsi:nil="true"/>
@@ -650,7 +651,7 @@ sub updateCampaign : Test(no_plan)
 
         my $campaign = Google::Adwords::Campaign->new();
         $campaign->id( $self->{_campaign_id} );
-        $campaign->dailyBudget(500000);
+        $campaign->budgetAmount(500000);
 
         my $ret = $self->{obj}->updateCampaign($campaign);
         ok( $ret == 1, 'updateCampaign' );
@@ -674,7 +675,7 @@ EOF
 
         my $campaign = Google::Adwords::Campaign->new();
         $campaign->id(5555);
-        $campaign->dailyBudget(500000);
+        $campaign->budgetAmount(500000);
 
         my $ret = $self->{obj}->updateCampaign($campaign);
         ok( $ret == 1, 'updateCampaign' );
@@ -701,11 +702,11 @@ sub updateCampaignList : Test(no_plan)
 
         my $campaign0 = Google::Adwords::Campaign->new();
         $campaign0->id( $self->{_campaign_id_0} );
-        $campaign0->dailyBudget(2000000);
+        $campaign0->budgetAmount(2000000);
 
         my $campaign1 = Google::Adwords::Campaign->new();
         $campaign1->id( $self->{_campaign_id_1} );
-        $campaign1->dailyBudget(8000000);
+        $campaign1->budgetAmount(8000000);
 
         push @campaigns, $campaign0, $campaign1;
 
@@ -733,11 +734,11 @@ EOF
 
         my $campaign0 = Google::Adwords::Campaign->new();
         $campaign0->id(7819);
-        $campaign0->dailyBudget(2000000);
+        $campaign0->budgetAmount(2000000);
 
         my $campaign1 = Google::Adwords::Campaign->new();
         $campaign1->id(18982);
-        $campaign1->dailyBudget(200);
+        $campaign1->budgetAmount(200);
 
         push @campaigns, $campaign0, $campaign1;
 

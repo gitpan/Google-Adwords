@@ -1,5 +1,12 @@
 Revision history for Perl module Google::Adwords
 
+v1.10   Thu Aug 21 17:19:25 IST 2008
+    - support for v12 of the Adwords API
+    - added Google::Adwords::ConversionOptimizerSettings module
+    - Campaign.dailyBudget deprecated
+    - Added budgetAmount, budgetPeriod, contentTargeting, 
+      and conversionOptimizerSettings methods to the Campaign object
+
 v1.9.3  Tue Apr 22 17:33:00 IST 2008
     - bugfix in KeywordToolService.pm; check for arrayref. Thanks 
       to Tony Jewell for the bug report
@@ -12,7 +19,8 @@ v1.9.1  Wed Apr  2 00:09:04 IST 2008
 v1.9    Tue Apr  1 02:51:13 IST 2008
     - bugfix: chained set accessor calls now work for all objects
     - bugfix: AdService.checkAds() and CriterionService.checkCriteria() don't
-      check for exisiting Ad/Criterion IDs in the request
+      check for exisiting Ad/Criterion IDs in the request. Thanks to Eugene
+      Toropov for the fix.
     - bugfix: In CampaignService, multiple circles can be returned for a
       ProximityTarget. The code now handles this gracefully. Thanks to Rick
       Morris for the patch
