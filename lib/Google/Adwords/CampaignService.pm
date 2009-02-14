@@ -2,7 +2,7 @@ package Google::Adwords::CampaignService;
 use strict;
 use warnings;
 
-use version; our $VERSION = qv('0.10');
+use version; our $VERSION = qv('0.11');
 
 use base 'Google::Adwords::Service';
 use Date::Manip;
@@ -96,14 +96,6 @@ sub _create_campaign_params
             )->type('');
 
     } # end if ( defined $campaign...
-
-    # enableSeparateContentBids
-    if ( defined $campaign->enableSeparateContentBids )
-    {
-        push @campaign_params,
-            SOAP::Data->name( 'enableSeparateContentBids' =>
-                $campaign->enableSeparateContentBids )->type('');
-    }
 
     # end_day
     if ( defined $campaign->endDay )
@@ -290,7 +282,6 @@ sub _create_campaign_object
     my ( $self, $data ) = @_;
 
     # format dates
-    Date_Init("TZ=EST5EDT");
     $data->{'startDay'}
         = UnixDate( ParseDate( $data->{'startDay'} ), "%Y-%m-%d %H:%M:%S" );
     $data->{'endDay'}

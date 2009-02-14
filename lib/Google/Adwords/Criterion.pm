@@ -2,7 +2,7 @@ package Google::Adwords::Criterion;
 use strict;
 use warnings;
 
-use version; our $VERSION = qv('0.2.1');
+use version; our $VERSION = qv('0.3');
 
 use base 'Google::Adwords::Data';
 
@@ -11,17 +11,18 @@ my @fields = qw/
     criterionType
     destinationUrl
     exemptionRequest
+    firstPageCpc
     id
     language
+    maxCpc
+    maxCpm
     negative
     paused
-    status
-    maxCpc
-    minCpc
     proxyMaxCpc
+    qualityScore
+    status
     text
     type
-    maxCpm
     url
     /;
 

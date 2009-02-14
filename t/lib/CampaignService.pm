@@ -57,6 +57,7 @@ sub addCampaign : Test(no_plan)
 
     #$campaign->name('Rohan Campaign');
     $campaign->budgetAmount(100000);
+    $campaign->budgetPeriod('Daily');
     $campaign->enableSeparateContentBids('true');
 
     # budget optimizer
@@ -313,7 +314,7 @@ sub getCampaign : Test(no_plan)
     if ( $self->{sandbox} )
     {
 
-        #my $campaign = $self->{obj}->getCampaign( 4127 );
+        #my $campaign = $self->{obj}->getCampaign( 9747 );
         my $campaign = $self->{obj}->getCampaign( $self->{_campaign_id} );
         ok(
             $campaign->id == $self->{_campaign_id},

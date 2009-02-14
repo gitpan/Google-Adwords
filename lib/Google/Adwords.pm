@@ -2,7 +2,7 @@ package Google::Adwords;
 use strict;
 use warnings;
 
-use version; our $VERSION = qv('1.10');
+use version; our $VERSION = qv('1.12');
 
 1;
 
@@ -15,12 +15,12 @@ Google::Adwords - an interface which abstracts the Google Adwords SOAP API
  
 =head1 VERSION
  
-This documentation refers to Google::Adwords version 1.10
+This documentation refers to Google::Adwords version 1.12
  
 
 =head1 API VERSION
 
-Google::Adwords currently uses version 12 (v12) of the Adwords API. As such,
+Google::Adwords currently uses version 13 (v13) of the Adwords API. As such,
 this version of Google::Adwords does not support earlier API versions. If you
 have a need to use earlier API versions, please use the corresponding earlier
 version of Google::Adwords

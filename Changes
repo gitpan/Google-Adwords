@@ -1,5 +1,11 @@
 Revision history for Perl module Google::Adwords
 
+v1.12   Sat Feb 14 15:19:01 IST 2009
+    - support for v13 of the Adwords API
+    - removed CampaignService.enableSeparateContentBids property
+    - added firstPageCpc and qualityScore accessors to Criterion object 
+    - removed minCpc from Criterion object
+
 v1.10   Thu Aug 21 17:19:25 IST 2008
     - support for v12 of the Adwords API
     - added Google::Adwords::ConversionOptimizerSettings module
