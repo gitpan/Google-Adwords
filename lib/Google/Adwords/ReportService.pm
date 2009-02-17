@@ -244,7 +244,8 @@ sub validateReportJob
     } # end for ( qw/ selectedReportType aggregationTypes selectedColumns...
 
     my @params;
-    push @params, SOAP::Data->name( 'job' => \SOAP::Data->value(@job_params) )
+    push @params,
+        SOAP::Data->name( 'job' => \SOAP::Data->value(@job_params) )
         ->attr( { 'xsi:type' => 'DefinedReportJob' } )->type('');
 
     my $result = $self->_create_service_and_call(
@@ -306,7 +307,8 @@ sub scheduleReportJob
     } # end for ( qw/ selectedReportType aggregationTypes selectedColumns...
 
     my @params;
-    push @params, SOAP::Data->name( 'job' => \SOAP::Data->value(@job_params) )
+    push @params,
+        SOAP::Data->name( 'job' => \SOAP::Data->value(@job_params) )
         ->attr( { 'xsi:type' => 'DefinedReportJob' } )->type('');
 
     my $result = $self->_create_service_and_call(

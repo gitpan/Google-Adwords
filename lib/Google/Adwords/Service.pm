@@ -2,14 +2,14 @@ package Google::Adwords::Service;
 use strict;
 use warnings;
 
-use version; our $VERSION = qv('0.15');
+use version; our $VERSION = qv('0.15.2');
 
 use base qw/ Class::Accessor::Chained Google::Adwords /;
 use SOAP::Lite;
 use Readonly;
 
 Readonly my $default_api_version => 'v13';
-Readonly my $user_agent          => "Google::Adwords v1.12";
+Readonly my $user_agent          => "Google::Adwords v1.12.2";
 Readonly my $endpoint            => 'https://adwords.google.com/api/adwords';
 Readonly my $endpoint_sandbox    => 'https://sandbox.google.com/api/adwords';
 Readonly my $default_timeout => 35;    # HTTP timeout in seconds
@@ -102,7 +102,8 @@ sub _get_soap_headers
     # or the clientCustomerId header
     if ( defined $self->clientCustomerId )
     {
-        push @headers, SOAP::Header->name("clientCustomerId")
+        push @headers,
+            SOAP::Header->name("clientCustomerId")
             ->value( $self->clientCustomerId )->type('');
     }
 
@@ -297,7 +298,7 @@ Google::Adwords::Service - Base class for the Service modules
  
 =head1 VERSION
  
-This documentation refers to Google::Adwords::Service version 0.15
+This documentation refers to Google::Adwords::Service version 0.15.2
  
  
 =head1 DESCRIPTION

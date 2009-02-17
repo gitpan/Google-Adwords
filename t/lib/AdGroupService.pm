@@ -216,7 +216,7 @@ sub getAdGroup : Test(no_plan)
         my $adgroup = $self->{obj}->getAdGroup( $self->{_adgroup_id} );
 
         ok( $adgroup->campaignId == $self->_get_campaign_id(), 'getAdGroup' );
-        ok( $adgroup->id == $self->{_adgroup_id}, 'getAdGroup' );
+        ok( $adgroup->id == $self->{_adgroup_id},              'getAdGroup' );
     }
     else
     {

@@ -7,6 +7,7 @@ use version; our $VERSION = qv('0.0.1');
 use base 'Google::Adwords::Data';
 
 my @fields = qw/
+    _excludedMetros
     _metros
     /;
 
@@ -62,6 +63,35 @@ sub metros
 
     return $self->get('_metros');
 } # end sub metros
+
+# excludedMetros should always return an array ref
+sub excludedMetros
+{
+    my $self = shift;
+
+    # if its a put
+    if (@_)
+    {
+        my $put_ref = [];
+
+        for (@_)
+        {
+            if ( ref $_ ne 'ARRAY' )
+            {
+                push @{$put_ref}, $_;
+            }
+            else
+            {
+                push @{$put_ref}, @{$_};
+            }
+        }
+
+        $self->set( '_excludedMetros', $put_ref );
+        return $self;
+    } # end if (@_)
+
+    return $self->get('_excludedMetros');
+} # end sub excludedMetros
 
 1;
 

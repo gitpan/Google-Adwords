@@ -125,7 +125,8 @@ sub getKeywordVariations
         my @seedkeyword;
         if ( defined $_->negative )
         {
-            push @seedkeyword, SOAP::Data->name(
+            push @seedkeyword,
+                SOAP::Data->name(
                 'negative' => ( $_->negative ) ? 'true' : 'false' )->type('');
         }
         if ( defined $_->text )
@@ -138,7 +139,8 @@ sub getKeywordVariations
             push @seedkeyword,
                 SOAP::Data->name( 'type' => $_->type )->type('');
         }
-        push @params, SOAP::Data->name(
+        push @params,
+            SOAP::Data->name(
             'seedKeywords' => \SOAP::Data->value(@seedkeyword) )->type('');
     } # end for ( @{ $args_ref->{seedKeywords...
 

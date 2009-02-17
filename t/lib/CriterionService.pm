@@ -478,9 +478,10 @@ sub setCampaignNegativeCriteria : Test(no_plan)
         $criterion2->type('Broad');
         $criterion2->text('Google Adwords Perl');
 
-        my $ret = $self->{obj}->setCampaignNegativeCriteria( $campaign_id,
+        my $ret
+            = $self->{obj}->setCampaignNegativeCriteria( $campaign_id,
             [ $criterion1, $criterion2, ],
-        );
+            );
 
         ok( $ret == 1, 'setCampaignNegativeCriteria' );
     } # end if ( $self->{sandbox} ...
@@ -514,9 +515,10 @@ EOF
         $criterion2->type('Broad');
         $criterion2->text('Google Adwords Perl');
 
-        my $ret = $self->{obj}->setCampaignNegativeCriteria( $campaign_id,
+        my $ret
+            = $self->{obj}->setCampaignNegativeCriteria( $campaign_id,
             [ $criterion1, $criterion2, ],
-        );
+            );
 
         ok( $ret == 1, 'setCampaignNegativeCriteria' );
 

@@ -8,6 +8,7 @@ use base 'Google::Adwords::Data';
 
 my @fields = qw/
     _cities
+    _excludedCities
     /;
 
 __PACKAGE__->mk_accessors(@fields);
@@ -62,6 +63,35 @@ sub cities
 
     return $self->get('_cities');
 } # end sub cities
+
+# excludedCities should always return an array ref
+sub excludedCities
+{
+    my $self = shift;
+
+    # if its a put
+    if (@_)
+    {
+        my $put_ref = [];
+
+        for (@_)
+        {
+            if ( ref $_ ne 'ARRAY' )
+            {
+                push @{$put_ref}, $_;
+            }
+            else
+            {
+                push @{$put_ref}, @{$_};
+            }
+        }
+
+        $self->set( '_excludedCities', $put_ref );
+        return $self;
+    } # end if (@_)
+
+    return $self->get('_excludedCities');
+} # end sub excludedCities
 
 1;
 

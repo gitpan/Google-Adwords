@@ -234,7 +234,8 @@ sub updateAccountInfo
     # languagePreference
     if ( defined $account->languagePreference )
     {
-        push @account_params, SOAP::Data->name(
+        push @account_params,
+            SOAP::Data->name(
             'languagePreference' => $account->languagePreference )->type('');
     }
 

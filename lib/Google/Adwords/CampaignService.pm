@@ -133,15 +133,34 @@ sub _create_campaign_params
                 my $targets = $geo_obj->$_;
                 my $key     = $geo_target_params{$_};
 
+                my @soap_targets;
+
                 if (    ( defined $targets->$key )
                     and ( scalar @{ $targets->$key } > 0 ) )
                 {
+                    push @soap_targets,
+                        SOAP::Data->name( $key => @{ $targets->$key } )
+                        ->type('');
+                }
+
+                # exclusions
+                my $exclusion = 'excluded' . ucfirst $key;
+                if (    ( defined $targets->$exclusion )
+                    and ( scalar @{ $targets->$exclusion } > 0 ) )
+                {
+                    push @soap_targets,
+                        SOAP::Data->name(
+                        $exclusion => @{ $targets->$exclusion } )->type('');
+                }
+
+                if (@soap_targets)
+                {
                     push @geo_data,
                         SOAP::Data->name(
-                        $_ => \SOAP::Data->name( $key => @{ $targets->$key } )
-                            ->type('') )->type('');
+                        $_ => \SOAP::Data->value(@soap_targets) )->type('');
                 }
-            }
+
+            } # end if ( defined $geo_obj->$_...
         } # end for ( keys %geo_target_params...
 
         # proximityTargets
@@ -165,7 +184,8 @@ sub _create_campaign_params
                             ->type('');
                     }
                 }
-                push @proximity_soap, SOAP::Data->name(
+                push @proximity_soap,
+                    SOAP::Data->name(
                     circles => \SOAP::Data->value(@circles_soap) )->type('');
 
             }
@@ -178,7 +198,8 @@ sub _create_campaign_params
 
         if ( scalar @geo_data > 0 )
         {
-            push @campaign_params, SOAP::Data->name(
+            push @campaign_params,
+                SOAP::Data->name(
                 'geoTargeting' => \SOAP::Data->value(@geo_data), )->type('');
         }
     } # end if ( defined $campaign...
@@ -247,7 +268,8 @@ sub _create_campaign_params
                 ->type('');
         }
 
-        push @campaign_params, SOAP::Data->name(
+        push @campaign_params,
+            SOAP::Data->name(
             'schedule' => \SOAP::Data->value(@schedule_params) )->type('');
     } # end if ( defined $campaign...
 
@@ -290,7 +312,8 @@ sub _create_campaign_object
     # budgetOptimizerSettings
     if ( exists $data->{budgetOptimizerSettings} )
     {
-        $data->{budgetOptimizerSettings} = $self->_create_object_from_hash(
+        $data->{budgetOptimizerSettings}
+            = $self->_create_object_from_hash(
             $data->{budgetOptimizerSettings},
             'Google::Adwords::BudgetOptimizerSettings' );
     }
@@ -491,7 +514,8 @@ sub addCampaignList
 
         my @campaign_params = _create_campaign_params($_);
 
-        push @params, SOAP::Data->name(
+        push @params,
+            SOAP::Data->name(
             'campaign' => \SOAP::Data->value(@campaign_params) )->type('');
 
     }
@@ -725,7 +749,8 @@ sub setOptimizeAdServing
 
     my @params;
     push @params, SOAP::Data->name( 'campaignid' => $id )->type('');
-    push @params, SOAP::Data->name( 'enable' => ($enable) ? 'true' : 'false' )
+    push @params,
+        SOAP::Data->name( 'enable' => ($enable) ? 'true' : 'false' )
         ->type('');
 
     my $result = $self->_create_service_and_call(
@@ -813,7 +838,8 @@ sub updateCampaignList
         push @campaign_params,
             SOAP::Data->name( 'id' => $campaign->id )->type('');
 
-        push @params, SOAP::Data->name(
+        push @params,
+            SOAP::Data->name(
             'campaign' => \SOAP::Data->value(@campaign_params) )->type('');
 
     }

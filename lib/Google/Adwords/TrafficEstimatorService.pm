@@ -61,7 +61,8 @@ sub checkKeywordTraffic
                 SOAP::Data->name( 'language' => $_->language )->type('');
         }
 
-        push @params, SOAP::Data->name(
+        push @params,
+            SOAP::Data->name(
             'requests' => \SOAP::Data->value(@request_params) )->type('');
     } # end for (@k_t_reqs)
 
@@ -116,8 +117,8 @@ sub estimateAdGroupList
         }
         if ( defined $_->keywordRequests )
         {
-            my @p =
-                ( ref( $_->keywordRequests ) eq 'ARRAY' )
+            my @p
+                = ( ref( $_->keywordRequests ) eq 'ARRAY' )
                 ? @{ $_->keywordRequests }
                 : $_->keywordRequests;
             foreach my $kwreq (@p)
@@ -160,8 +161,8 @@ sub estimateAdGroupList
         )
     {
         my @keywordestimate;
-        my $ra_keywordestimate =
-            ( ref( $c->{keywordEstimates} ) eq 'ARRAY' )
+        my $ra_keywordestimate
+            = ( ref( $c->{keywordEstimates} ) eq 'ARRAY' )
             ? $c->{keywordEstimates}
             : [ $c->{keywordEstimates} ];
         for ( @{$ra_keywordestimate} )
@@ -289,8 +290,8 @@ sub estimateCampaignList
         if ( defined $campaign->adGroupRequests
             && $campaign->adGroupRequests )
         {
-            my @p =
-                ( ref( $campaign->adGroupRequests ) eq 'ARRAY' )
+            my @p
+                = ( ref( $campaign->adGroupRequests ) eq 'ARRAY' )
                 ? @{ $campaign->adGroupRequests }
                 : $campaign->adGroupRequests;
             foreach my $adgrpreq (@p)
@@ -309,8 +310,8 @@ sub estimateCampaignList
                 # keywordRequests
                 if ( defined $adgrpreq->keywordRequests )
                 {
-                    my @p =
-                        ( ref( $adgrpreq->keywordRequests ) eq 'ARRAY' )
+                    my @p
+                        = ( ref( $adgrpreq->keywordRequests ) eq 'ARRAY' )
                         ? @{ $adgrpreq->keywordRequests }
                         : $adgrpreq->keywordRequests;
                     foreach my $kwreq (@p)
@@ -320,7 +321,8 @@ sub estimateCampaignList
                         {
                             if ( defined $kwreq->$field )
                             {
-                                push @keywordrequest_params, SOAP::Data->name(
+                                push @keywordrequest_params,
+                                    SOAP::Data->name(
                                     $field => $kwreq->$field )->type('');
                             }
                         }
@@ -358,15 +360,15 @@ sub estimateCampaignList
         )
     {
         my @adgroupestimate;
-        my $ra_adgroupestimate =
-            ( ref( $c->{adGroupEstimates} ) eq 'ARRAY' )
+        my $ra_adgroupestimate
+            = ( ref( $c->{adGroupEstimates} ) eq 'ARRAY' )
             ? $c->{adGroupEstimates}
             : [ $c->{adGroupEstimates} ];
         foreach my $adgrpest ( @{$ra_adgroupestimate} )
         {
             my @keywordestimate;
-            my $ra_keywordestimate =
-                ( ref( $adgrpest->{keywordEstimates} ) eq 'ARRAY' )
+            my $ra_keywordestimate
+                = ( ref( $adgrpest->{keywordEstimates} ) eq 'ARRAY' )
                 ? $adgrpest->{keywordEstimates}
                 : [ $adgrpest->{keywordEstimates} ];
             for ( @{$ra_keywordestimate} )

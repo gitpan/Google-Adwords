@@ -354,7 +354,8 @@ sub updateAdGroup
     }
 
     my @params;
-    push @params, SOAP::Data->name(
+    push @params,
+        SOAP::Data->name(
         'changedData' => \SOAP::Data->value(@adgroup_params) )->type('');
 
     # create the SOAP service
@@ -417,7 +418,8 @@ sub updateAdGroupList
             }
         }
 
-        push @params, SOAP::Data->name(
+        push @params,
+            SOAP::Data->name(
             'changedData' => \SOAP::Data->value(@adgroup_params) )->type('');
     } # end for my $adgroup (@adgroups...
 

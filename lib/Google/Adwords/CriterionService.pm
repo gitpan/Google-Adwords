@@ -111,7 +111,8 @@ sub addCriteria
         }
         my @criterion_params = $self->_create_request_params($criterion);
 
-        push @params, SOAP::Data->name(
+        push @params,
+            SOAP::Data->name(
             'criteria' => \SOAP::Data->value(@criterion_params) )->type('');
 
     } # end for my $criterion (@criteria...
@@ -242,7 +243,8 @@ sub checkCriteria
                             ->type('');
                     }
                 }
-                push @proximity_soap, SOAP::Data->name(
+                push @proximity_soap,
+                    SOAP::Data->name(
                     circles => \SOAP::Data->value(@circles_soap) )->type('');
 
             }
@@ -255,7 +257,8 @@ sub checkCriteria
 
         if ( scalar @geo_data > 0 )
         {
-            push @params, SOAP::Data->name(
+            push @params,
+                SOAP::Data->name(
                 'geoTarget' => \SOAP::Data->value(@geo_data), )->type('');
         }
     } # end if ( exists $args_ref->...
@@ -272,7 +275,8 @@ sub checkCriteria
     foreach my $c (
         $result->valueof("//checkCriteriaResponse/checkCriteriaReturn") )
     {
-        push @data, $self->_create_object_from_hash( $c,
+        push @data,
+            $self->_create_object_from_hash( $c,
             'Google::Adwords::ApiError' );
     }
 
@@ -313,7 +317,8 @@ sub setCampaignNegativeCriteria
         }
         my @criterion_params = $self->_create_request_params($criterion);
 
-        push @params, SOAP::Data->name(
+        push @params,
+            SOAP::Data->name(
             'criteria' => \SOAP::Data->value(@criterion_params) )->type('');
     } # end for my $criterion ( @{$criterions_ref...
 
@@ -355,7 +360,8 @@ sub updateCriteria
         }
         my @criterion_params = $self->_create_request_params($criterion);
 
-        push @params, SOAP::Data->name(
+        push @params,
+            SOAP::Data->name(
             'criteria' => \SOAP::Data->value(@criterion_params) )->type('');
     } # end for my $criterion (@criteria...
 

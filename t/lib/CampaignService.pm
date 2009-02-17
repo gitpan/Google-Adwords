@@ -22,16 +22,17 @@ sub test_class { return "Google::Adwords::CampaignService"; }
 
 # tests to be run
 my %tests = (
-    addCampaign            => 1,
-    addCampaignList        => 1,
-    getAllAdWordsCampaigns => 1,
-    getCampaign            => 1,
-    getCampaignList        => 1,
-    getCampaignStats       => 1,
-    getOptimizeAdServing   => 1,
-    setOptimizeAdServing   => 1,
-    updateCampaign         => 1,
-    updateCampaignList     => 1,
+    addCampaign                => 1,
+    addCampaign_exclude_region => 1,
+    addCampaignList            => 1,
+    getAllAdWordsCampaigns     => 1,
+    getCampaign                => 1,
+    getCampaignList            => 1,
+    getCampaignStats           => 1,
+    getOptimizeAdServing       => 1,
+    setOptimizeAdServing       => 1,
+    updateCampaign             => 1,
+    updateCampaignList         => 1,
 );
 
 sub start_of_each_test : Test(setup)
@@ -217,6 +218,153 @@ EOF
     }
 
 } # end sub addCampaign :
+
+sub addCampaign_exclude_region : Test(no_plan)
+{
+    my $self = shift;
+
+    $sub_name = ( caller 0 )[3];
+    $sub_name =~ s/^.+:://;
+    if ( not $tests{$sub_name} )
+    {
+        return;
+    }
+
+    my $campaign = Google::Adwords::Campaign->new();
+
+    #$campaign->name('Rohan Campaign');
+    $campaign->budgetAmount(100000);
+    $campaign->enableSeparateContentBids('true');
+
+    # geoTargeting
+    my $geo_target      = Google::Adwords::GeoTarget->new();
+    my $country_targets = Google::Adwords::CountryTargets->new();
+    my $region_targets  = Google::Adwords::RegionTargets->new();
+
+    $country_targets->countries( ['US'] );
+    $geo_target->countryTargets($country_targets);
+
+    $region_targets->excludedRegions( ['US-AK'] );
+    $geo_target->regionTargets($region_targets);
+
+    # set the geo Target now
+    $campaign->geoTargeting($geo_target);
+
+    if ( $self->{'sandbox'} )
+    {
+        my $camp = $self->{'obj'}->addCampaign($campaign);
+        ok( $camp->budgetAmount == 100000, 'addCampaign' );
+        ok( $camp->id =~ /\d+/, 'addCampaign exRegion - id: ' . $camp->id );
+
+        my $g = $camp->geoTargeting->regionTargets->excludedRegions;
+        ok( $g->[0] eq 'US-AK', 'excludedRegions' );
+
+        # save campaign id
+        $self->{_campaign_id} = $camp->id;
+
+        # save it for other test modules
+        $self->_set_campaign_id( $camp->id );
+    } # end if ( $self->{'sandbox'...
+
+    else
+    {
+
+        my $soap = Test::MockModule->new('SOAP::Lite');
+        $soap->mock(
+            call => sub {
+                my $xml .= <<'EOF';
+<addCampaignResponse xmlns="">
+   <ns1:addCampaignReturn xmlns:ns1="https://adwords.google.com/api/adwords/v11">
+    <ns1:budgetOptimizerSettings>
+     <ns1:enabled>false</ns1:enabled>
+    </ns1:budgetOptimizerSettings>
+    <ns1:budgetAmount>100000</ns1:budgetAmount>
+    <ns1:enableSeparateContentBids>true</ns1:enableSeparateContentBids>
+    <ns1:endDay>2037-12-30-05:00</ns1:endDay>
+    <ns1:geoTargeting>
+     <ns1:targetAll>false</ns1:targetAll>
+     <ns1:countryTargets>
+      <ns1:countries>US</ns1:countries>
+      <ns1:countries>IN</ns1:countries>
+     </ns1:countryTargets>
+     <ns1:regionTargets xsi:nil="true"/>
+     <ns1:metroTargets xsi:nil="true"/>
+     <ns1:cityTargets xsi:nil="true"/>
+     <ns1:proximityTargets>
+      <ns1:circles>
+       <ns1:longitudeMicroDegrees>40</ns1:longitudeMicroDegrees>
+       <ns1:latitudeMicroDegrees>20</ns1:latitudeMicroDegrees>
+       <ns1:radiusMeters>1000</ns1:radiusMeters>
+      </ns1:circles>
+     </ns1:proximityTargets>
+    </ns1:geoTargeting>
+    <ns1:id>4143</ns1:id>
+    <ns1:languageTargeting>
+     <ns1:languages>en</ns1:languages>
+     <ns1:languages>fr</ns1:languages>
+    </ns1:languageTargeting>
+    <ns1:name>Campaign #5</ns1:name>
+    <ns1:networkTargeting>
+     <ns1:networkTypes>GoogleSearch</ns1:networkTypes>
+    </ns1:networkTargeting>
+    <ns1:schedule>
+     <ns1:intervals>
+      <ns1:day>Monday</ns1:day>
+      <ns1:startHour>1</ns1:startHour>
+      <ns1:startMinute>0</ns1:startMinute>
+      <ns1:endHour>10</ns1:endHour>
+      <ns1:endMinute>0</ns1:endMinute>
+      <ns1:multiplier>1.0</ns1:multiplier>
+     </ns1:intervals>
+     <ns1:status>Enabled</ns1:status>
+    </ns1:schedule>
+    <ns1:startDay>2008-03-14-04:00</ns1:startDay>
+    <ns1:status>Active</ns1:status>
+   </ns1:addCampaignReturn>
+  </addCampaignResponse>
+EOF
+
+                $xml = $self->gen_full_response($xml);
+                my $env = SOAP::Deserializer->deserialize($xml);
+                return $env;
+            }
+        );
+
+        my $campaign_obj = $self->{'obj'}->addCampaign($campaign);
+
+        ok( $campaign_obj->budgetOptimizerSettings->enabled eq 'false',
+            'addCampaign, budgetOptimizerSettings' );
+
+        ok(
+            $campaign_obj->geoTargeting->countryTargets->countries->[0] eq
+                'US',
+            'addCampaign geoTargeting, countryTargets'
+        );
+
+        ok(
+            $campaign_obj->geoTargeting->proximityTargets->circles->[0]
+                ->radiusMeters eq '1000',
+            'addCampaign geoTargeting, proximityTargets'
+        );
+
+        ok( $campaign_obj->languageTargeting->languages->[0] eq 'en',
+            'addCampaign languageTargeting' );
+
+        ok(
+            $campaign_obj->networkTargeting->networkTypes->[0] eq
+                'GoogleSearch',
+            'addCampaign networkTargeting'
+        );
+
+        ok( $campaign_obj->schedule->status eq 'Enabled',
+            'addCampaign, schedule' );
+
+        ok( $campaign_obj->schedule->intervals->[0]->day eq 'Monday',
+            'addCampaign, schedule, intervals, day' );
+
+    }
+
+} # end sub addCampaign_exclude_region :
 
 sub getAllAdWordsCampaigns : Test(no_plan)
 {

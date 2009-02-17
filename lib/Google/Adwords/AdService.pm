@@ -82,7 +82,8 @@ sub _create_request_params
                     } # end if ( defined $image->$_...
                 } # end for (@image_fields)
 
-                push @params, SOAP::Data->name(
+                push @params,
+                    SOAP::Data->name(
                     $_ => \SOAP::Data->value(@image_params) )->type('');
             } # end if ( ( $_ eq 'image' )...
             else
@@ -123,7 +124,8 @@ sub _parse_ad_response
             || $_ eq 'customIcon'
             || $_ eq 'productImage' )
         {
-            $ad_ref->{$_} = $self->_create_object_from_hash( $r->{$_},
+            $ad_ref->{$_}
+                = $self->_create_object_from_hash( $r->{$_},
                 'Google::Adwords::Image' )
                 if ( $r->{$_} );
         }
@@ -167,7 +169,8 @@ sub addAds
     }
 
     my @params;
-    push @params, SOAP::Data->name( 'ads' => \SOAP::Data->value(@ads_params) )
+    push @params,
+        SOAP::Data->name( 'ads' => \SOAP::Data->value(@ads_params) )
         ->type('');
 
     my $result = $self->_create_service_and_call(
@@ -234,7 +237,8 @@ sub findBusinesses
     foreach my $c (
         $result->valueof("//findBusinessesResponse/findBusinessesReturn") )
     {
-        push @data, $self->_create_object_from_hash( $c,
+        push @data,
+            $self->_create_object_from_hash( $c,
             'Google::Adwords::Business' );
     }
 
@@ -430,7 +434,8 @@ sub getMyBusinesses
     foreach my $c (
         $result->valueof("//getMyBusinessesResponse/getMyBusinessesReturn") )
     {
-        push @data, $self->_create_object_from_hash( $c,
+        push @data,
+            $self->_create_object_from_hash( $c,
             'Google::Adwords::Business' );
     }
 
@@ -529,7 +534,8 @@ sub checkAds
         my @ad_params = $self->_create_request_params($ad);
         push @ads_params, @ad_params;
     }
-    push @params, SOAP::Data->name( 'ads' => \SOAP::Data->value(@ads_params) )
+    push @params,
+        SOAP::Data->name( 'ads' => \SOAP::Data->value(@ads_params) )
         ->type('');
 
     # languageTarget
@@ -604,7 +610,8 @@ sub checkAds
                             ->type('');
                     }
                 }
-                push @proximity_soap, SOAP::Data->name(
+                push @proximity_soap,
+                    SOAP::Data->name(
                     circles => \SOAP::Data->value(@circles_soap) )->type('');
 
             }
@@ -617,7 +624,8 @@ sub checkAds
 
         if ( scalar @geo_data > 0 )
         {
-            push @params, SOAP::Data->name(
+            push @params,
+                SOAP::Data->name(
                 'geoTarget' => \SOAP::Data->value(@geo_data), )->type('');
         }
     } # end if ( exists $args_ref->...
@@ -633,7 +641,8 @@ sub checkAds
     my @data;
     foreach my $c ( $result->valueof("//checkAdsResponse/checkAdsReturn") )
     {
-        push @data, $self->_create_object_from_hash( $c,
+        push @data,
+            $self->_create_object_from_hash( $c,
             'Google::Adwords::ApiError' );
     }
 

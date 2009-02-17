@@ -206,7 +206,7 @@ EOF
         $image_ad->image($image);
 
         my @ads = $self->{obj}->addAds($image_ad);
-        ok( $ads[0]->id == 24633, 'addAds Image (id)' );
+        ok( $ads[0]->id == 24633,         'addAds Image (id)' );
         ok( $ads[0]->image->width == 300, 'addAds Image (width)' );
         ok( $ads[0]->adType eq 'ImageAd', 'addAds Image (adType)' );
 
@@ -315,7 +315,7 @@ EOF
         my @ads = $self->{obj}->getActiveAds($adgroup_id);
 
         # should get two or more
-        ok( scalar @ads >= 2, 'getActiveAds' );
+        ok( scalar @ads >= 2,                  'getActiveAds' );
         ok( $ads[0]->adGroupId == $adgroup_id, 'getActiveAds (adGroupId)' );
 
         for (@ads)
