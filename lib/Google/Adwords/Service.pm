@@ -2,14 +2,14 @@ package Google::Adwords::Service;
 use strict;
 use warnings;
 
-use version; our $VERSION = qv('0.15.2');
+use version; our $VERSION = qv('0.16');
 
 use base qw/ Class::Accessor::Chained Google::Adwords /;
 use SOAP::Lite;
 use Readonly;
 
 Readonly my $default_api_version => 'v13';
-Readonly my $user_agent          => "Google::Adwords v1.12.2";
+Readonly my $user_agent          => "Google::Adwords v1.13";
 Readonly my $endpoint            => 'https://adwords.google.com/api/adwords';
 Readonly my $endpoint_sandbox    => 'https://sandbox.google.com/api/adwords';
 Readonly my $default_timeout => 35;    # HTTP timeout in seconds
@@ -31,6 +31,7 @@ __PACKAGE__->mk_accessors(
         operations
         units
         responseTime
+        factory_class_hook
         /
 );
 
@@ -283,9 +284,14 @@ sub _create_object_from_hash
         $hashref = {};
     }
 
+    if ( my $hook = $self->factory_class_hook )
+    {
+        $class_name = $hook->( $class_name, $hashref ) || $class_name;
+    }
+
     my $obj = $class_name->new($hashref);
     return $obj;
-}
+} # end sub _create_object_from_hash
 
 1;
 
@@ -298,7 +304,7 @@ Google::Adwords::Service - Base class for the Service modules
  
 =head1 VERSION
  
-This documentation refers to Google::Adwords::Service version 0.15.2
+This documentation refers to Google::Adwords::Service version 0.16
  
  
 =head1 DESCRIPTION
@@ -386,6 +392,26 @@ These accessors/methods are available across all the child Service modules
 =head2 B<api_version()>
 
     Returns version information for the Adwords API
+
+=head2 B<factory_class_hook()>
+
+Specifies a reference to a subroutine. The subroutine will be called whenever
+the service is about to create a new object. It can be used to alter the class
+into which new objects are blessed. Default is undef.
+
+The subroutine is passed the default class name, and a reference to the hash of
+values that will be used to initialise the object. It should return the class
+name it wishes to use. The class name returned should be a subclass of the
+original class.  If it returns false, the original class name will be used.
+
+For example:
+
+  $service->factory_class_hook( sub {
+      my $class_name = shift;
+      # only alter Campaign objects
+      return unless $class_name eq 'Google::Adwords::Campaign';
+      return "My::Adwords::WhizzoCampaign";
+  } );
 
 
 B<The following accessors are available after an API call is done. These give

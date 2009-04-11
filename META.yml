@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                Google-Adwords
-version:             1.12.2
+version:             v1.13
 abstract:            an interface which abstracts the Google Adwords SOAP API
 license:             ~
 author:              

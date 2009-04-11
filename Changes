@@ -1,5 +1,10 @@
 Revision history for Perl module Google::Adwords
 
+v1.13   Sat Apr 11 17:02:40 IST 2009
+    - added Service.factory_class_hook so you can use your own custom 
+      objects (campaign, keyword, etc) instead of the default 
+      Google::Adwords::* objects. Thanks to Tim Bunce for the patch.
+
 v1.12.2 Tue Feb 17 16:53:51 IST 2009
     - added support for GeoTarget exclusions. excluded* fields added to the
       CityTargets, CountryTargets, MetroTargets and RegionTargets objects
