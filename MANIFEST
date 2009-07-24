@@ -46,6 +46,7 @@ lib/Google/Adwords/KeywordTrafficRequest.pm
 lib/Google/Adwords/KeywordVariation.pm
 lib/Google/Adwords/KeywordVariations.pm
 lib/Google/Adwords/LanguageTarget.pm
+lib/Google/Adwords/MccAlert.pm
 lib/Google/Adwords/MetroTargets.pm
 lib/Google/Adwords/NetworkTarget.pm
 lib/Google/Adwords/ProximityTargets.pm

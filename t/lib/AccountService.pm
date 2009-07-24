@@ -17,6 +17,7 @@ my %tests = (
     getAccountInfo    => 1,
     getClientAccounts => 0,
     updateAccountInfo => 0,
+    getMccAlerts      => 1,
 );
 
 sub start_of_each_test : Test(setup)
@@ -244,6 +245,47 @@ EOF
 
     }
 } # end sub updateAccountInfo :
+
+sub getMccAlerts : Test(no_plan)
+{
+    my $self = shift;
+
+    $sub_name = ( caller 0 )[3];
+    $sub_name =~ s/^.+:://;
+    if ( not $tests{$sub_name} )
+    {
+        return;
+    }
+
+    if ( $self->{sandbox} )
+    {
+
+        my @mcc_alerts = $self->{obj}->getMccAlerts();
+
+        return;
+    }
+    else
+    {
+
+        my $soap = Test::MockModule->new('SOAP::Lite');
+        $soap->mock(
+            call => sub {
+                my $xml .= <<'EOF';
+  <getMccAlertsResponse xmlns="" />
+EOF
+
+                $xml = $self->gen_full_response($xml);
+                my $env = SOAP::Deserializer->deserialize($xml);
+                return $env;
+            }
+        );
+
+        my @mcc_alerts = $self->{obj}->getMccAlerts;
+        ok( scalar @mcc_alerts == 0, 'getMccAlerts' );
+
+    }
+
+} # end sub getClientAccounts :
 
 1;
 

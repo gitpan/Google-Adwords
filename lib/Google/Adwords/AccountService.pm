@@ -13,6 +13,7 @@ use Google::Adwords::Address;
 use Google::Adwords::CoverageType;
 use Google::Adwords::CreditCard;
 use Google::Adwords::NetworkTarget;
+use Google::Adwords::MccAlert;
 
 ### INSTANCE METHOD ################################################
 # Usage      :
@@ -118,6 +119,35 @@ sub getClientAccounts
     # get response data in a array
     my @data = $result->valueof(
         "//getClientAccountsResponse/getClientAccountsReturn");
+
+    return @data;
+} # end sub getClientAccounts
+
+
+
+##########################################################################
+=pod
+
+=head2 getMccAlerts()
+
+    Description of the sub here
+
+=cut
+#############################################################################
+sub getMccAlerts
+{
+    my $self = shift;
+
+    my $result = $self->_create_service_and_call(
+        {
+            service => 'AccountService',
+            method  => 'getMccAlerts',
+        }
+    );
+
+    # get response data in a array
+    my @data = $result->valueof(
+        "//getMccAlertsResponse/getMccAlertsReturn");
 
     return @data;
 } # end sub getClientAccounts
